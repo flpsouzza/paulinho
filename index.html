@@ -951,9 +951,8 @@
             return candidates[randomIndex];
         }
 
-        // Função auxiliar para o cálculo do Bate e Volta (evita recursão infinita)
+        // Função auxiliar para o cálculo do Bate e Volta (sem recursão)
         function getWorkersForDateHelper(year, month, day) {
-            // Versão simplificada, sem Bate e Volta para não criar loop
             let activeWorkers = [];
             let isDuty = false;
             const currentDate = new Date(year, month, day);
@@ -1290,6 +1289,7 @@
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
 
+                        // Pega o resultado completo com o nome do Bate e Volta
                         const result = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const { isDuty, activeWorkers, isBateVolta, nomeBateVolta } = result;
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
@@ -1321,13 +1321,11 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            let nomeBateVoltaCalculado = null;
-                            if (isBateVoltaDia) {
-                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
-                            }
+
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
+                                // USAR o nomeBateVolta retornado pela função, NÃO recalcular
+                                const isBate = (worker === nomeBateVolta && isBateVoltaDia);
                                 const color = getColorForName(worker);
                                 let coringaClass = isCoringa ? 'badge-coringa' : '';
                                 let bateClass = isBate ? 'badge-bate-volta' : '';
@@ -1400,13 +1398,10 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            let nomeBateVoltaCalculado = null;
-                            if (isBateVoltaDia) {
-                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
-                            }
+
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
+                                const isBate = (worker === nomeBateVolta && isBateVoltaDia);
                                 const color = getColorForName(worker);
                                 let coringaClass = isCoringa ? 'badge-coringa' : '';
                                 let bateClass = isBate ? 'badge-bate-volta' : '';
