@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024">
-    <title>Plantão Noturno - Final de Semana</title>
+    <title>Plantão Noturno - Escala Invertida</title>
     <style>
         :root {
             --rio-blue: #002D5E;
@@ -124,7 +124,7 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
         
-        /* Modal de edição da escala - VERSÃO NOVA */
+        /* Modal de edição da escala - VERSÃO COM EXCEÇÕES */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -139,7 +139,7 @@
             background: #FFF;
             border-radius: 16px;
             padding: 30px;
-            max-width: 600px;
+            max-width: 700px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
@@ -161,6 +161,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .day-section .badge-info {
             font-size: 11px;
@@ -243,6 +244,59 @@
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 4px;
+        }
+
+        /* Exceções */
+        .excecao-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .excecao-row select {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            background: #FFF;
+        }
+        .excecao-row input {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+            min-width: 120px;
+        }
+        .excecao-row input:focus { border-color: var(--rio-light); }
+        .excecao-tag {
+            background: #8B5CF6;
+            color: #FFF;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 2px;
+        }
+        .excecao-tag .remove-btn {
+            background: none;
+            border: none;
+            color: #FF6B6B;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            padding: 0 2px;
+        }
+        .excecao-tag .remove-btn:hover { color: #FF0000; }
+        .excecoes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
         }
 
         .modal-buttons {
@@ -386,8 +440,7 @@
             display: none;
         }
 
-        /* Animações */
-        .name-tag {
+        .name-tag, .excecao-tag {
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn {
@@ -410,7 +463,7 @@
 
     <div class="calendar-container" id="calendar-screen">
         <div class="top-bar-header">
-            Final de Semana
+            Plantão Invertido
             <button class="logout-btn" id="logout-btn">Sair</button>
         </div>
         <header>
@@ -460,12 +513,12 @@
         </footer>
     </div>
 
-    <!-- ===== MODAL DE EDIÇÃO DA ESCALA - NOVA VERSÃO ===== -->
+    <!-- ===== MODAL DE EDIÇÃO DA ESCALA ===== -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-content">
-            <h2>📝 Editar Escala</h2>
+            <h2>📝 Editar Escala (Invertida)</h2>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; text-align: center;">
-                Defina quantas pessoas você quer em cada dia. Use <strong>+</strong> para adicionar e <strong>×</strong> para remover.
+                Defina os nomes para cada grupo. Use <strong>+</strong> para adicionar e <strong>×</strong> para remover.
             </p>
 
             <!-- RODÍZIO (SEXTA) -->
@@ -480,14 +533,14 @@
                     <input type="text" id="rotation-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'rotation')">
                     <button class="btn-add-name" onclick="addNameToList('rotation')">+</button>
                 </div>
-                <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (pode ter quantos quiser)</div>
+                <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (quantos quiser)</div>
             </div>
 
-            <!-- SÁBADO -->
+            <!-- SÁBADO (FIXOS) -->
             <div class="day-section" id="section-sabado">
                 <h3>
-                    📅 Sábado
-                    <span class="badge-info">— nomes fixos (sempre esses)</span>
+                    📅 Sábado (fixos)
+                    <span class="badge-info">— sempre aparecem no sábado</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('sabado')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="sabado-list"></div>
@@ -495,14 +548,14 @@
                     <input type="text" id="sabado-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'sabado')">
                     <button class="btn-add-name" onclick="addNameToList('sabado')">+</button>
                 </div>
-                <div class="helper">Ex: Felipe, Mariana... (pode ter 1, 2 ou mais pessoas)</div>
+                <div class="helper">Ex: Felipe, Mariana... (sempre aparecem no sábado, além do rodízio)</div>
             </div>
 
-            <!-- DOMINGO -->
+            <!-- DOMINGO (FIXOS) -->
             <div class="day-section" id="section-domingo">
                 <h3>
-                    📅 Domingo
-                    <span class="badge-info">— nomes fixos (sempre esses)</span>
+                    📅 Domingo (fixos)
+                    <span class="badge-info">— sempre aparecem no domingo</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('domingo')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="domingo-list"></div>
@@ -510,14 +563,14 @@
                     <input type="text" id="domingo-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'domingo')">
                     <button class="btn-add-name" onclick="addNameToList('domingo')">+</button>
                 </div>
-                <div class="helper">Ex: Júlio, Ana... (pode ter 1, 2 ou mais pessoas)</div>
+                <div class="helper">Ex: Júlio, Ana... (sempre aparecem no domingo, além do rodízio)</div>
             </div>
 
-            <!-- QUINTA -->
+            <!-- QUINTA (FIXOS) -->
             <div class="day-section" id="section-quinta">
                 <h3>
-                    📅 Quinta-feira
-                    <span class="badge-info">— nomes fixos (sempre esses)</span>
+                    📅 Quinta-feira (fixos)
+                    <span class="badge-info">— sempre aparecem na quinta</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('quinta')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="quinta-list"></div>
@@ -525,7 +578,30 @@
                     <input type="text" id="quinta-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'quinta')">
                     <button class="btn-add-name" onclick="addNameToList('quinta')">+</button>
                 </div>
-                <div class="helper">Ex: Leandro, Paulo... (pode ter 1, 2 ou mais pessoas)</div>
+                <div class="helper">Ex: Leandro, Paulo... (sempre aparecem na quinta)</div>
+            </div>
+
+            <!-- EXCEÇÕES (CORINGAS) -->
+            <div class="day-section" style="border-color: #8B5CF6; background: #F5F3FF;">
+                <h3 style="color: #6D28D9;">
+                    ⭐ Exceções (coringas)
+                    <span class="badge-info">— nomes que aparecem em dias específicos, independente da regra</span>
+                </h3>
+                <div class="excecao-row">
+                    <input type="text" id="excecao-input" placeholder="Nome..." style="flex:1; min-width:100px;">
+                    <select id="excecao-dia">
+                        <option value="0">Domingo</option>
+                        <option value="1">Segunda</option>
+                        <option value="2">Terça</option>
+                        <option value="3">Quarta</option>
+                        <option value="4">Quinta</option>
+                        <option value="5">Sexta</option>
+                        <option value="6">Sábado</option>
+                    </select>
+                    <button class="btn-add-name" onclick="addExcecao()" style="background: #6D28D9;">+</button>
+                </div>
+                <div class="excecoes-list" id="excecoes-list"></div>
+                <div class="helper">Digite um nome, escolha o dia e clique em +. Esse nome aparecerá sempre nesse dia.</div>
             </div>
 
             <div class="modal-buttons">
@@ -578,12 +654,13 @@
         let noteMetaCache = {};
         const saveTimers = new Map();
 
-        // Configuração da escala - NOVO FORMATO
+        // Configuração da escala - NOVO FORMATO COM EXCEÇÕES
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             sabado: ["Felipe"],
             domingo: ["Júlio"],
-            quinta: ["Leandro"]
+            quinta: ["Leandro"],
+            excecoes: {} // formato: { "0": ["João"], "2": ["Maria"] } onde a chave é o dia da semana
         };
 
         const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -625,15 +702,16 @@
                     staffConfig.sabado = data.sabado || staffConfig.sabado;
                     staffConfig.domingo = data.domingo || staffConfig.domingo;
                     staffConfig.quinta = data.quinta || staffConfig.quinta;
+                    staffConfig.excecoes = data.excecoes || {};
                 } else {
-                    await saveStaffConfig(staffConfig.rotation, staffConfig.sabado, staffConfig.domingo, staffConfig.quinta);
+                    await saveStaffConfig(staffConfig.rotation, staffConfig.sabado, staffConfig.domingo, staffConfig.quinta, staffConfig.excecoes);
                 }
             } catch (error) {
                 console.error("Erro ao carregar configuração:", error);
             }
         }
 
-        async function saveStaffConfig(newRotation, newSabado, newDomingo, newQuinta) {
+        async function saveStaffConfig(newRotation, newSabado, newDomingo, newQuinta, newExcecoes) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
@@ -641,12 +719,14 @@
                     rotation: newRotation,
                     sabado: newSabado,
                     domingo: newDomingo,
-                    quinta: newQuinta
+                    quinta: newQuinta,
+                    excecoes: newExcecoes || {}
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
                 staffConfig.sabado = newSabado;
                 staffConfig.domingo = newDomingo;
                 staffConfig.quinta = newQuinta;
+                staffConfig.excecoes = newExcecoes || {};
                 buildCalendar();
             } catch (error) {
                 console.error("Erro ao salvar configuração:", error);
@@ -704,8 +784,10 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // ===== NOVA LÓGICA: INVERTIDA =====
         function getWorkersForDate(year, month, day) {
-            let activeWorkers = [], isDuty = false;
+            let activeWorkers = [];
+            let isDuty = false;
             const diff = calculateDaysFromAnchor(year, month, day);
             const pos = mathematicalMod(diff, 14);
 
@@ -713,38 +795,84 @@
             const sabadoList = staffConfig.sabado || [];
             const domingoList = staffConfig.domingo || [];
             const quintaList = staffConfig.quinta || [];
+            const excecoes = staffConfig.excecoes || {};
 
-            if (pos === 0 || pos === 1 || pos === 2) {
+            // Verifica se há exceção para este dia da semana
+            const dayOfWeek = new Date(year, month, day).getDay(); // 0=domingo, 6=sábado
+            const excecaoNomes = excecoes[dayOfWeek] || [];
+
+            // Primeiro, determina se é plantão pela regra invertida
+            // Antes: plantão nas posições 0,1,2 (sexta, sábado, domingo) e 6 (quinta)
+            // Agora: plantão nas posições 7,8,9 (sexta, sábado, domingo da outra semana) e mantém 6 (quinta)
+            let isPlantaoRegra = false;
+            let posTipo = null; // 'sexta', 'sabado', 'domingo', 'quinta'
+
+            if (pos === 6) {
+                isPlantaoRegra = true;
+                posTipo = 'quinta';
+            } else if (pos === 7) {
+                isPlantaoRegra = true;
+                posTipo = 'sexta';
+            } else if (pos === 8) {
+                isPlantaoRegra = true;
+                posTipo = 'sabado';
+            } else if (pos === 9) {
+                isPlantaoRegra = true;
+                posTipo = 'domingo';
+            }
+
+            // Se for plantão pela regra, monta os trabalhadores
+            if (isPlantaoRegra) {
                 isDuty = true;
-                if (rotation.length === 0) {
-                    activeWorkers = [];
-                } else {
-                    const weekendIdx = Math.floor((diff - pos) / 14);
-                    const offset = mathematicalMod(weekendIdx, rotation.length);
-                    const order = rotation.slice(offset).concat(rotation.slice(0, offset));
 
-                    if (pos === 0) {
-                        // Sexta: dois do rodízio (ou 1 se só tiver 1)
+                if (posTipo === 'sexta') {
+                    // Sexta: dois do rodízio (ou 1 se só tiver 1)
+                    if (rotation.length > 0) {
+                        const weekendIdx = Math.floor((diff - pos) / 14);
+                        const offset = mathematicalMod(weekendIdx, rotation.length);
+                        const order = rotation.slice(offset).concat(rotation.slice(0, offset));
                         const count = Math.min(2, order.length);
                         for (let i = 0; i < count; i++) {
                             activeWorkers.push(order[i]);
                         }
-                    } else if (pos === 1) {
-                        // Sábado: todos os fixos do sábado + 1 do rodízio
-                        activeWorkers.push(...sabadoList);
+                    }
+                } else if (posTipo === 'sabado') {
+                    // Sábado: todos os fixos do sábado + 1 do rodízio
+                    activeWorkers.push(...sabadoList);
+                    if (rotation.length > 0) {
+                        const weekendIdx = Math.floor((diff - pos) / 14);
+                        const offset = mathematicalMod(weekendIdx, rotation.length);
+                        const order = rotation.slice(offset).concat(rotation.slice(0, offset));
                         if (order.length >= 3) activeWorkers.push(order[2]);
                         else if (order.length >= 1) activeWorkers.push(order[0]);
-                    } else if (pos === 2) {
-                        // Domingo: todos os fixos do domingo + 1 do rodízio
-                        activeWorkers.push(...domingoList);
+                    }
+                } else if (posTipo === 'domingo') {
+                    // Domingo: todos os fixos do domingo + 1 do rodízio
+                    activeWorkers.push(...domingoList);
+                    if (rotation.length > 0) {
+                        const weekendIdx = Math.floor((diff - pos) / 14);
+                        const offset = mathematicalMod(weekendIdx, rotation.length);
+                        const order = rotation.slice(offset).concat(rotation.slice(0, offset));
                         if (order.length >= 4) activeWorkers.push(order[3]);
                         else if (order.length >= 1) activeWorkers.push(order[0]);
                     }
+                } else if (posTipo === 'quinta') {
+                    // Quinta: todos os fixos da quinta
+                    activeWorkers.push(...quintaList);
                 }
-            } else if (pos === 6) {
-                isDuty = true;
-                activeWorkers.push(...quintaList);
             }
+
+            // Adiciona as exceções (independente da regra)
+            if (excecaoNomes.length > 0) {
+                activeWorkers.push(...excecaoNomes);
+                // Se não era plantão pela regra, mas tem exceção, vira plantão
+                if (!isDuty) {
+                    isDuty = true;
+                }
+            }
+
+            // Remove duplicatas (caso um nome apareça duas vezes)
+            activeWorkers = [...new Set(activeWorkers)];
 
             return { isDuty, activeWorkers };
         }
@@ -1218,10 +1346,10 @@
             }
         };
 
-        // ==================== MODAL DE EDIÇÃO DA ESCALA - NOVO ====================
+        // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
         const modalOverlay = document.getElementById("edit-modal");
 
-        // Funções globais para o modal (usadas nos onclick)
+        // Funções para listas de nomes
         window.addNameToList = function(section) {
             const inputMap = {
                 rotation: 'rotation-input',
@@ -1289,13 +1417,52 @@
             return names;
         }
 
+        // Funções para exceções
+        window.addExcecao = function() {
+            const input = document.getElementById('excecao-input');
+            const diaSelect = document.getElementById('excecao-dia');
+            const nome = input.value.trim();
+            if (!nome) return alert('Digite um nome!');
+            const dia = diaSelect.value;
+            const diaNome = diaSelect.options[diaSelect.selectedIndex].text;
+            
+            const list = document.getElementById('excecoes-list');
+            const tag = document.createElement('span');
+            tag.className = 'excecao-tag';
+            tag.dataset.dia = dia;
+            tag.innerHTML = `${escapeHtml(nome)} (${diaNome}) <button class="remove-btn" onclick="removeExcecao(this)">×</button>`;
+            list.appendChild(tag);
+            input.value = '';
+            input.focus();
+        };
+
+        window.removeExcecao = function(btn) {
+            const tag = btn.closest('.excecao-tag');
+            if (tag) tag.remove();
+        };
+
+        function getExcecoesFromList() {
+            const list = document.getElementById('excecoes-list');
+            const tags = list.querySelectorAll('.excecao-tag');
+            const excecoes = {};
+            tags.forEach(tag => {
+                const dia = tag.dataset.dia;
+                const text = tag.textContent.replace(/\(.*\)/, '').replace('×', '').trim();
+                if (text) {
+                    if (!excecoes[dia]) excecoes[dia] = [];
+                    excecoes[dia].push(text);
+                }
+            });
+            return excecoes;
+        }
+
         function openEditModal() {
             if (!sessionUser) {
                 alert("Você precisa estar logado para editar a escala.");
                 return;
             }
 
-            // Preenche as listas com os valores atuais
+            // Preenche as listas de nomes
             const sections = ['rotation', 'sabado', 'domingo', 'quinta'];
             const configMap = {
                 rotation: staffConfig.rotation || [],
@@ -1322,6 +1489,21 @@
                 });
             });
 
+            // Preenche as exceções
+            const excecoesList = document.getElementById('excecoes-list');
+            excecoesList.innerHTML = '';
+            const excecoes = staffConfig.excecoes || {};
+            const diaNomes = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            for (const [dia, nomes] of Object.entries(excecoes)) {
+                nomes.forEach(nome => {
+                    const tag = document.createElement('span');
+                    tag.className = 'excecao-tag';
+                    tag.dataset.dia = dia;
+                    tag.innerHTML = `${escapeHtml(nome)} (${diaNomes[parseInt(dia)]}) <button class="remove-btn" onclick="removeExcecao(this)">×</button>`;
+                    excecoesList.appendChild(tag);
+                });
+            }
+
             modalOverlay.classList.add('active');
         }
 
@@ -1336,14 +1518,15 @@
             const newSabado = getNamesFromList('sabado');
             const newDomingo = getNamesFromList('domingo');
             const newQuinta = getNamesFromList('quinta');
+            const newExcecoes = getExcecoesFromList();
 
-            // Se alguma lista estiver vazia, usa os valores padrão
+            // Se o rodízio estiver vazio, usa padrão
             if (newRotation.length === 0) {
                 if (!confirm('O rodízio está vazio. Deseja manter os valores padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
 
-            await saveStaffConfig(newRotation, newSabado, newDomingo, newQuinta);
+            await saveStaffConfig(newRotation, newSabado, newDomingo, newQuinta, newExcecoes);
             closeEditModal();
             alert('✅ Escala atualizada com sucesso!');
         }
