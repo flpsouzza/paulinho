@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
     <title>Visualização - Plantão</title>
     <style>
+        /* ===== MESMO CSS do index.html, mas sem auth ===== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -111,11 +112,11 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        .calendar-content { 
-            padding: 10px; 
-            width: 100%; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch; 
+        .calendar-content {
+            padding: 10px;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             touch-action: pan-x pan-y;
         }
         .calendar-grid-table {
@@ -152,6 +153,15 @@
         .calendar-grid-table .empty-cell { background-color: #F8FAFC; }
         .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
         .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
+
+        .calendar-grid-table td.bate-volta-cell {
+            border: 2px solid #F59E0B !important;
+            background-color: #FFFBEB !important;
+        }
+        .mobile-card.bate-volta-card {
+            border: 2px solid #F59E0B !important;
+            background-color: #FFFBEB !important;
+        }
 
         :root {
             --plantao-bg: #EAF4FF;
@@ -243,6 +253,11 @@
             background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important;
             border: 1px solid #5B21B6;
         }
+        .badge-bate-volta {
+            background: #F59E0B !important;
+            border: 1px solid #D97706;
+            color: #000 !important;
+        }
         .readonly-note {
             font-size: 0.75rem;
             color: #333;
@@ -279,6 +294,7 @@
         .l-dot { width: 12px; height: 12px; border-radius: 50%; }
         .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
         .l-coringa { background: linear-gradient(135deg, #8B5CF6, #6D28D9); border: 1px solid #5B21B6; }
+        .l-bate-volta { background: #F59E0B; border: 1px solid #D97706; }
         .l-today { background: #FFFBEB; border: 2px solid #F59E0B; }
         .l-annotated { background: var(--bg-annotated); border: 1px solid var(--border-annotated); }
 
@@ -354,6 +370,7 @@
             <div class="legend-container">
                 <div class="legend-item"><div class="l-dot l-active"></div> Plantão</div>
                 <div class="legend-item"><div class="l-dot l-coringa"></div> Coringa</div>
+                <div class="legend-item"><div class="l-dot l-bate-volta"></div> Bate e Volta</div>
                 <div class="legend-item"><div class="l-dot l-today"></div> Hoje</div>
                 <div class="legend-item"><div class="l-dot l-annotated"></div> Com Anotação</div>
             </div>
@@ -392,6 +409,10 @@
                 sexta: 1,
                 sabado: 1,
                 domingo: 1
+            },
+            bateVolta: {
+                ativo: false,
+                dia: 0
             }
         };
 
@@ -427,6 +448,7 @@
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
+                    staffConfig.bateVolta = data.bateVolta || { ativo: false, dia: 0 };
                 }
             } catch (error) { console.error("Erro ao carregar configuração:", error); }
         }
@@ -460,8 +482,45 @@
             return Math.floor((utc1 - utc2) / msPerDay);
         }
 
-        // ===== LÓGICA DE PLANTÃO (com distribuição em bloco) =====
-        function getWorkersForDate(year, month, day) {
+        // ===== BATE E VOLTA =====
+        function calcularNomeBateVolta(year, month, day) {
+            const rotation = staffConfig.rotation || [];
+            if (rotation.length === 0) return null;
+
+            let bestStreak = -1;
+            const candidates = [];
+            const currentDate = new Date(year, month, day);
+            const startDate = new Date(currentDate);
+            startDate.setDate(startDate.getDate() - 60);
+
+            for (const nome of rotation) {
+                let streak = 0;
+                const checkDate = new Date(currentDate);
+                checkDate.setDate(checkDate.getDate() - 1);
+                while (checkDate >= startDate) {
+                    const { isDuty, activeWorkers } = getWorkersForDateHelper(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
+                    if (isDuty && activeWorkers.includes(nome)) {
+                        streak++;
+                        checkDate.setDate(checkDate.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+                if (streak > bestStreak) {
+                    bestStreak = streak;
+                    candidates.length = 0;
+                    candidates.push(nome);
+                } else if (streak === bestStreak) {
+                    candidates.push(nome);
+                }
+            }
+
+            if (candidates.length === 0) return rotation[0];
+            const randomIndex = Math.floor(Math.random() * candidates.length);
+            return candidates[randomIndex];
+        }
+
+        function getWorkersForDateHelper(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
             const currentDate = new Date(year, month, day);
@@ -473,6 +532,79 @@
                 if (diffDays % 2 === 0) isDuty = true;
             }
 
+            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
+                const anchor = new Date(2026, 6, 3);
+                const diff = daysBetween(currentDate, anchor);
+                const pos = mathematicalMod(diff, 14);
+                let isWeekendPlantao = false;
+                if (pos === 7 && dayOfWeek === 5) isWeekendPlantao = true;
+                else if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
+                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
+
+                if (isWeekendPlantao) {
+                    isDuty = true;
+                    const rotation = staffConfig.rotation || [];
+                    const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
+                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
+                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
+                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
+                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
+
+                    if (rotation.length > 0 && totalPorFDS > 0) {
+                        const weekendIdx = Math.floor((diff - pos) / 14);
+                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
+                        const getSlice = (start, count) => {
+                            const slice = [];
+                            for (let i = 0; i < count; i++) {
+                                const idx = mathematicalMod(start + i, rotation.length);
+                                slice.push(rotation[idx]);
+                            }
+                            return slice;
+                        };
+                        let offsetSexta = offsetBase;
+                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
+                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
+
+                        if (dayOfWeek === 5) {
+                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
+                        } else if (dayOfWeek === 6) {
+                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
+                        } else if (dayOfWeek === 0) {
+                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
+                        }
+                    }
+                }
+            }
+
+            if (isDuty) {
+                const excecoes = staffConfig.excecoes || {};
+                const excecaoNomes = excecoes[dayOfWeek] || [];
+                if (excecaoNomes.length > 0) {
+                    activeWorkers.push(...excecaoNomes);
+                }
+            }
+
+            activeWorkers = [...new Set(activeWorkers)];
+            return { isDuty, activeWorkers };
+        }
+
+        // ===== LÓGICA DE PLANTÃO (COM BATE E VOLTA) =====
+        function getWorkersForDate(year, month, day) {
+            let activeWorkers = [];
+            let isDuty = false;
+            let isBateVolta = false;
+            let nomeBateVolta = null;
+            const currentDate = new Date(year, month, day);
+            const dayOfWeek = currentDate.getDay();
+            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+            // REGRA 1: ALTERNÂNCIA (segunda a sexta)
+            if (isWeekday) {
+                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
+                if (diffDays % 2 === 0) isDuty = true;
+            }
+
+            // REGRA 2: FIM DE SEMANA (sexta, sábado e domingo)
             if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
                 const anchor = new Date(2026, 6, 3);
                 const diff = daysBetween(currentDate, anchor);
@@ -519,14 +651,32 @@
                 }
             }
 
+            // EXCEÇÕES (coringas)
             if (isDuty) {
                 const excecoes = staffConfig.excecoes || {};
                 const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) activeWorkers.push(...excecaoNomes);
+                if (excecaoNomes.length > 0) {
+                    activeWorkers.push(...excecaoNomes);
+                }
+            }
+
+            // REGRA 3: BATE E VOLTA
+            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
+            if (bateVolta.ativo && dayOfWeek === bateVolta.dia) {
+                if (isDuty) {
+                    const nomeExtra = calcularNomeBateVolta(year, month, day);
+                    if (nomeExtra) {
+                        if (!activeWorkers.includes(nomeExtra)) {
+                            activeWorkers.push(nomeExtra);
+                            isBateVolta = true;
+                            nomeBateVolta = nomeExtra;
+                        }
+                    }
+                }
             }
 
             activeWorkers = [...new Set(activeWorkers)];
-            return { isDuty, activeWorkers };
+            return { isDuty, activeWorkers, isBateVolta, nomeBateVolta };
         }
 
         function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
@@ -576,7 +726,9 @@
                         hasData = true;
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
-                        const { isDuty, activeWorkers } = getWorkersForDate(activeYear, activeMonth, currentDayNum);
+
+                        const result = getWorkersForDate(activeYear, activeMonth, currentDayNum);
+                        const { isDuty, activeWorkers, isBateVolta, nomeBateVolta } = result;
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
                         const dayOfWeek = new Date(activeYear, activeMonth, currentDayNum).getDay();
                         const isWeekend = dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0;
@@ -586,6 +738,7 @@
                             if (!isWeekend) td.classList.add("weekday-plantao");
                         }
                         if (isToday) td.classList.add("today-cell");
+                        if (isBateVolta) td.classList.add("bate-volta-cell");
 
                         const savedNote = notesCache[noteKey(activeYear, activeMonth, currentDayNum)] || "";
                         if (savedNote.trim() && !isToday && !isPlantao) td.classList.add("annotated-cell");
@@ -603,11 +756,23 @@
                         } else {
                             const excecoes = staffConfig.excecoes || {};
                             const excecaoNomes = excecoes[dayOfWeek] || [];
+                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
+                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
+                            let nomeBateVoltaCalculado = null;
+                            if (isBateVoltaDia) {
+                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
+                            }
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
+                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
-                                const coringaClass = isCoringa ? 'badge-coringa' : '';
-                                html += `<span class="badge ${coringaClass}" style="background-color:${color};">${escapeHtml(worker)}</span>`;
+                                let coringaClass = isCoringa ? 'badge-coringa' : '';
+                                let bateClass = isBate ? 'badge-bate-volta' : '';
+                                let badgeText = escapeHtml(worker);
+                                if (isBate) {
+                                    badgeText += ' 🔄 B&V';
+                                }
+                                html += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
                             });
                         }
                         html += `</div>`;
@@ -618,10 +783,12 @@
 
                         td.innerHTML = html;
 
+                        // MOBILE CARD
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
                         if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
                         if (savedNote.trim() && !isToday && !isPlantao) card.classList.add("annotated-card");
+                        if (isBateVolta) card.classList.add('bate-volta-card');
 
                         let cardHtml = `
                             <div class="mobile-card-header">
@@ -637,11 +804,23 @@
                         } else {
                             const excecoes = staffConfig.excecoes || {};
                             const excecaoNomes = excecoes[dayOfWeek] || [];
+                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
+                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
+                            let nomeBateVoltaCalculado = null;
+                            if (isBateVoltaDia) {
+                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
+                            }
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
+                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
-                                const coringaClass = isCoringa ? 'badge-coringa' : '';
-                                cardHtml += `<span class="badge ${coringaClass}" style="background-color:${color};">${escapeHtml(worker)}</span>`;
+                                let coringaClass = isCoringa ? 'badge-coringa' : '';
+                                let bateClass = isBate ? 'badge-bate-volta' : '';
+                                let badgeText = escapeHtml(worker);
+                                if (isBate) {
+                                    badgeText += ' 🔄 B&V';
+                                }
+                                cardHtml += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
                             });
                         }
                         cardHtml += `</div></div>`;
