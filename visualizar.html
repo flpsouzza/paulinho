@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
     <title>Visualização - Plantão</title>
     <style>
-        /* ===== CSS idêntico ao index.html, mas sem a auth ===== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -461,7 +460,7 @@
             return Math.floor((utc1 - utc2) / msPerDay);
         }
 
-        // ===== LÓGICA DE PLANTÃO =====
+        // ===== LÓGICA DE PLANTÃO (com distribuição em bloco) =====
         function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
@@ -487,19 +486,34 @@
                     isDuty = true;
                     const rotation = staffConfig.rotation || [];
                     const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    let quantidade = 0;
-                    if (dayOfWeek === 5) quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
-                    else if (dayOfWeek === 6) quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
-                    else if (dayOfWeek === 0) quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
-                    if (rotation.length > 0 && quantidade > 0) {
+                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
+                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
+                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
+                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
+
+                    if (rotation.length > 0 && totalPorFDS > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offset = mathematicalMod(weekendIdx, rotation.length);
-                        if (dayOfWeek === 5) offset = mathematicalMod(weekendIdx, rotation.length);
-                        else if (dayOfWeek === 6) offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                        else if (dayOfWeek === 0) offset = mathematicalMod(weekendIdx + 2, rotation.length);
-                        for (let i = 0; i < quantidade; i++) {
-                            const idx = mathematicalMod(offset + i, rotation.length);
-                            activeWorkers.push(rotation[idx]);
+                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
+
+                        const getSlice = (start, count) => {
+                            const slice = [];
+                            for (let i = 0; i < count; i++) {
+                                const idx = mathematicalMod(start + i, rotation.length);
+                                slice.push(rotation[idx]);
+                            }
+                            return slice;
+                        };
+
+                        let offsetSexta = offsetBase;
+                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
+                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
+
+                        if (dayOfWeek === 5) {
+                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
+                        } else if (dayOfWeek === 6) {
+                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
+                        } else if (dayOfWeek === 0) {
+                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
                         }
                     }
                 }
