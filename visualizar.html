@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualização - Plantão</title>
     <style>
-        /* O mesmo CSS do index.html, mas sem a parte de auth e com cores ajustadas */
+        /* (mesmo CSS do visualizar anterior, sem alterações) */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -568,7 +568,6 @@
                         }
                         html += `<div class="badges-list">`;
                         if (activeWorkers.length === 0) {
-                            // NÃO EXIBE NADA
                             html += ``;
                         } else {
                             const excecoes = staffConfig.excecoes || {};
@@ -588,7 +587,6 @@
 
                         td.innerHTML = html;
 
-                        // VERSÃO MOBILE (card)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
                         if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
