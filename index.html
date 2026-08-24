@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
     <title>Plantão - Escala</title>
     <style>
-        /* (mesmo CSS de antes, sem alterações) */
+        /* (mesmo CSS anterior, com ajustes) */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -30,6 +30,9 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 12px;
+            touch-action: manipulation; /* permite zoom com gestos */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         @media (max-width: 768px) {
             :root { --font-base: 15px; }
@@ -335,7 +338,13 @@
         .btn-cancel { background: #E2E8F0; color: var(--text-main); }
         .btn-cancel:hover { background: #CBD5E1; }
 
-        .calendar-content { padding: 10px; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .calendar-content { 
+            padding: 10px; 
+            width: 100%; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            touch-action: pan-x pan-y; /* permite scroll e zoom na tabela */
+        }
         .calendar-grid-table {
             width: 100%;
             min-width: 700px;
@@ -345,6 +354,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             overflow: hidden;
+            touch-action: pan-x pan-y;
         }
         .calendar-grid-table th {
             background-color: var(--rio-blue);
