@@ -124,6 +124,68 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
         
+        /* Modal de edição da escala */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: #FFF;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { color: var(--rio-blue); margin-bottom: 20px; text-align: center; }
+        .modal-content label {
+            display: block;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .modal-content .helper {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            margin-bottom: 6px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal-buttons button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-save { background: var(--rio-blue); color: #FFF; }
+        .btn-save:hover { background: var(--rio-light); }
+        .btn-cancel { background: #E2E8F0; color: var(--text-main); }
+        .btn-cancel:hover { background: #CBD5E1; }
+
         .calendar-content { 
             padding: 12px; 
             width: 100%;
@@ -147,7 +209,6 @@
         .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; box-shadow: inset 0 0 0 1px var(--border-annotated); }
         .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
 
-        /* ====== DESTAQUE AZUL DOS DIAS DE PLANTÃO ====== */
         :root {
             --plantao-bg: #EAF4FF;
             --plantao-border: #C9DDF5;
@@ -275,7 +336,7 @@
             <div class="title-block">
                 <div class="month-title" id="month-label">Julho</div>
                 <div class="year-title" id="year-label">2026</div>
-                <button id="edit-staff-btn" class="btn-action" style="margin-top: 10px;">Editar Escala</button>
+                <button id="edit-staff-btn" class="btn-action" style="margin-top: 10px;">📝 Editar Escala</button>
             </div>
         </header>
 
@@ -318,6 +379,37 @@
         </footer>
     </div>
 
+    <!-- ===== MODAL DE EDIÇÃO DA ESCALA ===== -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content">
+            <h2>📝 Editar Escala</h2>
+            
+            <label>Rodízio (sextas-feiras) - 4 nomes que se alternam</label>
+            <input type="text" id="edit-r0" placeholder="1º nome">
+            <input type="text" id="edit-r1" placeholder="2º nome" style="margin-top:6px;">
+            <input type="text" id="edit-r2" placeholder="3º nome" style="margin-top:6px;">
+            <input type="text" id="edit-r3" placeholder="4º nome" style="margin-top:6px;">
+            <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane</div>
+
+            <label style="margin-top:16px;">Sábado (nome fixo)</label>
+            <input type="text" id="edit-sabado" placeholder="Nome do sábado">
+            <div class="helper">Ex: Felipe</div>
+
+            <label style="margin-top:16px;">Domingo (nome fixo)</label>
+            <input type="text" id="edit-domingo" placeholder="Nome do domingo">
+            <div class="helper">Ex: Júlio</div>
+
+            <label style="margin-top:16px;">Quinta-feira (nome fixo)</label>
+            <input type="text" id="edit-quinta" placeholder="Nome da quinta">
+            <div class="helper">Ex: Leandro</div>
+
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="edit-cancel-btn">Cancelar</button>
+                <button class="btn-save" id="edit-save-btn">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
@@ -341,17 +433,15 @@
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
         // ==================== FIREBASE CONFIG ====================
-        // COLE SUAS CHAVES AQUI (as que você copiou do Firebase)
         const firebaseConfig = {
- apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
-  authDomain: "escalaaberta-d968c.firebaseapp.com",
-  projectId: "escalaaberta-d968c",
-  storageBucket: "escalaaberta-d968c.firebasestorage.app",
-  messagingSenderId: "259093020146",
-  appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
-  measurementId: "G-ETSK8NEHDF"
-
-};
+            apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
+            authDomain: "escalaaberta-d968c.firebaseapp.com",
+            projectId: "escalaaberta-d968c",
+            storageBucket: "escalaaberta-d968c.firebasestorage.app",
+            messagingSenderId: "259093020146",
+            appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
+            measurementId: "G-ETSK8NEHDF"
+        };
         // ========================================================
 
         const app = initializeApp(firebaseConfig);
@@ -363,7 +453,7 @@
         let noteMetaCache = {};
         const saveTimers = new Map();
 
-        // Configuração da escala (vem do Firestore)
+        // Configuração da escala
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             sabado_fixo: "Felipe",
@@ -531,7 +621,6 @@
 
         async function loadNotesFromServer() {
             if (!sessionUser) {
-                // Se não tiver usuário, tenta carregar mesmo assim (leitura pública)
                 try {
                     const snapshot = await getDocs(collection(db, "agenda"));
                     notesCache = {};
@@ -988,36 +1077,66 @@
             }
         };
 
-        // ==================== EVENTO DE EDIÇÃO DA ESCALA ====================
-        document.getElementById("edit-staff-btn").addEventListener("click", async () => {
+        // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
+        const modalOverlay = document.getElementById("edit-modal");
+        const editR0 = document.getElementById("edit-r0");
+        const editR1 = document.getElementById("edit-r1");
+        const editR2 = document.getElementById("edit-r2");
+        const editR3 = document.getElementById("edit-r3");
+        const editSabado = document.getElementById("edit-sabado");
+        const editDomingo = document.getElementById("edit-domingo");
+        const editQuinta = document.getElementById("edit-quinta");
+
+        function openEditModal() {
             if (!sessionUser) {
                 alert("Você precisa estar logado para editar a escala.");
                 return;
             }
 
-            const r0 = prompt("1º nome do rodízio (ex: Carlos):", staffConfig.rotation[0]);
-            if (r0 === null) return;
-            const r1 = prompt("2º nome do rodízio (ex: Leticia):", staffConfig.rotation[1]);
-            if (r1 === null) return;
-            const r2 = prompt("3º nome do rodízio (ex: Gustavo):", staffConfig.rotation[2]);
-            if (r2 === null) return;
-            const r3 = prompt("4º nome do rodízio (ex: Tatiane):", staffConfig.rotation[3]);
-            if (r3 === null) return;
+            // Preenche os campos com os valores atuais
+            editR0.value = staffConfig.rotation[0] || "";
+            editR1.value = staffConfig.rotation[1] || "";
+            editR2.value = staffConfig.rotation[2] || "";
+            editR3.value = staffConfig.rotation[3] || "";
+            editSabado.value = staffConfig.sabado_fixo || "";
+            editDomingo.value = staffConfig.domingo_fixo || "";
+            editQuinta.value = staffConfig.quinta_fixo || "";
 
-            const sabado = prompt("Nome fixo para os SÁBADOS (antes era Felipe):", staffConfig.sabado_fixo);
-            if (sabado === null) return;
-            const domingo = prompt("Nome fixo para os DOMINGOS (antes era Júlio):", staffConfig.domingo_fixo);
-            if (domingo === null) return;
-            const quinta = prompt("Nome fixo para as QUINTAS-FEIRAS (antes era Leandro):", staffConfig.quinta_fixo);
-            if (quinta === null) return;
+            modalOverlay.classList.add("active");
+        }
 
-            const newRotation = [r0.trim(), r1.trim(), r2.trim(), r3.trim()];
-            const newSabado = sabado.trim();
-            const newDomingo = domingo.trim();
-            const newQuinta = quinta.trim();
+        function closeEditModal() {
+            modalOverlay.classList.remove("active");
+        }
+
+        async function saveEditModal() {
+            if (!sessionUser) return;
+
+            const newRotation = [
+                editR0.value.trim() || "Carlos",
+                editR1.value.trim() || "Leticia",
+                editR2.value.trim() || "Gustavo",
+                editR3.value.trim() || "Tatiane"
+            ];
+            const newSabado = editSabado.value.trim() || "Felipe";
+            const newDomingo = editDomingo.value.trim() || "Júlio";
+            const newQuinta = editQuinta.value.trim() || "Leandro";
 
             await saveStaffConfig(newRotation, newSabado, newDomingo, newQuinta);
+            closeEditModal();
             alert("✅ Escala atualizada com sucesso!");
+        }
+
+        // Botão de abrir modal
+        document.getElementById("edit-staff-btn").addEventListener("click", openEditModal);
+
+        // Botões do modal
+        document.getElementById("edit-cancel-btn").addEventListener("click", closeEditModal);
+        document.getElementById("edit-save-btn").addEventListener("click", saveEditModal);
+
+        // Fechar modal clicando fora
+        modalOverlay.addEventListener("click", (e) => {
+            if (e.target === modalOverlay) closeEditModal();
         });
 
         // ==================== NAVEGAÇÃO DO CALENDÁRIO ====================
