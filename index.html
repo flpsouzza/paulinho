@@ -246,6 +246,29 @@
             margin-top: 4px;
         }
 
+        /* Quantidades */
+        .qtd-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .qtd-row label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .qtd-row input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
+
         /* Exceções */
         .excecao-row {
             display: flex;
@@ -518,15 +541,14 @@
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; text-align: center;">
-                Adicione os nomes que vão se revezar nos plantões de <strong>sexta, sábado e domingo</strong>.
-                Exceções aparecem no dia escolhido <strong>quando for plantão</strong>.
+                Defina os nomes do rodízio e quantas pessoas aparecem em cada dia.
             </p>
 
-            <!-- RODÍZIO (sexta, sábado, domingo) -->
+            <!-- RODÍZIO -->
             <div class="day-section" id="section-rotation">
                 <h3>
-                    🔄 Nomes do Rodízio
-                    <span class="badge-info">— se alternam entre sexta, sábado e domingo</span>
+                    🔄 Rodízio
+                    <span class="badge-info">— nomes que se alternam</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('rotation')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="rotation-list"></div>
@@ -537,10 +559,26 @@
                 <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (quantos quiser)</div>
             </div>
 
-            <!-- QUINTA (fixos) -->
+            <!-- QUANTIDADES POR DIA -->
+            <div class="day-section" style="border-color: #F59E0B; background: #FFFBEB;">
+                <h3 style="color: #D97706;">
+                    🔢 Quantos nomes do rodízio em cada dia?
+                </h3>
+                <div class="qtd-row">
+                    <label>Sexta:</label>
+                    <input type="number" id="qtd-sexta" min="0" max="10" value="1">
+                    <label>Sábado:</label>
+                    <input type="number" id="qtd-sabado" min="0" max="10" value="1">
+                    <label>Domingo:</label>
+                    <input type="number" id="qtd-domingo" min="0" max="10" value="1">
+                </div>
+                <div class="helper">Digite quantas pessoas do rodízio você quer em cada dia. Ex: sexta 2, sábado 3, domingo 1.</div>
+            </div>
+
+            <!-- QUINTA -->
             <div class="day-section" id="section-quinta">
                 <h3>
-                    📅 Quinta-feira
+                    📅 Quinta-feira (fixos)
                     <span class="badge-info">— sempre aparecem na quinta</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('quinta')" title="Remover último nome">−</button>
                 </h3>
@@ -552,7 +590,7 @@
                 <div class="helper">Ex: Leandro, Paulo... (sempre aparecem na quinta)</div>
             </div>
 
-            <!-- EXCEÇÕES (coringas) -->
+            <!-- EXCEÇÕES -->
             <div class="day-section" style="border-color: #8B5CF6; background: #F5F3FF;">
                 <h3 style="color: #6D28D9;">
                     ⭐ Exceções (coringas)
@@ -629,7 +667,12 @@
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             quinta: ["Leandro"],
-            excecoes: {} // { "0": ["João"], "2": ["Maria"] } dia da semana -> array
+            excecoes: {},
+            quantidades: {
+                sexta: 1,
+                sabado: 1,
+                domingo: 1
+            }
         };
 
         const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -670,26 +713,29 @@
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
                     staffConfig.quinta = data.quinta || staffConfig.quinta;
                     staffConfig.excecoes = data.excecoes || {};
+                    staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
                 } else {
-                    await saveStaffConfig(staffConfig.rotation, staffConfig.quinta, staffConfig.excecoes);
+                    await saveStaffConfig(staffConfig.rotation, staffConfig.quinta, staffConfig.excecoes, staffConfig.quantidades);
                 }
             } catch (error) {
                 console.error("Erro ao carregar configuração:", error);
             }
         }
 
-        async function saveStaffConfig(newRotation, newQuinta, newExcecoes) {
+        async function saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
                 await setDoc(docRef, {
                     rotation: newRotation,
                     quinta: newQuinta,
-                    excecoes: newExcecoes || {}
+                    excecoes: newExcecoes || {},
+                    quantidades: newQuantidades || { sexta:1, sabado:1, domingo:1 }
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
                 staffConfig.quinta = newQuinta;
                 staffConfig.excecoes = newExcecoes || {};
+                staffConfig.quantidades = newQuantidades || { sexta:1, sabado:1, domingo:1 };
                 buildCalendar();
             } catch (error) {
                 console.error("Erro ao salvar configuração:", error);
@@ -747,7 +793,7 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ===== LÓGICA INVERTIDA COM RODÍZIO ÚNICO =====
+        // ===== LÓGICA INVERTIDA COM QUANTIDADES CONFIGURÁVEIS =====
         function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
@@ -757,13 +803,13 @@
             const rotation = staffConfig.rotation || [];
             const quintaList = staffConfig.quinta || [];
             const excecoes = staffConfig.excecoes || {};
+            const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
 
-            // Verifica exceções para este dia da semana
             const dayOfWeek = new Date(year, month, day).getDay();
             const excecaoNomes = excecoes[dayOfWeek] || [];
 
             let isPlantaoRegra = false;
-            let posTipo = null; // 'quinta', 'sexta', 'sabado', 'domingo'
+            let posTipo = null;
 
             if (pos === 6) {
                 isPlantaoRegra = true;
@@ -783,37 +829,35 @@
                 isDuty = true;
                 if (posTipo === 'quinta') {
                     activeWorkers.push(...quintaList);
-                } else if (posTipo === 'sexta') {
-                    // Sexta: pega o primeiro nome do rodízio (índice baseado no plantão)
+                } else {
+                    // Sexta, sábado ou domingo: usar o rodízio com a quantidade configurada
                     if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
-                        const offset = mathematicalMod(weekendIdx, rotation.length);
-                        activeWorkers.push(rotation[offset]);
-                    }
-                } else if (posTipo === 'sabado') {
-                    if (rotation.length > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        const offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                        activeWorkers.push(rotation[offset]);
-                    }
-                } else if (posTipo === 'domingo') {
-                    if (rotation.length > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        const offset = mathematicalMod(weekendIdx + 2, rotation.length);
-                        activeWorkers.push(rotation[offset]);
+                        let offset = mathematicalMod(weekendIdx, rotation.length);
+                        if (posTipo === 'sexta') {
+                            offset = mathematicalMod(weekendIdx, rotation.length);
+                        } else if (posTipo === 'sabado') {
+                            offset = mathematicalMod(weekendIdx + 1, rotation.length);
+                        } else if (posTipo === 'domingo') {
+                            offset = mathematicalMod(weekendIdx + 2, rotation.length);
+                        }
+                        // Quantos nomes pegar?
+                        let quantidade = 0;
+                        if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
+                        else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
+                        else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
+                        // Pega a fatia com wrap-around
+                        for (let i = 0; i < quantidade; i++) {
+                            const idx = mathematicalMod(offset + i, rotation.length);
+                            activeWorkers.push(rotation[idx]);
+                        }
                     }
                 }
             }
 
-            // Adiciona exceções (só se o dia for plantão pela regra)
+            // Adiciona exceções (só se for plantão)
             if (isPlantaoRegra && excecaoNomes.length > 0) {
                 activeWorkers.push(...excecaoNomes);
-            } else if (!isPlantaoRegra && excecaoNomes.length > 0) {
-                // Se não é plantão pela regra, mas há exceção, não ativa (a não ser que você queira ativar)
-                // Vamos manter: exceção só entra se for plantão.
-                // Se quiser que exceção crie plantão em dias que não são, descomente a linha abaixo:
-                // isDuty = true;
-                // activeWorkers.push(...excecaoNomes);
             }
 
             // Remove duplicatas
@@ -1392,6 +1436,14 @@
             return excecoes;
         }
 
+        // Quantidades
+        function getQuantidadesFromUI() {
+            const sexta = parseInt(document.getElementById('qtd-sexta').value) || 0;
+            const sabado = parseInt(document.getElementById('qtd-sabado').value) || 0;
+            const domingo = parseInt(document.getElementById('qtd-domingo').value) || 0;
+            return { sexta, sabado, domingo };
+        }
+
         function openEditModal() {
             if (!sessionUser) {
                 alert("Você precisa estar logado para editar a escala.");
@@ -1433,6 +1485,12 @@
                 });
             }
 
+            // Preenche quantidades
+            const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
+            document.getElementById('qtd-sexta').value = qtd.sexta || 1;
+            document.getElementById('qtd-sabado').value = qtd.sabado || 1;
+            document.getElementById('qtd-domingo').value = qtd.domingo || 1;
+
             modalOverlay.classList.add('active');
         }
 
@@ -1446,13 +1504,14 @@
             const newRotation = getNamesFromList('rotation');
             const newQuinta = getNamesFromList('quinta');
             const newExcecoes = getExcecoesFromList();
+            const newQuantidades = getQuantidadesFromUI();
 
             if (newRotation.length === 0) {
                 if (!confirm('O rodízio está vazio. Deseja manter os valores padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
 
-            await saveStaffConfig(newRotation, newQuinta, newExcecoes);
+            await saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades);
             closeEditModal();
             alert('✅ Escala atualizada com sucesso!');
         }
