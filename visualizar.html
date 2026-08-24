@@ -221,7 +221,6 @@
             border-left: 3px solid #94A3B8;
         }
 
-        /* Cores fixas para nomes */
         .badge-color-0 { background-color: #3B82F6; }
         .badge-color-1 { background-color: #10B981; }
         .badge-color-2 { background-color: #F59E0B; }
@@ -319,7 +318,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Forçamos o modo visualização (sem login)
+        // Forçamos modo visualização
         const sessionUser = null;
         let notesCache = {};
         let noteMetaCache = {};
@@ -327,14 +326,15 @@
         // Configuração da escala (vem do Firestore)
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
-            quinta: ["Leandro"],
             excecoes: {},
             quantidades: {
-                sexta: 1,
                 sabado: 1,
                 domingo: 1
             }
         };
+
+        // Data de referência para alternância (25/08/2026 = terça = trabalha)
+        const ALTERNANCIA_REF = new Date(2026, 7, 25);
 
         const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
         const dayNamesList = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
@@ -356,33 +356,11 @@
         monthSelect.value = String(activeMonth);
         yearSelect.value = String(activeYear);
 
-        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
-        async function loadStaffConfig() {
-            try {
-                const docRef = doc(db, "config", "staff");
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    staffConfig.rotation = data.rotation || staffConfig.rotation;
-                    staffConfig.quinta = data.quinta || staffConfig.quinta;
-                    staffConfig.excecoes = data.excecoes || {};
-                    staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
-                } else {
-                    // Se não existir, usa os padrões (não vamos salvar porque é visualização)
-                    console.warn("Configuração não encontrada, usando padrões.");
-                }
-            } catch (error) {
-                console.error("Erro ao carregar configuração:", error);
-            }
-        }
-
-        // ==================== FUNÇÕES DO CALENDÁRIO ====================
+        // ==================== FUNÇÕES AUXILIARES ====================
         function mathematicalMod(n,m) { return ((n%m)+m)%m; }
-
         function cleanStringForClass(text) {
             return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
         }
-
         function escapeHtml(text) {
             return String(text ?? "")
                 .replace(/&/g, "&amp;")
@@ -392,14 +370,13 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Mapa de cores fixas para cada nome (baseado no nome)
+        // Mapa de cores
         const colorPalette = [
             '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
             '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16'
         ];
         const colorMap = {};
         let colorIndex = 0;
-
         function getColorForName(name) {
             if (!name) return '#6B7280';
             const trimmed = name.trim();
@@ -411,62 +388,58 @@
             return color;
         }
 
-        function calculateDaysFromAnchor(y,m,d) {
-            const anchor = Date.UTC(2026,6,3);
-            const target = Date.UTC(y,m,d);
-            return Math.floor((target - anchor) / (1000*60*60*24));
+        function daysBetween(date1, date2) {
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+            const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+            return Math.floor((utc1 - utc2) / msPerDay);
         }
 
+        // ===== LÓGICA DE PLANTÃO =====
         function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
-            const diff = calculateDaysFromAnchor(year, month, day);
-            const pos = mathematicalMod(diff, 14);
+            const currentDate = new Date(year, month, day);
+            const dayOfWeek = currentDate.getDay(); // 0=domingo, 6=sábado
+            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
-            const rotation = staffConfig.rotation || [];
-            const quintaList = staffConfig.quinta || [];
-            const excecoes = staffConfig.excecoes || {};
-            const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-
-            const dayOfWeek = new Date(year, month, day).getDay();
-            const excecaoNomes = excecoes[dayOfWeek] || [];
-
-            let isPlantaoRegra = false;
-            let posTipo = null;
-
-            if (pos === 6) {
-                isPlantaoRegra = true;
-                posTipo = 'quinta';
-            } else if (pos === 7) {
-                isPlantaoRegra = true;
-                posTipo = 'sexta';
-            } else if (pos === 8) {
-                isPlantaoRegra = true;
-                posTipo = 'sabado';
-            } else if (pos === 9) {
-                isPlantaoRegra = true;
-                posTipo = 'domingo';
+            // --- REGRA 1: ALTERNÂNCIA para dias de semana (segunda a sexta) ---
+            if (isWeekday) {
+                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
+                if (diffDays % 2 === 0) {
+                    isDuty = true;
+                }
             }
 
-            if (isPlantaoRegra) {
-                isDuty = true;
-                if (posTipo === 'quinta') {
-                    activeWorkers.push(...quintaList);
-                } else {
-                    if (rotation.length > 0) {
+            // --- REGRA 2: FIM DE SEMANA (sábado e domingo) com rodízio a cada 15 dias ---
+            if (dayOfWeek === 6 || dayOfWeek === 0) {
+                const anchor = new Date(2026, 6, 3);
+                const diff = daysBetween(currentDate, anchor);
+                const pos = mathematicalMod(diff, 14);
+
+                let isWeekendPlantao = false;
+                if (pos === 8 && dayOfWeek === 6) {
+                    isWeekendPlantao = true;
+                } else if (pos === 9 && dayOfWeek === 0) {
+                    isWeekendPlantao = true;
+                }
+
+                if (isWeekendPlantao) {
+                    isDuty = true;
+                    const rotation = staffConfig.rotation || [];
+                    const qtd = staffConfig.quantidades || { sabado:1, domingo:1 };
+                    let quantidade = 0;
+                    if (dayOfWeek === 6) quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
+                    else if (dayOfWeek === 0) quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
+
+                    if (rotation.length > 0 && quantidade > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
                         let offset = mathematicalMod(weekendIdx, rotation.length);
-                        if (posTipo === 'sexta') {
-                            offset = mathematicalMod(weekendIdx, rotation.length);
-                        } else if (posTipo === 'sabado') {
+                        if (dayOfWeek === 6) {
                             offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                        } else if (posTipo === 'domingo') {
+                        } else if (dayOfWeek === 0) {
                             offset = mathematicalMod(weekendIdx + 2, rotation.length);
                         }
-                        let quantidade = 0;
-                        if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
-                        else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
-                        else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
                         for (let i = 0; i < quantidade; i++) {
                             const idx = mathematicalMod(offset + i, rotation.length);
                             activeWorkers.push(rotation[idx]);
@@ -475,8 +448,13 @@
                 }
             }
 
-            if (isPlantaoRegra && excecaoNomes.length > 0) {
-                activeWorkers.push(...excecaoNomes);
+            // --- EXCEÇÕES (coringas) ---
+            if (isDuty) {
+                const excecoes = staffConfig.excecoes || {};
+                const excecaoNomes = excecoes[dayOfWeek] || [];
+                if (excecaoNomes.length > 0) {
+                    activeWorkers.push(...excecaoNomes);
+                }
             }
 
             activeWorkers = [...new Set(activeWorkers)];
@@ -487,6 +465,25 @@
             return isDutyOriginal;
         }
 
+        // ==================== CARREGAR CONFIG ====================
+        async function loadStaffConfig() {
+            try {
+                const docRef = doc(db, "config", "staff");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    staffConfig.rotation = data.rotation || staffConfig.rotation;
+                    staffConfig.excecoes = data.excecoes || {};
+                    staffConfig.quantidades = data.quantidades || { sabado:1, domingo:1 };
+                } else {
+                    console.warn("Configuração não encontrada, usando padrões.");
+                }
+            } catch (error) {
+                console.error("Erro ao carregar configuração:", error);
+            }
+        }
+
+        // ==================== CARREGAR NOTAS ====================
         async function loadNotesFromServer() {
             try {
                 const snapshot = await getDocs(collection(db, "agenda"));
@@ -507,11 +504,12 @@
             buildCalendar();
         }
 
+        // ==================== CONSTRUÇÃO DO CALENDÁRIO ====================
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
             const daysInMonth = new Date(activeYear, activeMonth+1, 0).getDate();
             const today = new Date();
-            const isEditable = false; // SEMPRE visualização
+            const isEditable = false;
 
             document.getElementById("month-label").innerText = monthNamesList[activeMonth];
             document.getElementById("year-label").innerText = activeYear;
@@ -523,8 +521,6 @@
             tbody.innerHTML = "";
             listView.innerHTML = "";
             let dayNum = 1;
-
-            const isWeekend = (dayOfWeek) => dayOfWeek === 0 || dayOfWeek === 6;
 
             for (let w=0; w<6; w++) {
                 const tr = document.createElement("tr");
@@ -543,11 +539,11 @@
                         const { isDuty, activeWorkers } = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
                         const dayOfWeek = new Date(activeYear, activeMonth, currentDayNum).getDay();
-                        const isWeekendDay = isWeekend(dayOfWeek);
+                        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
                         if (isPlantao) {
                             td.classList.add("plantao-cell");
-                            if (!isWeekendDay) td.classList.add("weekday-plantao");
+                            if (!isWeekend) td.classList.add("weekday-plantao");
                         }
                         if (isToday) td.classList.add("today-cell");
 
@@ -558,14 +554,19 @@
                         html += isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`;
                         html += `</div>`;
                         if (isPlantao) {
-                            const labelClass = !isWeekendDay ? 'weekday-label' : '';
+                            const labelClass = !isWeekend ? 'weekday-label' : '';
                             html += `<span class="plantao-label ${labelClass}">Plantão</span>`;
                         }
                         html += `<div class="badges-list">`;
                         if (activeWorkers.length === 0) {
-                            html += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
+                            if (isPlantao && !isWeekend) {
+                                html += `<span style="font-size:9px; color:#2E7D32;">(alternado)</span>`;
+                            } else {
+                                html += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
+                            }
                         } else {
-                            const excecaoNomes = staffConfig.excecoes[dayOfWeek] || [];
+                            const excecoes = staffConfig.excecoes || {};
+                            const excecaoNomes = excecoes[dayOfWeek] || [];
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
                                 const color = getColorForName(worker);
@@ -585,7 +586,7 @@
                         // Versão mobile (lista)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
-                        if (isPlantao && !isWeekendDay) card.classList.add('weekday-plantao');
+                        if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
                         if (savedNote.trim() && !isToday && !isPlantao) card.classList.add("annotated-card");
 
                         let cardHtml = `
@@ -593,14 +594,19 @@
                                 <div class="mobile-card-date">
                                     <div class="mobile-day-name">${dayNamesList[d]}</div>
                                     ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
-                                    ${isPlantao ? `<span class="plantao-label ${!isWeekendDay ? 'weekday-label' : ''}">Plantão</span>` : ''}
+                                    ${isPlantao ? `<span class="plantao-label ${!isWeekend ? 'weekday-label' : ''}">Plantão</span>` : ''}
                                 </div>
                                 <div class="badges-list">
                         `;
                         if (activeWorkers.length === 0) {
-                            cardHtml += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
+                            if (isPlantao && !isWeekend) {
+                                cardHtml += `<span style="font-size:9px; color:#2E7D32;">(alternado)</span>`;
+                            } else {
+                                cardHtml += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
+                            }
                         } else {
-                            const excecaoNomes = staffConfig.excecoes[dayOfWeek] || [];
+                            const excecoes = staffConfig.excecoes || {};
+                            const excecaoNomes = excecoes[dayOfWeek] || [];
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
                                 const color = getColorForName(worker);
