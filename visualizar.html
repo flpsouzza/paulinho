@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Visualização - Plantão</title>
     <style>
+        /* O mesmo CSS do index.html, mas sem a parte de auth e com cores ajustadas */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -16,17 +17,27 @@
             --border-color: #E2E8F0;
             --bg-annotated: #F0FDF4;
             --border-annotated: #BBF7D0;
+            --font-base: 14px;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: var(--font-base);
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 16px;
+            padding: 12px;
+        }
+        @media (max-width: 768px) {
+            :root { --font-base: 15px; }
+            body { padding: 8px; }
+        }
+        @media (max-width: 480px) {
+            :root { --font-base: 16px; }
+            body { padding: 4px; }
         }
 
         .calendar-container {
@@ -39,27 +50,27 @@
             display: flex;
             flex-direction: column;
             margin-bottom: 20px;
-            position: relative;
         }
         .top-bar-header {
             background-color: var(--rio-blue);
             color: #FFF;
             text-align: center;
-            padding: 14px;
-            font-size: 16px;
+            padding: 14px 12px;
+            font-size: 1.1rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             position: relative;
         }
-        .top-bar-header .view-badge {
+        .view-badge {
             position: absolute;
-            right: 14px; top: 11px;
+            right: 12px; top: 50%;
+            transform: translateY(-50%);
             background: rgba(255,255,255,0.2);
             color: #FFF;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 0.7rem;
             font-weight: 700;
         }
         header {
@@ -67,61 +78,70 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 20px;
+            padding: 16px 12px;
             background: #FFF;
-            gap: 16px;
+            gap: 10px;
             border-bottom: 1px solid var(--border-color);
-            position: relative;
         }
-        .title-block { position: relative; width: 100%; }
-        .title-block .month-title { font-size: 36px; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
-        .title-block .year-title { font-size: 15px; color: var(--accent-bronze); font-weight: 700; letter-spacing: 6px; margin-top: 4px; }
-
+        .title-block { width: 100%; }
+        .title-block .month-title { font-size: 1.8rem; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
+        .title-block .year-title { font-size: 0.9rem; color: var(--accent-bronze); font-weight: 700; letter-spacing: 4px; margin-top: 2px; }
         .readonly-banner {
             background: #FEF3C7;
             border: 1px solid #F59E0B;
             color: #92400E;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
         }
-
         .toolbar {
-            display: flex; flex-wrap: wrap; gap: 12px; width: 100%; justify-content: center; align-items: center;
-            background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color);
+            display: flex; flex-wrap: wrap; gap: 10px; width: 100%; justify-content: center; align-items: center;
+            background: #F8FAFC; padding: 12px 16px; border-bottom: 1px solid var(--border-color);
         }
-        .nav-controls, .view-controls, .search-control, .jump-control { display: flex; align-items: center; gap: 6px; }
-        .toolbar select, .toolbar input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; background: #FFF; }
-        
+        .toolbar select, .toolbar input { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.85rem; background: #FFF; }
         .btn-action {
-            background-color: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
-            padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 20px; transition: all 0.2s ease; text-transform: uppercase;
+            background: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
+            padding: 6px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border-radius: 20px;
+            transition: all 0.2s; text-transform: uppercase;
+            white-space: nowrap;
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        .calendar-content { 
-            padding: 12px; 
+        .calendar-content { padding: 10px; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .calendar-grid-table {
             width: 100%;
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
+            min-width: 700px;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
         }
-        .calendar-grid-table { 
-            width: 100%; 
-            min-width: 900px; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            table-layout: fixed; 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            overflow: hidden; 
+        .calendar-grid-table th {
+            background-color: var(--rio-blue);
+            color: #FFF;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 8px 2px;
+            text-align: center;
         }
-        .calendar-grid-table th { background-color: var(--rio-blue); color: #FFF; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 10px 4px; text-align: center; }
-        .calendar-grid-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); vertical-align: top; padding: 6px 4px; height: 135px; background-color: #FFF; position: relative; transition: background-color 0.2s, border-color 0.2s; }
+        .calendar-grid-table td {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            padding: 4px 3px;
+            height: 120px;
+            background-color: #FFF;
+            position: relative;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 0.85rem;
+        }
         .calendar-grid-table .empty-cell { background-color: #F8FAFC; }
-        
-        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; box-shadow: inset 0 0 0 1px var(--border-annotated); }
+        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
         .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
 
         :root {
@@ -129,7 +149,6 @@
             --plantao-border: #C9DDF5;
             --plantao-text: #315F8C;
         }
-
         .calendar-grid-table td.plantao-cell {
             background-color: var(--plantao-bg) !important;
             border-color: var(--plantao-border) !important;
@@ -142,19 +161,17 @@
 
         .plantao-label {
             display: block;
-            margin-top: 4px;
-            margin-bottom: 5px;
-            font-size: 10px;
+            margin-top: 2px;
+            margin-bottom: 4px;
+            font-size: 0.6rem;
             line-height: 1.2;
             font-weight: 900;
             color: var(--plantao-text);
-            letter-spacing: 0.9px;
+            letter-spacing: 0.5px;
             text-align: right;
             text-transform: uppercase;
         }
-        .plantao-label.weekday-label {
-            color: #2E7D32;
-        }
+        .plantao-label.weekday-label { color: #2E7D32; }
 
         .mobile-card.plantao-card {
             background-color: var(--plantao-bg) !important;
@@ -164,55 +181,61 @@
             background-color: #E8F5E9 !important;
             border-color: #A5D6A7 !important;
         }
-
         .mobile-card .plantao-label {
             margin: 0 0 0 6px;
             text-align: left;
             align-self: center;
         }
 
-        .date-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
-        .date-num { font-weight: 700; font-size: 11px; color: #94A3B8; }
-        .duty-day-circle { width: 22px; height: 22px; border: 2px solid var(--rio-light); background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rio-light); font-size: 10px; font-weight: 800; }
-        
+        .date-row { display: flex; justify-content: flex-end; margin-bottom: 2px; }
+        .date-num { font-weight: 700; font-size: 0.8rem; color: #94A3B8; }
+        .duty-day-circle {
+            width: 22px; height: 22px;
+            border: 2px solid var(--rio-light);
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--rio-light);
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
         .mobile-list-view { display: none; flex-direction: column; gap: 10px; padding: 8px; width: 100%; }
-        .mobile-card { background: #FFF; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; transition: background-color 0.2s, border-color 0.2s; }
+        .mobile-card {
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
         .mobile-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .mobile-card-date { display: flex; align-items: center; gap: 8px; }
-        .mobile-day-name { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .mobile-card-date { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .mobile-day-name { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         
-        .badges-list { display: flex; flex-direction: column; gap: 3px; width: 100%; }
-        .badge { 
-            font-size: 9px; 
-            font-weight: 800; 
-            color: #FFF; 
-            padding: 2px 4px; 
-            border-radius: 4px; 
-            text-transform: uppercase; 
-            text-align: center; 
-            white-space: nowrap; 
-            overflow: hidden; 
+        .badges-list { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+        .badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #FFF;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
             text-overflow: ellipsis;
         }
         .badge-coringa {
             background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important;
             border: 1px solid #5B21B6;
         }
-        
-        .today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; box-shadow: none !important; }
-        .today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
-        
-        footer { padding: 16px 20px; background-color: #F8FAFC; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .legend-container { display: flex; gap: 14px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .l-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
-        .l-coringa { background: linear-gradient(135deg, #8B5CF6, #6D28D9); border: 1px solid #5B21B6; }
-        .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; }
-        .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
-
         .readonly-note {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #333;
             margin-top: 4px;
             background: #f1f5f9;
@@ -220,6 +243,35 @@
             border-radius: 4px;
             border-left: 3px solid #94A3B8;
         }
+
+        .today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; box-shadow: none !important; }
+        .today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
+        
+        footer {
+            padding: 12px 16px;
+            background: #F8FAFC;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .l-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
+        .l-coringa { background: linear-gradient(135deg, #8B5CF6, #6D28D9); border: 1px solid #5B21B6; }
+        .l-today { background: #FFFBEB; border: 2px solid #F59E0B; }
+        .l-annotated { background: var(--bg-annotated); border: 1px solid var(--border-annotated); }
 
         .badge-color-0 { background-color: #3B82F6; }
         .badge-color-1 { background-color: #10B981; }
@@ -231,6 +283,18 @@
         .badge-color-7 { background-color: #F97316; }
         .badge-color-8 { background-color: #6366F1; }
         .badge-color-9 { background-color: #84CC16; }
+
+        @media (max-width: 480px) {
+            .calendar-grid-table td { height: 100px; padding: 3px 2px; font-size: 0.75rem; }
+            .calendar-grid-table th { font-size: 0.6rem; padding: 6px 1px; }
+            .duty-day-circle { width: 18px; height: 18px; font-size: 0.65rem; }
+            .date-num { font-size: 0.7rem; }
+            .badge { font-size: 0.6rem; padding: 1px 4px; }
+            .plantao-label { font-size: 0.5rem; }
+            .toolbar { gap: 6px; padding: 8px 10px; }
+            .btn-action { font-size: 0.65rem; padding: 4px 10px; }
+            .title-block .month-title { font-size: 1.4rem; }
+        }
     </style>
 </head>
 <body>
@@ -284,7 +348,7 @@
                 <div class="legend-item"><div class="l-dot l-today"></div> Hoje</div>
                 <div class="legend-item"><div class="l-dot l-annotated"></div> Com Anotação</div>
             </div>
-            <span class="credit-footer">Desenvolvido por <strong>Felipe Souza</strong></span>
+            <span class="credit-footer" style="font-size:0.7rem;">Desenvolvido por <strong>Felipe Souza</strong></span>
         </footer>
     </div>
 
@@ -295,15 +359,9 @@
             collection,
             doc,
             getDocs,
-            getDoc,
-            setDoc,
-            deleteDoc,
-            deleteField,
-            writeBatch,
-            serverTimestamp
+            getDoc
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-        // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
             authDomain: "escalaaberta-d968c.firebaseapp.com",
@@ -313,28 +371,16 @@
             appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
             measurementId: "G-ETSK8NEHDF"
         };
-        // ========================================================
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Forçamos modo visualização
-        const sessionUser = null;
         let notesCache = {};
-        let noteMetaCache = {};
-
-        // Configuração da escala (vem do Firestore)
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
-            quantidades: {
-                sabado: 1,
-                domingo: 1
-            }
+            quantidades: { sabado: 1, domingo: 1 }
         };
-
-        // Data de referência para alternância (25/08/2026 = terça = trabalha)
-        const ALTERNANCIA_REF = new Date(2026, 7, 25);
 
         const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
         const dayNamesList = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
@@ -356,25 +402,31 @@
         monthSelect.value = String(activeMonth);
         yearSelect.value = String(activeYear);
 
-        // ==================== FUNÇÕES AUXILIARES ====================
-        function mathematicalMod(n,m) { return ((n%m)+m)%m; }
-        function cleanStringForClass(text) {
-            return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-        }
-        function escapeHtml(text) {
-            return String(text ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        const ALTERNANCIA_REF = new Date(2026, 7, 25);
+
+        // ==================== CONFIG ====================
+        async function loadStaffConfig() {
+            try {
+                const docRef = doc(db, "config", "staff");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    staffConfig.rotation = data.rotation || staffConfig.rotation;
+                    staffConfig.excecoes = data.excecoes || {};
+                    staffConfig.quantidades = data.quantidades || { sabado:1, domingo:1 };
+                }
+            } catch (error) { console.error("Erro ao carregar configuração:", error); }
         }
 
-        // Mapa de cores
-        const colorPalette = [
-            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-            '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#84CC16'
-        ];
+        // ==================== AUXILIARES ====================
+        function escapeHtml(text) {
+            return String(text ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+        }
+        function mathematicalMod(n,m) { return ((n%m)+m)%m; }
+        function noteKey(year, month, day) { return `${year}_${month}_${day}`; }
+        function cleanStringForClass(text) { return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
+
+        const colorPalette = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
         const colorMap = {};
         let colorIndex = 0;
         function getColorForName(name) {
@@ -389,7 +441,7 @@
         }
 
         function daysBetween(date1, date2) {
-            const msPerDay = 1000 * 60 * 60 * 24;
+            const msPerDay = 1000*60*60*24;
             const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
             const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
             return Math.floor((utc1 - utc2) / msPerDay);
@@ -400,29 +452,21 @@
             let activeWorkers = [];
             let isDuty = false;
             const currentDate = new Date(year, month, day);
-            const dayOfWeek = currentDate.getDay(); // 0=domingo, 6=sábado
+            const dayOfWeek = currentDate.getDay();
             const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
-            // --- REGRA 1: ALTERNÂNCIA para dias de semana (segunda a sexta) ---
             if (isWeekday) {
                 const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) {
-                    isDuty = true;
-                }
+                if (diffDays % 2 === 0) isDuty = true;
             }
 
-            // --- REGRA 2: FIM DE SEMANA (sábado e domingo) com rodízio a cada 15 dias ---
             if (dayOfWeek === 6 || dayOfWeek === 0) {
                 const anchor = new Date(2026, 6, 3);
                 const diff = daysBetween(currentDate, anchor);
                 const pos = mathematicalMod(diff, 14);
-
                 let isWeekendPlantao = false;
-                if (pos === 8 && dayOfWeek === 6) {
-                    isWeekendPlantao = true;
-                } else if (pos === 9 && dayOfWeek === 0) {
-                    isWeekendPlantao = true;
-                }
+                if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
+                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
 
                 if (isWeekendPlantao) {
                     isDuty = true;
@@ -431,15 +475,11 @@
                     let quantidade = 0;
                     if (dayOfWeek === 6) quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
                     else if (dayOfWeek === 0) quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
-
                     if (rotation.length > 0 && quantidade > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
                         let offset = mathematicalMod(weekendIdx, rotation.length);
-                        if (dayOfWeek === 6) {
-                            offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                        } else if (dayOfWeek === 0) {
-                            offset = mathematicalMod(weekendIdx + 2, rotation.length);
-                        }
+                        if (dayOfWeek === 6) offset = mathematicalMod(weekendIdx + 1, rotation.length);
+                        else if (dayOfWeek === 0) offset = mathematicalMod(weekendIdx + 2, rotation.length);
                         for (let i = 0; i < quantidade; i++) {
                             const idx = mathematicalMod(offset + i, rotation.length);
                             activeWorkers.push(rotation[idx]);
@@ -448,54 +488,27 @@
                 }
             }
 
-            // --- EXCEÇÕES (coringas) ---
             if (isDuty) {
                 const excecoes = staffConfig.excecoes || {};
                 const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
+                if (excecaoNomes.length > 0) activeWorkers.push(...excecaoNomes);
             }
 
             activeWorkers = [...new Set(activeWorkers)];
             return { isDuty, activeWorkers };
         }
 
-        function isPlantaoDia(year, month, day, isDutyOriginal) {
-            return isDutyOriginal;
-        }
+        function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
 
-        // ==================== CARREGAR CONFIG ====================
-        async function loadStaffConfig() {
-            try {
-                const docRef = doc(db, "config", "staff");
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    staffConfig.rotation = data.rotation || staffConfig.rotation;
-                    staffConfig.excecoes = data.excecoes || {};
-                    staffConfig.quantidades = data.quantidades || { sabado:1, domingo:1 };
-                } else {
-                    console.warn("Configuração não encontrada, usando padrões.");
-                }
-            } catch (error) {
-                console.error("Erro ao carregar configuração:", error);
-            }
-        }
-
-        // ==================== CARREGAR NOTAS ====================
+        // ==================== NOTAS ====================
         async function loadNotesFromServer() {
             try {
                 const snapshot = await getDocs(collection(db, "agenda"));
                 notesCache = {};
-                noteMetaCache = {};
-                snapshot.forEach(documentSnapshot => {
-                    const item = documentSnapshot.data();
+                snapshot.forEach(docSnap => {
+                    const item = docSnap.data();
                     if (typeof item.nota === "string" && item.nota.trim()) {
-                        notesCache[documentSnapshot.id] = item.nota;
-                        noteMetaCache[documentSnapshot.id] = {
-                            sequenceId: item.sequenceId || null
-                        };
+                        notesCache[docSnap.id] = item.nota;
                     }
                 });
             } catch (error) {
@@ -504,12 +517,11 @@
             buildCalendar();
         }
 
-        // ==================== CONSTRUÇÃO DO CALENDÁRIO ====================
+        // ==================== BUILD CALENDAR ====================
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
             const daysInMonth = new Date(activeYear, activeMonth+1, 0).getDate();
             const today = new Date();
-            const isEditable = false;
 
             document.getElementById("month-label").innerText = monthNamesList[activeMonth];
             document.getElementById("year-label").innerText = activeYear;
@@ -525,17 +537,14 @@
             for (let w=0; w<6; w++) {
                 const tr = document.createElement("tr");
                 let hasData = false;
-
                 for (let d=0; d<7; d++) {
                     const td = document.createElement("td");
-
                     if ((w===0 && d<firstDay) || dayNum > daysInMonth) {
                         td.className = "empty-cell";
                     } else {
                         hasData = true;
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
-
                         const { isDuty, activeWorkers } = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
                         const dayOfWeek = new Date(activeYear, activeMonth, currentDayNum).getDay();
@@ -559,11 +568,8 @@
                         }
                         html += `<div class="badges-list">`;
                         if (activeWorkers.length === 0) {
-                            if (isPlantao && !isWeekend) {
-                                html += `<span style="font-size:9px; color:#2E7D32;">(alternado)</span>`;
-                            } else {
-                                html += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
-                            }
+                            // NÃO EXIBE NADA
+                            html += ``;
                         } else {
                             const excecoes = staffConfig.excecoes || {};
                             const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -576,14 +582,13 @@
                         }
                         html += `</div>`;
 
-                        // Modo somente leitura
                         if (savedNote.trim()) {
                             html += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
                         }
 
                         td.innerHTML = html;
 
-                        // Versão mobile (lista)
+                        // VERSÃO MOBILE (card)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
                         if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
@@ -599,11 +604,7 @@
                                 <div class="badges-list">
                         `;
                         if (activeWorkers.length === 0) {
-                            if (isPlantao && !isWeekend) {
-                                cardHtml += `<span style="font-size:9px; color:#2E7D32;">(alternado)</span>`;
-                            } else {
-                                cardHtml += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
-                            }
+                            cardHtml += ``;
                         } else {
                             const excecoes = staffConfig.excecoes || {};
                             const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -615,6 +616,7 @@
                             });
                         }
                         cardHtml += `</div></div>`;
+
                         if (savedNote.trim()) {
                             cardHtml += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
                         }
@@ -623,62 +625,51 @@
                         listView.appendChild(card);
                         dayNum++;
                     }
-
                     tr.appendChild(td);
                 }
-
                 if (hasData) tbody.appendChild(tr);
                 if (dayNum > daysInMonth) break;
             }
         }
 
-        function noteKey(year, month, day) {
-            return `${year}_${month}_${day}`;
-        }
-
         // ==================== NAVEGAÇÃO ====================
-        document.getElementById("view-grid-btn").onclick = () => {
-            currentViewMode = "grid";
-            document.getElementById("main-grid-view").style.display = "table";
-            document.getElementById("main-list-view").style.display = "none";
-            document.getElementById("view-grid-btn").classList.add("active");
-            document.getElementById("view-list-btn").classList.remove("active");
+        document.getElementById('view-grid-btn').onclick = () => {
+            currentViewMode = 'grid';
+            document.getElementById('main-grid-view').style.display = 'table';
+            document.getElementById('main-list-view').style.display = 'none';
+            document.getElementById('view-grid-btn').classList.add('active');
+            document.getElementById('view-list-btn').classList.remove('active');
         };
-
-        document.getElementById("view-list-btn").onclick = () => {
-            currentViewMode = "list";
-            document.getElementById("main-grid-view").style.display = "none";
-            document.getElementById("main-list-view").style.display = "flex";
-            document.getElementById("view-list-btn").classList.add("active");
-            document.getElementById("view-grid-btn").classList.remove("active");
+        document.getElementById('view-list-btn').onclick = () => {
+            currentViewMode = 'list';
+            document.getElementById('main-grid-view').style.display = 'none';
+            document.getElementById('main-list-view').style.display = 'flex';
+            document.getElementById('view-list-btn').classList.add('active');
+            document.getElementById('view-grid-btn').classList.remove('active');
         };
-
-        document.getElementById("btn-prev-month").onclick = () => {
+        document.getElementById('btn-prev-month').onclick = () => {
             activeMonth--;
             if (activeMonth < 0) { activeMonth = 11; activeYear--; }
             if (activeYear < 2026) { activeYear = 2026; activeMonth = 0; }
             buildCalendar();
         };
-
-        document.getElementById("btn-next-month").onclick = () => {
+        document.getElementById('btn-next-month').onclick = () => {
             activeMonth++;
             if (activeMonth > 11) { activeMonth = 0; activeYear++; }
             if (activeYear > 2035) { activeYear = 2035; activeMonth = 11; }
             buildCalendar();
         };
-
-        document.getElementById("jump-submit-btn").onclick = () => {
+        document.getElementById('jump-submit-btn').onclick = () => {
             activeMonth = parseInt(monthSelect.value, 10);
             activeYear = parseInt(yearSelect.value, 10);
             buildCalendar();
         };
 
-        // ==================== INICIALIZAÇÃO ====================
+        // ==================== INIT ====================
         async function init() {
             await loadStaffConfig();
             await loadNotesFromServer();
         }
-
         init();
     </script>
 </body>
