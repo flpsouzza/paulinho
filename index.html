@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plantão - Escala</title>
     <style>
+        /* (mesmo CSS de antes, sem alterações) */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -30,7 +31,6 @@
             min-height: 100vh;
             padding: 12px;
         }
-        /* Ajustes mobile */
         @media (max-width: 768px) {
             :root { --font-base: 15px; }
             body { padding: 8px; }
@@ -139,7 +139,6 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -634,7 +633,6 @@
                 Defina os nomes do rodízio (sábado e domingo) e as exceções.
             </p>
 
-            <!-- RODÍZIO (SÁBADO E DOMINGO) -->
             <div class="day-section" id="section-rotation">
                 <h3>
                     🔄 Rodízio (sábado e domingo)
@@ -649,7 +647,6 @@
                 <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Ex: Carlos, Leticia, Gustavo, Tatiane</div>
             </div>
 
-            <!-- QUANTIDADES SÁBADO/DOMINGO -->
             <div class="day-section" style="border-color:#F59E0B; background:#FFFBEB;">
                 <h3 style="color:#D97706;">🔢 Quantos nomes do rodízio em cada dia?</h3>
                 <div class="qtd-row">
@@ -661,7 +658,6 @@
                 <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Quantas pessoas do rodízio em cada dia.</div>
             </div>
 
-            <!-- EXCEÇÕES -->
             <div class="day-section" style="border-color:#8B5CF6; background:#F5F3FF;">
                 <h3 style="color:#6D28D9;">
                     ⭐ Exceções (coringas)
@@ -862,15 +858,11 @@
             const dayOfWeek = currentDate.getDay();
             const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
-            // REGRA 1: ALTERNÂNCIA (segunda a sexta)
             if (isWeekday) {
                 const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) {
-                    isDuty = true;
-                }
+                if (diffDays % 2 === 0) isDuty = true;
             }
 
-            // REGRA 2: FIM DE SEMANA (sábado e domingo) com rodízio a cada 15 dias
             if (dayOfWeek === 6 || dayOfWeek === 0) {
                 const anchor = new Date(2026, 6, 3);
                 const diff = daysBetween(currentDate, anchor);
@@ -886,7 +878,6 @@
                     let quantidade = 0;
                     if (dayOfWeek === 6) quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
                     else if (dayOfWeek === 0) quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
-
                     if (rotation.length > 0 && quantidade > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
                         let offset = mathematicalMod(weekendIdx, rotation.length);
@@ -900,13 +891,10 @@
                 }
             }
 
-            // EXCEÇÕES (coringas) - só se for plantão
             if (isDuty) {
                 const excecoes = staffConfig.excecoes || {};
                 const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
+                if (excecaoNomes.length > 0) activeWorkers.push(...excecaoNomes);
             }
 
             activeWorkers = [...new Set(activeWorkers)];
@@ -1113,7 +1101,6 @@
                         }
                         html += `<div class="badges-list">`;
                         if (activeWorkers.length === 0) {
-                            // NÃO EXIBE NADA se não houver anotação (nem "alternado")
                             html += ``;
                         } else {
                             const excecoes = staffConfig.excecoes || {};
@@ -1164,7 +1151,6 @@
                             }
                         }
 
-                        // VERSÃO MOBILE (card)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
                         if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
@@ -1180,7 +1166,6 @@
                                 <div class="badges-list">
                         `;
                         if (activeWorkers.length === 0) {
-                            // não exibe nada
                             cardHtml += ``;
                         } else {
                             const excecoes = staffConfig.excecoes || {};
@@ -1286,7 +1271,6 @@
         const modalOverlay = document.getElementById("edit-modal");
 
         window.addNameToList = function(section) {
-            const input = document.getElementById(section === 'rotation' ? 'rotation-input' : '');
             if (section !== 'rotation') return;
             const name = document.getElementById('rotation-input').value.trim();
             if (!name) return alert('Digite um nome!');
@@ -1305,7 +1289,7 @@
         };
 
         window.removeLastFromList = function(section) {
-            const list = document.getElementById(section === 'rotation' ? 'rotation-list' : '');
+            const list = document.getElementById('rotation-list');
             if (!list) return;
             const last = list.lastElementChild;
             if (last) last.remove();
@@ -1375,7 +1359,6 @@
 
         function openEditModal() {
             if (!sessionUser) return alert("Faça login para editar.");
-            // preencher rodízio
             const list = document.getElementById('rotation-list');
             list.innerHTML = '';
             (staffConfig.rotation || []).forEach(name => {
@@ -1384,7 +1367,6 @@
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
                 list.appendChild(tag);
             });
-            // preencher exceções
             const exList = document.getElementById('excecoes-list');
             exList.innerHTML = '';
             const excecoes = staffConfig.excecoes || {};
