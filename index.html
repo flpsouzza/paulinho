@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
     <title>Plantão - Escala</title>
     <style>
+        /* ===== MESMO CSS ANTERIOR (não alterado) ===== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -79,6 +80,31 @@
         .btn-register { background: #475569; margin-top: 5px; }
         .btn-register:hover { background: #334155; }
         .auth-divider { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin: 5px 0; }
+
+        /* ---- NOVO: estilos para o campo de convite ---- */
+        .convite-wrapper {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .convite-wrapper input {
+            flex: 1;
+        }
+        .convite-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .convite-status.valido {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        .convite-status.invalido {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
 
         .calendar-container {
             width: 100%;
@@ -596,6 +622,13 @@
         <h2>Acesso à Escala</h2>
         <input type="email" id="auth-email" class="auth-input" placeholder="Seu e-mail">
         <input type="password" id="auth-password" class="auth-input" placeholder="Sua senha">
+
+        <!-- NOVO: campo de convite -->
+        <div class="convite-wrapper">
+            <input type="text" id="auth-convite" class="auth-input" placeholder="Código de convite" style="flex:1;">
+            <span id="convite-status" class="convite-status"></span>
+        </div>
+
         <button id="auth-login-btn" class="auth-btn btn-login">Entrar</button>
         <div class="auth-divider">ou se for seu primeiro acesso</div>
         <button id="auth-register-btn" class="auth-btn btn-register">Criar Nova Conta</button>
@@ -655,7 +688,7 @@
         </footer>
     </div>
 
-    <!-- MODAL DE EDIÇÃO -->
+    <!-- MODAL DE EDIÇÃO (mesmo de antes) -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
@@ -758,7 +791,9 @@
             deleteDoc,
             deleteField,
             writeBatch,
-            serverTimestamp
+            serverTimestamp,
+            query,
+            where
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -817,12 +852,70 @@
         const logoutBtn = document.getElementById("logout-btn");
         const emailInput = document.getElementById("auth-email");
         const passwordInput = document.getElementById("auth-password");
+        const conviteInput = document.getElementById("auth-convite");
+        const conviteStatus = document.getElementById("convite-status");
         const monthSelect = document.getElementById("jump-month-select");
 
         monthSelect.value = String(activeMonth);
         yearSelect.value = String(activeYear);
 
         const ALTERNANCIA_REF = new Date(2026, 7, 25);
+
+        // ==================== CONVITE ====================
+        // Função para verificar se o código de convite é válido
+        async function validarConvite(codigo) {
+            if (!codigo) return { valido: false, mensagem: "Digite um código de convite." };
+            try {
+                const convitesRef = collection(db, "convites");
+                const q = query(convitesRef, where("codigo", "==", codigo.trim()));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    return { valido: false, mensagem: "Código inválido." };
+                }
+                const docSnap = querySnapshot.docs[0];
+                const data = docSnap.data();
+                if (data.usado === true) {
+                    return { valido: false, mensagem: "Este convite já foi usado." };
+                }
+                // O convite é válido e não foi usado. Retornamos o ID do documento para marcar como usado depois.
+                return { valido: true, docId: docSnap.id, mensagem: "Convite válido! ✅" };
+            } catch (error) {
+                console.error("Erro ao validar convite:", error);
+                return { valido: false, mensagem: "Erro ao validar convite. Tente novamente." };
+            }
+        }
+
+        // Função para marcar o convite como usado
+        async function marcarConviteUsado(docId) {
+            try {
+                const ref = doc(db, "convites", docId);
+                await setDoc(ref, { usado: true, usadoEm: serverTimestamp() }, { merge: true });
+                return true;
+            } catch (error) {
+                console.error("Erro ao marcar convite como usado:", error);
+                return false;
+            }
+        }
+
+        // Validação em tempo real (quando o usuário digita)
+        let timeoutConvite = null;
+        conviteInput.addEventListener("input", async () => {
+            clearTimeout(timeoutConvite);
+            const codigo = conviteInput.value.trim();
+            if (!codigo) {
+                conviteStatus.textContent = "";
+                conviteStatus.className = "convite-status";
+                return;
+            }
+            timeoutConvite = setTimeout(async () => {
+                const resultado = await validarConvite(codigo);
+                conviteStatus.textContent = resultado.mensagem;
+                conviteStatus.className = "convite-status " + (resultado.valido ? "valido" : "invalido");
+                // Guardamos o docId no dataset para uso no registro
+                conviteInput.dataset.docId = resultado.docId || "";
+                conviteInput.dataset.valido = resultado.valido ? "true" : "false";
+            }, 500);
+        });
 
         // ==================== CONFIG ====================
         async function loadStaffConfig() {
@@ -951,7 +1044,6 @@
             return candidates[randomIndex];
         }
 
-        // Função auxiliar para o cálculo do Bate e Volta (sem recursão)
         function getWorkersForDateHelper(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
@@ -1030,13 +1122,11 @@
             const dayOfWeek = currentDate.getDay();
             const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
-            // REGRA 1: ALTERNÂNCIA (segunda a sexta)
             if (isWeekday) {
                 const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
                 if (diffDays % 2 === 0) isDuty = true;
             }
 
-            // REGRA 2: FIM DE SEMANA (sexta, sábado e domingo)
             if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
                 const anchor = new Date(2026, 6, 3);
                 const diff = daysBetween(currentDate, anchor);
@@ -1083,7 +1173,6 @@
                 }
             }
 
-            // EXCEÇÕES (coringas)
             if (isDuty) {
                 const excecoes = staffConfig.excecoes || {};
                 const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -1092,7 +1181,6 @@
                 }
             }
 
-            // REGRA 3: BATE E VOLTA
             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
             if (bateVolta.ativo && dayOfWeek === bateVolta.dia) {
                 if (isDuty) {
@@ -1289,7 +1377,6 @@
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
 
-                        // Pega o resultado completo com o nome do Bate e Volta
                         const result = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const { isDuty, activeWorkers, isBateVolta, nomeBateVolta } = result;
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
@@ -1321,11 +1408,11 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
+                            const nomeBateVoltaCalculado = nomeBateVolta; // já vem do result
 
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
-                                // USAR o nomeBateVolta retornado pela função, NÃO recalcular
-                                const isBate = (worker === nomeBateVolta && isBateVoltaDia);
+                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
                                 let coringaClass = isCoringa ? 'badge-coringa' : '';
                                 let bateClass = isBate ? 'badge-bate-volta' : '';
@@ -1398,10 +1485,11 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
+                            const nomeBateVoltaCalculado = nomeBateVolta;
 
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVolta && isBateVoltaDia);
+                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
                                 let coringaClass = isCoringa ? 'badge-coringa' : '';
                                 let bateClass = isBate ? 'badge-bate-volta' : '';
@@ -1484,15 +1572,43 @@
         async function doRegister() {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
+            const codigo = conviteInput.value.trim();
+
             if (!email || !password) return alert("Preencha e-mail e senha!");
             if (password.length < 6) return alert("Senha precisa ter 6+ caracteres!");
+
+            // Validação do convite
+            if (!codigo) {
+                alert("Digite o código de convite.");
+                return;
+            }
+
             setAuthLoading(true, "register");
+
             try {
+                const resultado = await validarConvite(codigo);
+                if (!resultado.valido) {
+                    alert("Convite inválido: " + resultado.mensagem);
+                    setAuthLoading(false);
+                    return;
+                }
+
+                // Marcar convite como usado
+                const marcado = await marcarConviteUsado(resultado.docId);
+                if (!marcado) {
+                    alert("Erro ao marcar convite. Tente novamente.");
+                    setAuthLoading(false);
+                    return;
+                }
+
+                // Criar conta
                 await createUserWithEmailAndPassword(auth, email, password);
-                alert("Conta criada!");
+                alert("Conta criada com sucesso! Você já está conectado.");
             } catch (error) {
-                alert("Erro: " + friendlyFirebaseError(error));
-            } finally { setAuthLoading(false); }
+                alert("Erro ao criar conta: " + friendlyFirebaseError(error));
+            } finally {
+                setAuthLoading(false);
+            }
         }
 
         loginBtn.onclick = doLogin;
