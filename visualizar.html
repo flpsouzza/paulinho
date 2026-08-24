@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
     <title>Visualização - Plantão</title>
     <style>
-        /* ===== MESMO CSS do index.html, mas sem auth ===== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -758,10 +757,11 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            let nomeBateVoltaCalculado = null;
-                            if (isBateVoltaDia) {
-                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
-                            }
+
+                            // AGORA USAMOS o nomeBateVolta retornado pela função getWorkersForDate
+                            // NÃO recalculamos, usamos o que veio no result
+                            const nomeBateVoltaCalculado = nomeBateVolta; // já vem do result
+
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
                                 const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
@@ -806,10 +806,9 @@
                             const excecaoNomes = excecoes[dayOfWeek] || [];
                             const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
                             const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            let nomeBateVoltaCalculado = null;
-                            if (isBateVoltaDia) {
-                                nomeBateVoltaCalculado = calcularNomeBateVolta(activeYear, activeMonth, currentDayNum);
-                            }
+                            // USAR O nomeBateVolta do result
+                            const nomeBateVoltaCalculado = nomeBateVolta;
+
                             activeWorkers.forEach(worker => {
                                 const isCoringa = excecaoNomes.includes(worker);
                                 const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
