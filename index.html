@@ -588,7 +588,143 @@
         .l-today { background: #FFFBEB; border: 2px solid #F59E0B; }
         .l-annotated { background: var(--bg-annotated); border: 1px solid var(--border-annotated); }
 
-        #edit-staff-btn { display: none; }
+        #edit-staff-btn, #manage-invites-btn { display: none; }
+
+        /* ===== GERENCIAMENTO DE CONVITES ===== */
+        .title-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .invite-create-row {
+            display: grid;
+            grid-template-columns: minmax(200px, 1fr) auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .invite-create-row input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .invite-create-row input:focus {
+            border-color: var(--rio-light);
+            box-shadow: 0 0 0 2px rgba(0,45,94,0.12);
+        }
+        .invite-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .invite-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .invite-btn-primary { background: var(--rio-blue); color: #FFF; }
+        .invite-btn-primary:hover { background: var(--rio-light); }
+        .invite-btn-secondary { background: #E2E8F0; color: var(--text-main); }
+        .invite-btn-secondary:hover { background: #CBD5E1; }
+        .invite-btn-danger { background: #FEE2E2; color: #B91C1C; }
+        .invite-btn-danger:hover { background: #FECACA; }
+        .invite-helper {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .generated-invite-box {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid #BFDBFE;
+            border-radius: 10px;
+            background: #EFF6FF;
+        }
+        .generated-invite-box.active { display: block; }
+        .generated-code-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .generated-code {
+            font-family: Consolas, Monaco, monospace;
+            font-weight: 900;
+            font-size: 1.15rem;
+            color: var(--rio-blue);
+            letter-spacing: 1px;
+        }
+        .generated-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+        .invite-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .invite-list-header h3 { margin: 0; }
+        .invite-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .invite-empty {
+            padding: 18px 10px;
+            text-align: center;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-color);
+            border-radius: 10px;
+            background: #FFF;
+        }
+        .invite-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #FFF;
+            padding: 10px 12px;
+            display: grid;
+            grid-template-columns: minmax(140px, 0.8fr) minmax(180px, 1.2fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+        .invite-item-code {
+            font-family: Consolas, Monaco, monospace;
+            font-weight: 900;
+            color: var(--rio-blue);
+            word-break: break-word;
+        }
+        .invite-item-meta {
+            font-size: 0.75rem;
+            line-height: 1.45;
+            color: var(--text-muted);
+            word-break: break-word;
+        }
+        .invite-status-pill {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .invite-status-pill.available { background: #D1FAE5; color: #065F46; }
+        .invite-status-pill.used { background: #E2E8F0; color: #475569; }
+        .invite-item-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+        .invite-item-actions .invite-btn { padding: 7px 9px; font-size: 0.7rem; }
+
         .badge-color-0 { background-color: #3B82F6; }
         .badge-color-1 { background-color: #10B981; }
         .badge-color-2 { background-color: #F59E0B; }
@@ -613,6 +749,11 @@
             .title-block .month-title { font-size: 1.4rem; }
             .modal-content { padding: 16px 12px; }
             .day-section { padding: 10px 8px; }
+            .title-actions { gap: 6px; }
+            .invite-create-row { grid-template-columns: 1fr; }
+            .invite-item { grid-template-columns: 1fr; }
+            .invite-item-actions { justify-content: flex-start; }
+            .generated-code-row { align-items: flex-start; }
         }
     </style>
 </head>
@@ -643,7 +784,10 @@
             <div class="title-block">
                 <div class="month-title" id="month-label">Julho</div>
                 <div class="year-title" id="year-label">2026</div>
-                <button id="edit-staff-btn" class="btn-action" style="margin-top: 8px;">📝 Editar Escala</button>
+                <div class="title-actions">
+                    <button id="edit-staff-btn" class="btn-action">📝 Editar Escala</button>
+                    <button id="manage-invites-btn" class="btn-action">✉️ Convites</button>
+                </div>
             </div>
         </header>
 
@@ -772,6 +916,56 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONVITES -->
+    <div class="modal-overlay" id="invites-modal">
+        <div class="modal-content" style="max-width:820px;">
+            <h2>✉️ Gerenciar Convites</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:14px; line-height:1.45;">
+                Qualquer usuário logado pode gerar convites. O código é salvo na coleção <strong>convites</strong> do Firestore e só pode ser usado uma vez.
+            </p>
+
+            <div class="day-section">
+                <h3>🎟️ Novo convite</h3>
+                <div class="invite-create-row">
+                    <input type="email" id="invite-recipient-email" placeholder="E-mail do convidado (opcional)">
+                    <button type="button" class="invite-btn invite-btn-secondary" id="generate-invite-btn">Gerar código</button>
+                    <button type="button" class="invite-btn invite-btn-primary" id="generate-send-invite-btn">✉️ Gerar e enviar</button>
+                </div>
+                <div class="invite-helper">
+                    “Gerar e enviar” cria o código e abre o seu aplicativo/programa de e-mail com destinatário, assunto e mensagem já preenchidos. Você só precisa confirmar o envio.
+                </div>
+
+                <div class="generated-invite-box" id="generated-invite-box">
+                    <div class="generated-code-row">
+                        <div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:3px;">ÚLTIMO CONVITE GERADO</div>
+                            <div class="generated-code" id="generated-invite-code">—</div>
+                            <div id="generated-invite-email" style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;"></div>
+                        </div>
+                        <div class="generated-actions">
+                            <button type="button" class="invite-btn invite-btn-secondary" id="copy-generated-invite-btn">📋 Copiar</button>
+                            <button type="button" class="invite-btn invite-btn-primary" id="email-generated-invite-btn">✉️ Enviar por e-mail</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-section">
+                <div class="invite-list-header">
+                    <h3>📋 Convites cadastrados</h3>
+                    <button type="button" class="invite-btn invite-btn-secondary" id="refresh-invites-btn">↻ Atualizar</button>
+                </div>
+                <div class="invite-list" id="invites-list">
+                    <div class="invite-empty">Carregando convites...</div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="invites-close-btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
@@ -877,19 +1071,24 @@
                 if (data.usado === true) {
                     return { valido: false, mensagem: "Este convite já foi usado." };
                 }
-                // O convite é válido e não foi usado. Retornamos o ID do documento para marcar como usado depois.
-                return { valido: true, docId: docSnap.id, mensagem: "Convite válido! ✅" };
+                // O convite é válido e não foi usado. Retornamos o ID e os dados do documento.
+                return { valido: true, docId: docSnap.id, data, mensagem: "Convite válido! ✅" };
             } catch (error) {
                 console.error("Erro ao validar convite:", error);
                 return { valido: false, mensagem: "Erro ao validar convite. Tente novamente." };
             }
         }
 
-        // Função para marcar o convite como usado
-        async function marcarConviteUsado(docId) {
+        // Função para marcar o convite como usado somente depois que a conta for criada.
+        async function marcarConviteUsado(docId, user) {
             try {
                 const ref = doc(db, "convites", docId);
-                await setDoc(ref, { usado: true, usadoEm: serverTimestamp() }, { merge: true });
+                await setDoc(ref, {
+                    usado: true,
+                    usadoEm: serverTimestamp(),
+                    usadoPor: user?.email || null,
+                    usadoPorUid: user?.uid || null
+                }, { merge: true });
                 return true;
             } catch (error) {
                 console.error("Erro ao marcar convite como usado:", error);
@@ -916,6 +1115,249 @@
                 conviteInput.dataset.valido = resultado.valido ? "true" : "false";
             }, 500);
         });
+
+        // ==================== GERENCIAMENTO DE CONVITES ====================
+        const APP_URL = "https://flpsouzza.github.io/paulinho/";
+        let lastGeneratedInvite = null;
+
+        function normalizarEmail(email) {
+            return String(email || "").trim().toLowerCase();
+        }
+
+        function gerarCodigoConvite() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            const values = new Uint32Array(6);
+            crypto.getRandomValues(values);
+            let code = "COR-";
+            for (const value of values) code += chars[value % chars.length];
+            return code;
+        }
+
+        async function criarNovoConvite(email = "") {
+            if (!sessionUser) throw new Error("Faça login para gerar convites.");
+            const destinatario = normalizarEmail(email);
+
+            // Tenta algumas vezes para garantir que o código ainda não exista.
+            for (let attempt = 0; attempt < 10; attempt++) {
+                const codigo = gerarCodigoConvite();
+                const ref = doc(db, "convites", codigo);
+                const existing = await getDoc(ref);
+                if (existing.exists()) continue;
+
+                await setDoc(ref, {
+                    codigo,
+                    usado: false,
+                    email: destinatario || null,
+                    criadoEm: serverTimestamp(),
+                    criadoPor: sessionUser.email || sessionUser.uid,
+                    criadoPorUid: sessionUser.uid
+                });
+
+                return { docId: codigo, codigo, email: destinatario, usado: false };
+            }
+            throw new Error("Não foi possível gerar um código único. Tente novamente.");
+        }
+
+        function buildInviteEmailBody(invite) {
+            return [
+                "Olá!",
+                "",
+                "Você foi convidado para acessar a página de Plantão.",
+                "",
+                `Acesse: ${APP_URL}`,
+                `Código de convite: ${invite.codigo}`,
+                "",
+                "No primeiro acesso, informe seu e-mail, crie uma senha e digite o código de convite acima.",
+                "",
+                "Este código só pode ser utilizado uma vez."
+            ].join("\n");
+        }
+
+        function abrirEmailConvite(invite, emailOverride = "") {
+            const destinatario = normalizarEmail(emailOverride || invite?.email || "");
+            if (!destinatario) {
+                const informado = prompt("Digite o e-mail do convidado:", "");
+                if (!informado) return;
+                invite = { ...invite, email: normalizarEmail(informado) };
+            }
+            const finalEmail = normalizarEmail(invite.email || destinatario);
+            const subject = encodeURIComponent("Convite para acesso à escala de Plantão");
+            const body = encodeURIComponent(buildInviteEmailBody(invite));
+            window.location.href = `mailto:${encodeURIComponent(finalEmail)}?subject=${subject}&body=${body}`;
+        }
+
+        async function copiarTexto(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (_) {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand("copy");
+                ta.remove();
+                return ok;
+            }
+        }
+
+        function formatTimestamp(value) {
+            if (!value) return "—";
+            try {
+                const date = typeof value.toDate === "function" ? value.toDate() : new Date(value);
+                if (Number.isNaN(date.getTime())) return "—";
+                return new Intl.DateTimeFormat("pt-BR", {
+                    dateStyle: "short",
+                    timeStyle: "short"
+                }).format(date);
+            } catch (_) {
+                return "—";
+            }
+        }
+
+        function showGeneratedInvite(invite) {
+            lastGeneratedInvite = invite;
+            const box = document.getElementById("generated-invite-box");
+            document.getElementById("generated-invite-code").textContent = invite.codigo;
+            document.getElementById("generated-invite-email").textContent = invite.email ? `Para: ${invite.email}` : "Sem e-mail vinculado";
+            box.classList.add("active");
+        }
+
+        async function loadInvitesList() {
+            const list = document.getElementById("invites-list");
+            if (!sessionUser) {
+                list.innerHTML = '<div class="invite-empty">Faça login para visualizar os convites.</div>';
+                return;
+            }
+
+            list.innerHTML = '<div class="invite-empty">Carregando convites...</div>';
+            try {
+                const snapshot = await getDocs(collection(db, "convites"));
+                const invites = snapshot.docs.map(snap => ({ docId: snap.id, ...snap.data() }));
+                invites.sort((a, b) => {
+                    const ta = a.criadoEm?.toMillis?.() || 0;
+                    const tb = b.criadoEm?.toMillis?.() || 0;
+                    return tb - ta;
+                });
+
+                list.innerHTML = "";
+                if (!invites.length) {
+                    list.innerHTML = '<div class="invite-empty">Nenhum convite cadastrado.</div>';
+                    return;
+                }
+
+                for (const invite of invites) {
+                    const item = document.createElement("div");
+                    item.className = "invite-item";
+
+                    const codeCol = document.createElement("div");
+                    const status = document.createElement("span");
+                    status.className = `invite-status-pill ${invite.usado ? "used" : "available"}`;
+                    status.textContent = invite.usado ? "Utilizado" : "Disponível";
+                    const code = document.createElement("div");
+                    code.className = "invite-item-code";
+                    code.textContent = invite.codigo || invite.docId;
+                    codeCol.append(status, code);
+
+                    const meta = document.createElement("div");
+                    meta.className = "invite-item-meta";
+                    const metaLines = [];
+                    if (invite.email) metaLines.push(`Destinatário: ${invite.email}`);
+                    metaLines.push(`Criado: ${formatTimestamp(invite.criadoEm)}`);
+                    if (invite.criadoPor) metaLines.push(`Por: ${invite.criadoPor}`);
+                    if (invite.usado) {
+                        if (invite.usadoPor) metaLines.push(`Usado por: ${invite.usadoPor}`);
+                        metaLines.push(`Usado em: ${formatTimestamp(invite.usadoEm)}`);
+                    }
+                    meta.textContent = metaLines.join(" • ");
+
+                    const actions = document.createElement("div");
+                    actions.className = "invite-item-actions";
+
+                    const copyBtn = document.createElement("button");
+                    copyBtn.type = "button";
+                    copyBtn.className = "invite-btn invite-btn-secondary";
+                    copyBtn.textContent = "📋 Copiar";
+                    copyBtn.onclick = async () => {
+                        const ok = await copiarTexto(invite.codigo || invite.docId);
+                        alert(ok ? "Código copiado!" : "Não foi possível copiar o código.");
+                    };
+                    actions.appendChild(copyBtn);
+
+                    if (!invite.usado) {
+                        const emailBtn = document.createElement("button");
+                        emailBtn.type = "button";
+                        emailBtn.className = "invite-btn invite-btn-primary";
+                        emailBtn.textContent = "✉️ E-mail";
+                        emailBtn.onclick = () => abrirEmailConvite({
+                            codigo: invite.codigo || invite.docId,
+                            email: invite.email || ""
+                        });
+                        actions.appendChild(emailBtn);
+                    }
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.type = "button";
+                    deleteBtn.className = "invite-btn invite-btn-danger";
+                    deleteBtn.textContent = "Excluir";
+                    deleteBtn.onclick = async () => {
+                        const codigo = invite.codigo || invite.docId;
+                        if (!confirm(`Excluir o convite ${codigo}?`)) return;
+                        try {
+                            await deleteDoc(doc(db, "convites", invite.docId));
+                            if (lastGeneratedInvite?.docId === invite.docId) {
+                                lastGeneratedInvite = null;
+                                document.getElementById("generated-invite-box").classList.remove("active");
+                            }
+                            await loadInvitesList();
+                        } catch (error) {
+                            console.error("Erro ao excluir convite:", error);
+                            alert("Erro ao excluir convite: " + (error?.message || "falha desconhecida"));
+                        }
+                    };
+                    actions.appendChild(deleteBtn);
+
+                    item.append(codeCol, meta, actions);
+                    list.appendChild(item);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar convites:", error);
+                list.innerHTML = '<div class="invite-empty">Erro ao carregar convites. Verifique as regras do Firestore.</div>';
+            }
+        }
+
+        async function gerarConvitePelaTela(enviarDepois = false) {
+            if (!sessionUser) return alert("Faça login para gerar convites.");
+            const emailInputConvite = document.getElementById("invite-recipient-email");
+            const email = normalizarEmail(emailInputConvite.value);
+            if (enviarDepois && !email) {
+                emailInputConvite.focus();
+                return alert("Digite o e-mail do convidado para gerar e enviar.");
+            }
+            if (email && !emailInputConvite.checkValidity()) {
+                emailInputConvite.focus();
+                return alert("Digite um e-mail válido.");
+            }
+
+            const generateBtn = document.getElementById("generate-invite-btn");
+            const generateSendBtn = document.getElementById("generate-send-invite-btn");
+            generateBtn.disabled = true;
+            generateSendBtn.disabled = true;
+            try {
+                const invite = await criarNovoConvite(email);
+                showGeneratedInvite(invite);
+                await loadInvitesList();
+                if (enviarDepois) abrirEmailConvite(invite, email);
+            } catch (error) {
+                console.error("Erro ao gerar convite:", error);
+                alert("Erro ao gerar convite: " + (error?.message || "falha desconhecida"));
+            } finally {
+                generateBtn.disabled = false;
+                generateSendBtn.disabled = false;
+            }
+        }
 
         // ==================== CONFIG ====================
         async function loadStaffConfig() {
@@ -1593,17 +2035,17 @@
                     return;
                 }
 
-                // Marcar convite como usado
-                const marcado = await marcarConviteUsado(resultado.docId);
-                if (!marcado) {
-                    alert("Erro ao marcar convite. Tente novamente.");
-                    setAuthLoading(false);
-                    return;
-                }
+                // Criar a conta primeiro. Assim, se o cadastro falhar (por exemplo, e-mail já existente),
+                // o convite não é perdido.
+                const credential = await createUserWithEmailAndPassword(auth, email, password);
 
-                // Criar conta
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert("Conta criada com sucesso! Você já está conectado.");
+                // Só depois do cadastro concluído marcamos o convite como usado.
+                const marcado = await marcarConviteUsado(resultado.docId, credential.user);
+                if (!marcado) {
+                    alert("Conta criada com sucesso, mas não foi possível marcar o convite como usado. Avise um editor para verificar o Firestore.");
+                } else {
+                    alert("Conta criada com sucesso! Você já está conectado.");
+                }
             } catch (error) {
                 alert("Erro ao criar conta: " + friendlyFirebaseError(error));
             } finally {
@@ -1617,6 +2059,36 @@
         logoutBtn.onclick = async () => {
             try { await signOut(auth); } catch (error) { alert("Erro ao sair."); }
         };
+
+        // ==================== MODAL DE CONVITES ====================
+        const invitesModal = document.getElementById("invites-modal");
+        const manageInvitesBtn = document.getElementById("manage-invites-btn");
+
+        async function openInvitesModal() {
+            if (!sessionUser) return alert("Faça login para gerenciar convites.");
+            invitesModal.classList.add("active");
+            await loadInvitesList();
+        }
+
+        function closeInvitesModal() {
+            invitesModal.classList.remove("active");
+        }
+
+        manageInvitesBtn.addEventListener("click", openInvitesModal);
+        document.getElementById("invites-close-btn").addEventListener("click", closeInvitesModal);
+        document.getElementById("refresh-invites-btn").addEventListener("click", loadInvitesList);
+        document.getElementById("generate-invite-btn").addEventListener("click", () => gerarConvitePelaTela(false));
+        document.getElementById("generate-send-invite-btn").addEventListener("click", () => gerarConvitePelaTela(true));
+        document.getElementById("copy-generated-invite-btn").addEventListener("click", async () => {
+            if (!lastGeneratedInvite) return;
+            const ok = await copiarTexto(lastGeneratedInvite.codigo);
+            alert(ok ? "Código copiado!" : "Não foi possível copiar o código.");
+        });
+        document.getElementById("email-generated-invite-btn").addEventListener("click", () => {
+            if (!lastGeneratedInvite) return;
+            abrirEmailConvite(lastGeneratedInvite, document.getElementById("invite-recipient-email").value);
+        });
+        invitesModal.addEventListener("click", e => { if (e.target === invitesModal) closeInvitesModal(); });
 
         // ==================== MODAL ====================
         const modalOverlay = document.getElementById("edit-modal");
@@ -1820,11 +2292,14 @@
                 authScreen.style.display = 'none';
                 calendarScreen.style.display = 'flex';
                 document.getElementById('edit-staff-btn').style.display = 'inline-block';
+                document.getElementById('manage-invites-btn').style.display = 'inline-block';
             } else {
                 sessionUser = null;
                 authScreen.style.display = 'flex';
                 calendarScreen.style.display = 'flex';
                 document.getElementById('edit-staff-btn').style.display = 'none';
+                document.getElementById('manage-invites-btn').style.display = 'none';
+                closeInvitesModal();
             }
             await loadNotesFromServer();
         });
