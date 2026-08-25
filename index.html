@@ -96,6 +96,69 @@
         .forgot-password-btn:hover { text-decoration: underline; }
         .forgot-password-btn:disabled { opacity: 0.55; cursor: wait; text-decoration: none; }
 
+        /* ===== POP-UP DE RECUPERAÇÃO DE SENHA ===== */
+        .password-reset-card {
+            width: min(92vw, 430px);
+            background: #FFF;
+            border-radius: 20px;
+            padding: 28px 24px 22px;
+            text-align: center;
+            box-shadow: 0 24px 70px rgba(0, 45, 94, 0.28);
+            animation: resetModalIn 0.22s ease-out;
+        }
+        .password-reset-icon {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EAF4FF;
+            border: 1px solid #C9DDF5;
+            font-size: 2rem;
+        }
+        .password-reset-card h2 {
+            color: var(--rio-blue);
+            font-size: 1.45rem;
+            margin-bottom: 8px;
+        }
+        .password-reset-card p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+        .password-reset-email {
+            margin: 14px 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            color: var(--rio-blue);
+            font-size: 0.88rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+        .password-reset-tip {
+            margin: 14px 0 18px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            color: #92400E;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            text-align: left;
+        }
+        .password-reset-ok {
+            width: 100%;
+            margin-top: 4px;
+        }
+        @keyframes resetModalIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
         /* ---- NOVO: estilos para o campo de convite ---- */
         .convite-wrapper {
             display: flex;
@@ -791,6 +854,21 @@
         <button id="auth-register-btn" class="auth-btn btn-register">Criar Nova Conta</button>
     </div>
 
+    <!-- POP-UP DE RECUPERAÇÃO DE SENHA -->
+    <div class="modal-overlay" id="password-reset-modal" role="dialog" aria-modal="true" aria-labelledby="password-reset-title">
+        <div class="password-reset-card">
+            <div class="password-reset-icon" aria-hidden="true">🔐</div>
+            <h2 id="password-reset-title">Pedido de recuperação enviado!</h2>
+            <p>Enviamos um link para redefinir sua senha para o e-mail informado:</p>
+            <div class="password-reset-email" id="password-reset-email"></div>
+            <div class="password-reset-tip">
+                📩 A mensagem pode levar alguns minutos para chegar. Verifique também a pasta <strong>Spam/Lixo eletrônico</strong>.
+            </div>
+            <p>Depois é só criar uma nova senha e voltar para o <strong>Plantão</strong>. 😉</p>
+            <button type="button" class="auth-btn btn-login password-reset-ok" id="password-reset-ok-btn">Entendi 👍</button>
+        </div>
+    </div>
+
     <div class="calendar-container" id="calendar-screen">
         <div class="top-bar-header">
             Plantão
@@ -1019,6 +1097,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        auth.languageCode = "pt-BR";
         const db = getFirestore(app);
 
         let sessionUser = null;
@@ -1064,6 +1143,9 @@
         const emailInput = document.getElementById("auth-email");
         const passwordInput = document.getElementById("auth-password");
         const forgotPasswordBtn = document.getElementById("forgot-password-btn");
+        const passwordResetModal = document.getElementById("password-reset-modal");
+        const passwordResetEmail = document.getElementById("password-reset-email");
+        const passwordResetOkBtn = document.getElementById("password-reset-ok-btn");
         const conviteInput = document.getElementById("auth-convite");
         const conviteStatus = document.getElementById("convite-status");
         const monthSelect = document.getElementById("jump-month-select");
@@ -2029,6 +2111,17 @@
             } finally { setAuthLoading(false); }
         }
 
+        function showPasswordResetSuccess(email) {
+            passwordResetEmail.textContent = email;
+            passwordResetModal.classList.add("active");
+            setTimeout(() => passwordResetOkBtn.focus(), 50);
+        }
+
+        function closePasswordResetModal() {
+            passwordResetModal.classList.remove("active");
+            forgotPasswordBtn.focus();
+        }
+
         async function doPasswordReset() {
             const email = emailInput.value.trim();
             if (!email) {
@@ -2043,11 +2136,7 @@
 
             try {
                 await sendPasswordResetEmail(auth, email);
-                alert(
-                    "E-mail de recuperação enviado!\n\n" +
-                    "Verifique a caixa de entrada e também a pasta de spam/lixo eletrônico. " +
-                    "Abra o link enviado pelo Firebase para criar uma nova senha."
-                );
+                showPasswordResetSuccess(email);
             } catch (error) {
                 console.error("Erro ao enviar recuperação de senha:", error);
                 const code = error?.code || "";
@@ -2110,6 +2199,15 @@
 
         loginBtn.onclick = doLogin;
         forgotPasswordBtn.onclick = doPasswordReset;
+        passwordResetOkBtn.onclick = closePasswordResetModal;
+        passwordResetModal.addEventListener("click", e => {
+            if (e.target === passwordResetModal) closePasswordResetModal();
+        });
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && passwordResetModal.classList.contains("active")) {
+                closePasswordResetModal();
+            }
+        });
         registerBtn.onclick = doRegister;
         passwordInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
         logoutBtn.onclick = async () => {
