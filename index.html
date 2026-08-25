@@ -43,6 +43,23 @@
             body { padding: 4px; }
         }
 
+        /* ===== MOBILE: NA TELA DE LOGIN, OCULTA A PRÉVIA DA ESCALA =====
+           No desktop nada muda. Após autenticar, a classe guest-mode é removida
+           e a escala volta a ser exibida normalmente também no celular. */
+        @media (max-width: 768px) {
+            body.guest-mode #calendar-screen {
+                display: none !important;
+            }
+
+            body.guest-mode {
+                justify-content: center;
+            }
+
+            body.guest-mode #auth-screen {
+                margin-top: 24px;
+            }
+        }
+
         .auth-container {
             width: 100%;
             max-width: 400px;
@@ -2443,12 +2460,14 @@
             await loadStaffConfig();
             if (user) {
                 sessionUser = user;
+                document.body.classList.remove('guest-mode');
                 authScreen.style.display = 'none';
                 calendarScreen.style.display = 'flex';
                 document.getElementById('edit-staff-btn').style.display = 'inline-block';
                 document.getElementById('manage-invites-btn').style.display = 'inline-block';
             } else {
                 sessionUser = null;
+                document.body.classList.add('guest-mode');
                 authScreen.style.display = 'flex';
                 calendarScreen.style.display = 'flex';
                 document.getElementById('edit-staff-btn').style.display = 'none';
