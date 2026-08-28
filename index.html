@@ -1136,7 +1136,7 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ===== LÓGICA DO RODÍZIO (FIXA: SEQUENCIAL SEM SOBREPOSIÇÃO) =====
+        // ===== LÓGICA DO RODÍZIO (CORRIGIDA: PASSO VARIÁVEL) =====
         function getWorkersForDate(year, month, day) {
             const key = noteKey(year, month, day);
 
@@ -1174,23 +1174,31 @@
                     // quinta removida
                 } else {
                     if (rotation.length > 0) {
-                        // Índice do plantão (0, 1, 2, ...)
                         const plantaoIndex = Math.floor((diff - pos) / 14);
                         const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
                         const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
                         const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
                         const totalPorPlantao = qtdSexta + qtdSabado + qtdDomingo;
 
+                        // ===== CORREÇÃO DO BUG DE REPETIÇÃO =====
+                        // Calcula o "passo" da rotação. Se houver menos pessoas que vagas,
+                        // rotaciona 1 por vez para nunca repetir o mesmo grupo no mesmo dia.
+                        let step = totalPorPlantao;
+                        if (totalPorPlantao >= rotation.length) {
+                            step = 1; 
+                        }
+                        // =====================================================
+
                         let offset = 0;
                         let quantidade = 0;
                         if (posTipo === 'sexta') {
-                            offset = plantaoIndex * totalPorPlantao;
+                            offset = plantaoIndex * step;
                             quantidade = qtdSexta;
                         } else if (posTipo === 'sabado') {
-                            offset = plantaoIndex * totalPorPlantao + qtdSexta;
+                            offset = plantaoIndex * step + qtdSexta;
                             quantidade = qtdSabado;
                         } else if (posTipo === 'domingo') {
-                            offset = plantaoIndex * totalPorPlantao + qtdSexta + qtdSabado;
+                            offset = plantaoIndex * step + qtdSexta + qtdSabado;
                             quantidade = qtdDomingo;
                         }
 
@@ -1268,7 +1276,7 @@
             }
         }
 
-        // ==================== DRAG & DROP (CORRIGIDO) ====================
+        // ==================== DRAG & DROP ====================
         let draggedData = null;
 
         window.dragStart = function(e, day, name) {
@@ -1317,28 +1325,21 @@
             let sourceList = [...sourceResult.activeWorkers];
             let targetList = [...targetResult.activeWorkers];
 
-            // Verifica se o nome existe na origem
             if (!sourceList.includes(draggedName)) {
                 alert('Este nome não está mais disponível.');
                 return;
             }
 
-            // Se o destino já tem o nome, não faz nada
             if (targetList.includes(draggedName)) {
                 alert('Este nome já está no dia de destino.');
                 return;
             }
 
-            // Remove da origem
             sourceList = sourceList.filter(n => n !== draggedName);
-
-            // Adiciona ao destino (sem substituir)
             targetList.push(draggedName);
 
-            // Atualiza overrides
             const newOverrides = { ...staffConfig.manual_overrides };
 
-            // Se a lista da origem ficou igual ao padrão, remove override; senão, mantém
             const defaultSource = getWorkersForDate(activeYear, activeMonth, sourceDay);
             const isSourceDefault = JSON.stringify(sourceList.sort()) === JSON.stringify(defaultSource.activeWorkers.sort());
             if (isSourceDefault || sourceList.length === 0) {
@@ -1347,7 +1348,6 @@
                 newOverrides[sourceKey] = sourceList;
             }
 
-            // Se a lista do destino ficou igual ao padrão, remove override; senão, mantém
             const defaultTarget = getWorkersForDate(activeYear, activeMonth, parseInt(targetDay));
             const isTargetDefault = JSON.stringify(targetList.sort()) === JSON.stringify(defaultTarget.activeWorkers.sort());
             if (isTargetDefault) {
