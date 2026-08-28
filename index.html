@@ -116,6 +116,8 @@
         .modal-buttons button { padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; }
         .btn-save { background: var(--rio-blue); color: #FFF; } .btn-save:hover { background: var(--rio-light); }
         .btn-cancel { background: #E2E8F0; color: var(--text-main); } .btn-cancel:hover { background: #CBD5E1; }
+        .btn-clear-scale { background: #FEE2E2; color: #B91C1C; margin-right: auto; }
+        .btn-clear-scale:hover { background: #FECACA; }
         footer { padding: 14px 20px; background-color: #F8FAFC; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
         .legend-container { display: flex; gap: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
@@ -305,6 +307,7 @@
             </div>
 
             <div class="modal-buttons">
+                <button class="btn-clear-scale" id="clear-scale-btn">🗑️ Limpar Escala</button>
                 <button class="btn-cancel" id="edit-cancel-btn">Cancelar</button>
                 <button class="btn-save" id="edit-save-btn">💾 Salvar</button>
             </div>
@@ -526,7 +529,6 @@
             else if (pos === 9) { isPlantaoRegra = true; posTipo = 'domingo'; }
 
             if (isPlantaoRegra) {
-                // ===== FIX: QUINTA REMOVIDA COMPLETAMENTE =====
                 if (posTipo === 'quinta') {
                     return { isDuty: false, activeWorkers: [] };
                 }
@@ -538,10 +540,8 @@
                     const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
                     const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
                     
-                    // ===== CORREÇÃO FINAL: PASSO = 1 =====
-                    // Isso quebra as duplas fixas e faz todos se revezarem dia sim, dia não.
+                    // CORREÇÃO FINAL: PASSO = 1 (quebra duplas fixas)
                     let step = 1; 
-                    // ======================================
 
                     let offset = 0;
                     let quantidade = 0;
@@ -1147,6 +1147,32 @@
 
         function closeEditModal() { editModal.classList.remove('active'); }
 
+        // ==================== NOVA FUNÇÃO: LIMPAR ESCALA ====================
+        async function clearScale() {
+            if (!sessionUser) return;
+            
+            if (!confirm("Tem certeza que deseja apagar TODOS os nomes e configurações da escala?\n\nIsso limpará o rodízio, as exceções e as quantidades.")) {
+                return;
+            }
+
+            try {
+                // Define tudo vazio e salva no Firebase
+                await saveStaffConfig([], {}, { sexta: 0, sabado: 0, domingo: 0 }, {});
+                
+                // Fecha o modal
+                closeEditModal();
+                
+                // Recarrega o calendário sem nomes
+                buildCalendar();
+                
+                alert("✅ Escala zerada com sucesso!");
+            } catch (error) {
+                console.error("Erro ao limpar escala:", error);
+                alert("Erro ao limpar: " + friendlyFirebaseError(error));
+            }
+        }
+        // ================================================================
+
         async function saveEditModal() {
             if (!sessionUser) return;
             const newRotation = getNamesFromList('rotation');
@@ -1165,6 +1191,7 @@
         editStaffBtn.addEventListener('click', openEditModal);
         document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
         document.getElementById('edit-save-btn').addEventListener('click', saveEditModal);
+        document.getElementById('clear-scale-btn').addEventListener('click', clearScale);
         editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
 
         // ==================== NAVEGAÇÃO ====================
