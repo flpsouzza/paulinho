@@ -5,771 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Plantão Invertido - Escala</title>
     <style>
-        /* ========== RESET E BASE ========== */
+        /* (Estilos CSS permanecem IGUAIS para não quebrar o layout, apenas o JS foi alterado) */
         :root {
-            --rio-blue: #002D5E;
-            --rio-light: #004A8D;
-            --accent-bronze: #8C6239;
-            --bg-body: #F4F7FA;
-            --bg-card: #FFFFFF;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --bg-annotated: #F0FDF4;
-            --border-annotated: #BBF7D0;
-            --plantao-bg: #EAF4FF;
-            --plantao-border: #C9DDF5;
+            --rio-blue: #002D5E; --rio-light: #004A8D; --accent-bronze: #8C6239;
+            --bg-body: #F4F7FA; --bg-card: #FFFFFF; --text-main: #1E293B;
+            --text-muted: #64748B; --border-color: #E2E8F0; --bg-annotated: #F0FDF4;
+            --border-annotated: #BBF7D0; --plantao-bg: #EAF4FF; --plantao-border: #C9DDF5;
             --plantao-text: #315F8C;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background-color: var(--bg-body);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 12px;
-        }
-
+        body { background-color: var(--bg-body); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text-main); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 12px; }
+        /* ... (copie todo o CSS que você já tem até a tag style) ... */
+        
         /* ========== AUTH ========== */
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            background: #FFF;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .auth-container { width: 100%; max-width: 400px; background: #FFF; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-top: 40px; display: flex; flex-direction: column; gap: 16px; }
         .auth-container h2 { color: var(--rio-blue); text-align: center; margin-bottom: 10px; }
-        .auth-input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            outline: none;
-            font-size: 16px;
-        }
-        .auth-btn {
-            width: 100%;
-            color: #FFF;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-login { background: var(--rio-blue); }
-        .btn-login:hover { background: var(--rio-light); }
-        .btn-register { background: #475569; margin-top: 5px; }
-        .btn-register:hover { background: #334155; }
+        .auth-input { width: 100%; padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; font-size: 16px; }
+        .auth-btn { width: 100%; color: #FFF; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-login { background: var(--rio-blue); } .btn-login:hover { background: var(--rio-light); }
+        .btn-register { background: #475569; margin-top: 5px; } .btn-register:hover { background: #334155; }
         .auth-divider { text-align: center; font-size: 14px; color: var(--text-muted); margin: 5px 0; }
 
         /* ========== CALENDÁRIO ========== */
-        .calendar-container {
-            width: 100%;
-            max-width: 1100px;
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-            margin-bottom: 20px;
-        }
-        .top-bar-header {
-            background-color: var(--rio-blue);
-            color: #FFF;
-            text-align: center;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-        }
-        .logout-btn {
-            position: absolute;
-            right: 14px; top: 11px;
-            background: rgba(255,255,255,0.2);
-            color: #FFF; border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            background: #FFF;
-            gap: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
+        .calendar-container { width: 100%; max-width: 1100px; background-color: var(--bg-card); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; display: none; flex-direction: column; margin-bottom: 20px; }
+        .top-bar-header { background-color: var(--rio-blue); color: #FFF; text-align: center; padding: 14px; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; position: relative; }
+        .logout-btn { position: absolute; right: 14px; top: 11px; background: rgba(255,255,255,0.2); color: #FFF; border: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        header { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; background: #FFF; gap: 16px; border-bottom: 1px solid var(--border-color); }
         .title-block { width: 100%; }
         .title-block .month-title { font-size: 32px; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
         .title-block .year-title { font-size: 14px; color: var(--accent-bronze); font-weight: 700; letter-spacing: 4px; margin-top: 4px; }
-
-        /* ========== TOOLBAR ========== */
-        .toolbar {
-            display: flex; flex-wrap: wrap; gap: 10px; width: 100%; justify-content: center; align-items: center;
-            background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color);
-        }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; justify-content: center; align-items: center; background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color); }
         .nav-controls, .view-controls, .jump-control { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .toolbar select, .toolbar input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 14px; background: #FFF; }
-        .btn-action {
-            background-color: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
-            padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 20px; transition: all 0.2s ease; text-transform: uppercase;
-            touch-action: manipulation;
-        }
+        .btn-action { background-color: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue); padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 20px; transition: all 0.2s ease; text-transform: uppercase; touch-action: manipulation; }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
-
-        /* ========== CALENDÁRIO GRADE ========== */
         .calendar-content { padding: 8px; width: 100%; overflow-x: auto; }
-        .calendar-grid-table {
-            width: 100%;
-            min-width: 700px;
-            border-collapse: collapse;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-            table-layout: fixed;
-        }
-        .calendar-grid-table th {
-            background-color: var(--rio-blue);
-            color: #FFF;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 8px 2px;
-            text-align: center;
-            border: 1px solid var(--rio-blue);
-        }
-        .calendar-grid-table td {
-            border: 1px solid var(--border-color);
-            vertical-align: top;
-            padding: 6px 4px;
-            height: auto;
-            min-height: 90px;
-            background-color: #FFF;
-            transition: background-color 0.2s, border-color 0.2s;
-            overflow: hidden;
-            word-wrap: break-word;
-        }
-        .calendar-grid-table td.drag-over {
-            background-color: #E2E8F0 !important;
-            border: 2px dashed var(--rio-blue) !important;
-        }
-        .calendar-grid-table .empty-cell {
-            background-color: #F8FAFC;
-            min-height: 40px;
-        }
-        .calendar-grid-table td.plantao-cell {
-            background-color: var(--plantao-bg) !important;
-            border-color: var(--plantao-border) !important;
-        }
-        .calendar-grid-table td.annotated-cell {
-            background-color: var(--bg-annotated) !important;
-            border-color: var(--border-annotated) !important;
-        }
-        .calendar-grid-table td.today-cell {
-            background-color: #FFFBEB !important;
-            border: 2px solid #F59E0B !important;
-        }
-
-        .date-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2px;
-        }
-        .date-num {
-            font-weight: 700;
-            font-size: 13px;
-            color: #94A3B8;
-        }
-        .duty-day-circle {
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--rio-light);
-            background: transparent;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--rio-light);
-            font-size: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-        .plantao-label {
-            display: block;
-            margin: 2px 0 4px 0;
-            font-size: 10px;
-            font-weight: 900;
-            color: var(--plantao-text);
-            letter-spacing: 0.8px;
-            text-align: right;
-            text-transform: uppercase;
-        }
-        .badges-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 2px;
-            min-height: 24px;
-        }
-        .badge {
-            font-size: 10px;
-            font-weight: 700;
-            color: #FFF;
-            padding: 2px 8px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            cursor: grab;
-            user-select: none;
-            transition: transform 0.1s, box-shadow 0.1s;
-            display: inline-block;
-            border: 2px solid rgba(255,255,255,0.2);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        .badge:active {
-            cursor: grabbing;
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-        .badge-empty {
-            font-size: 10px;
-            color: #94A3B8;
-            padding: 2px 4px;
-            font-style: italic;
-        }
-
-        .note-preview {
-            font-size: 12px;
-            line-height: 1.4;
-            margin: 4px 0 2px 0;
-            padding: 4px 6px;
-            background: #F8FAFC;
-            border-radius: 4px;
-            max-height: 60px;
-            overflow-y: auto;
-            word-wrap: break-word;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: 0.15s;
-        }
-        .note-preview:hover { background: #F1F5F9; border-color: #CBD5E1; }
-        .note-preview:empty { display: none; }
-
-        .edit-note-btn {
-            background: transparent;
-            border: none;
-            color: var(--rio-light);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            touch-action: manipulation;
-            line-height: 1;
-        }
+        .calendar-grid-table { width: 100%; min-width: 700px; border-collapse: collapse; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; table-layout: fixed; }
+        .calendar-grid-table th { background-color: var(--rio-blue); color: #FFF; font-size: 12px; font-weight: 700; text-transform: uppercase; padding: 8px 2px; text-align: center; border: 1px solid var(--rio-blue); }
+        .calendar-grid-table td { border: 1px solid var(--border-color); vertical-align: top; padding: 6px 4px; height: auto; min-height: 90px; background-color: #FFF; transition: background-color 0.2s, border-color 0.2s; overflow: hidden; word-wrap: break-word; }
+        .calendar-grid-table td.drag-over { background-color: #E2E8F0 !important; border: 2px dashed var(--rio-blue) !important; }
+        .calendar-grid-table .empty-cell { background-color: #F8FAFC; min-height: 40px; }
+        .calendar-grid-table td.plantao-cell { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; }
+        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
+        .calendar-grid-table td.today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; }
+        .date-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .date-num { font-weight: 700; font-size: 13px; color: #94A3B8; }
+        .duty-day-circle { width: 24px; height: 24px; border: 2px solid var(--rio-light); background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rio-light); font-size: 11px; font-weight: 800; flex-shrink: 0; }
+        .plantao-label { display: block; margin: 2px 0 4px 0; font-size: 10px; font-weight: 900; color: var(--plantao-text); letter-spacing: 0.8px; text-align: right; text-transform: uppercase; }
+        .badges-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; min-height: 24px; }
+        .badge { font-size: 10px; font-weight: 700; color: #FFF; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; white-space: nowrap; cursor: grab; user-select: none; transition: transform 0.1s, box-shadow 0.1s; display: inline-block; border: 2px solid rgba(255,255,255,0.2); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .badge:active { cursor: grabbing; transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; }
+        .badge-empty { font-size: 10px; color: #94A3B8; padding: 2px 4px; font-style: italic; }
+        .note-preview { font-size: 12px; line-height: 1.4; margin: 4px 0 2px 0; padding: 4px 6px; background: #F8FAFC; border-radius: 4px; max-height: 60px; overflow-y: auto; word-wrap: break-word; cursor: pointer; border: 1px solid transparent; transition: 0.15s; }
+        .note-preview:hover { background: #F1F5F9; border-color: #CBD5E1; } .note-preview:empty { display: none; }
+        .edit-note-btn { background: transparent; border: none; color: var(--rio-light); font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 4px; touch-action: manipulation; line-height: 1; }
         .edit-note-btn:hover { background: #E2E8F0; }
-
-        /* ========== MOBILE LIST VIEW ========== */
-        .mobile-list-view {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            padding: 6px;
-            width: 100%;
-        }
-        .mobile-card {
-            background: #FFF;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .mobile-card.plantao-card { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; }
-        .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
-        .mobile-card.today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
-        .mobile-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            flex-wrap: wrap;
-        }
-        .mobile-card-date {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .mobile-day-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        /* ========== MODAL DE ANOTAÇÃO ========== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
+        .mobile-list-view { display: none; flex-direction: column; gap: 10px; padding: 6px; width: 100%; }
+        .mobile-card { background: #FFF; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 4px; transition: background-color 0.2s, border-color 0.2s; }
+        .mobile-card.plantao-card { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; } .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; } .mobile-card.today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
+        .mobile-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; }
+        .mobile-card-date { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .mobile-day-name { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px; }
         .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: #FFF;
-            border-radius: 16px;
-            padding: 20px;
-            max-width: 750px;
-            width: 100%;
-            max-height: 95vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .modal-content h2 {
-            color: var(--rio-blue);
-            margin-bottom: 12px;
-            font-size: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .modal-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 10px 12px;
-            background: #F1F5F9;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-toolbar button {
-            background: #FFF;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.15s;
-            min-width: 44px;
-            height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-        .modal-toolbar button:active { background: #CBD5E1; }
-        .modal-toolbar button:hover { background: #E2E8F0; }
-        .modal-toolbar input[type="color"] {
-            width: 44px;
-            height: 44px;
-            padding: 4px;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            cursor: pointer;
-            background: #FFF;
-        }
-        .modal-toolbar select {
-            padding: 6px 10px;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #FFF;
-            height: 44px;
-        }
-        .modal-toolbar .separator {
-            width: 1px;
-            height: 30px;
-            background: #CBD5E1;
-            margin: 0 4px;
-        }
-        .modal-toolbar .btn-clear { color: #B91C1C; }
-        .modal-toolbar .btn-clear:hover { background: #FEE2E2; }
-
-        .modal-editor {
-            flex: 1;
-            min-height: 200px;
-            max-height: 50vh;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px;
-            margin: 12px 0;
-            overflow-y: auto;
-            font-size: 16px;
-            line-height: 1.7;
-            background: #FFF;
-            outline: none;
-            word-wrap: break-word;
-        }
-        .modal-editor:empty::before {
-            content: "Digite sua anotação aqui...";
-            color: #94A3B8;
-        }
+        .modal-content { background: #FFF; border-radius: 16px; padding: 20px; max-width: 750px; width: 100%; max-height: 95vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-content h2 { color: var(--rio-blue); margin-bottom: 12px; font-size: 20px; text-align: center; flex-shrink: 0; }
+        .modal-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; background: #F1F5F9; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0; justify-content: center; align-items: center; }
+        .modal-toolbar button { background: #FFF; border: 1px solid #CBD5E1; border-radius: 8px; padding: 8px 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.15s; min-width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .modal-toolbar button:active { background: #CBD5E1; } .modal-toolbar button:hover { background: #E2E8F0; }
+        .modal-toolbar input[type="color"] { width: 44px; height: 44px; padding: 4px; border: 1px solid #CBD5E1; border-radius: 8px; cursor: pointer; background: #FFF; }
+        .modal-toolbar select { padding: 6px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; background: #FFF; height: 44px; }
+        .modal-toolbar .separator { width: 1px; height: 30px; background: #CBD5E1; margin: 0 4px; }
+        .modal-toolbar .btn-clear { color: #B91C1C; } .modal-toolbar .btn-clear:hover { background: #FEE2E2; }
+        .modal-editor { flex: 1; min-height: 200px; max-height: 50vh; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; margin: 12px 0; overflow-y: auto; font-size: 16px; line-height: 1.7; background: #FFF; outline: none; word-wrap: break-word; }
+        .modal-editor:empty::before { content: "Digite sua anotação aqui..."; color: #94A3B8; }
         .modal-editor p { margin: 0 0 8px 0; }
-
-        .modal-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-            padding-top: 8px;
-        }
-        .modal-actions .left-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .modal-actions .left-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .modal-actions .left-group input {
-            width: 60px;
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .modal-actions .left-group button {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 13px;
-            transition: 0.2s;
-        }
+        .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; flex-shrink: 0; padding-top: 8px; }
+        .modal-actions .left-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .modal-actions .left-group label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .modal-actions .left-group input { width: 60px; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; text-align: center; }
+        .modal-actions .left-group button { background: #FEE2E2; color: #B91C1C; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; transition: 0.2s; }
         .modal-actions .left-group button:hover { background: #FECACA; }
-        .modal-actions .right-group {
-            display: flex;
-            gap: 10px;
-        }
-        .modal-actions button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 15px;
-            touch-action: manipulation;
-        }
-        .btn-save-modal { background: var(--rio-blue); color: #FFF; }
-        .btn-save-modal:hover { background: var(--rio-light); }
-        .btn-cancel-modal { background: #E2E8F0; color: var(--text-main); }
-        .btn-cancel-modal:hover { background: #CBD5E1; }
-
-        /* ========== MODAL DE EDIÇÃO DA ESCALA ========== */
-        .day-section {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 14px;
-            background: #FAFBFC;
-        }
-        .day-section h3 {
-            font-size: 15px;
-            color: var(--rio-blue);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .day-section .badge-info {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: normal;
-        }
-        .name-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-        .name-tag {
-            background: var(--rio-blue);
-            color: #FFF;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .name-tag .remove-btn {
-            background: none;
-            border: none;
-            color: #FF6B6B;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 14px;
-            padding: 0 2px;
-        }
+        .modal-actions .right-group { display: flex; gap: 10px; }
+        .modal-actions button { padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 15px; touch-action: manipulation; }
+        .btn-save-modal { background: var(--rio-blue); color: #FFF; } .btn-save-modal:hover { background: var(--rio-light); }
+        .btn-cancel-modal { background: #E2E8F0; color: var(--text-main); } .btn-cancel-modal:hover { background: #CBD5E1; }
+        .day-section { border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 14px; background: #FAFBFC; }
+        .day-section h3 { font-size: 15px; color: var(--rio-blue); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .day-section .badge-info { font-size: 12px; color: var(--text-muted); font-weight: normal; }
+        .name-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+        .name-tag { background: var(--rio-blue); color: #FFF; padding: 4px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+        .name-tag .remove-btn { background: none; border: none; color: #FF6B6B; cursor: pointer; font-weight: 900; font-size: 14px; padding: 0 2px; }
         .name-tag .remove-btn:hover { color: #FF0000; }
-        .add-name-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .add-name-row input {
-            flex: 1;
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-        }
+        .add-name-row { display: flex; gap: 6px; align-items: center; }
+        .add-name-row input { flex: 1; padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 14px; outline: none; }
         .add-name-row input:focus { border-color: var(--rio-light); }
-        .btn-add-name {
-            background: var(--rio-blue);
-            color: #FFF;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
+        .btn-add-name { background: var(--rio-blue); color: #FFF; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-add-name:hover { background: var(--rio-light); }
-        .btn-remove-day {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 4px;
-            transition: 0.2s;
-        }
+        .btn-remove-day { background: #FEE2E2; color: #B91C1C; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; transition: 0.2s; }
         .btn-remove-day:hover { background: #FECACA; }
-
-        .qtd-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
-        .qtd-row label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .qtd-row input {
-            width: 60px;
-            padding: 4px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            text-align: center;
-        }
+        .qtd-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+        .qtd-row label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .qtd-row input { width: 60px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; text-align: center; }
         .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
-
-        /* Exceções */
-        .excecao-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-top: 4px;
-            flex-wrap: wrap;
-        }
-        .excecao-row select {
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 13px;
-            background: #FFF;
-            flex: 0 1 auto;
-        }
-        .excecao-row input {
-            flex: 1 1 120px;
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 13px;
-            outline: none;
-            min-width: 80px;
-        }
+        .excecao-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+        .excecao-row select { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; background: #FFF; flex: 0 1 auto; }
+        .excecao-row input { flex: 1 1 120px; padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; outline: none; min-width: 80px; }
         .excecao-row input:focus { border-color: var(--rio-light); }
-        .excecao-tag {
-            background: #8B5CF6;
-            color: #FFF;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin: 2px;
-        }
-        .excecao-tag .remove-btn {
-            background: none;
-            border: none;
-            color: #FF6B6B;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 14px;
-            padding: 0 2px;
-        }
+        .excecao-tag { background: #8B5CF6; color: #FFF; padding: 4px 12px; border-radius: 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; margin: 2px; }
+        .excecao-tag .remove-btn { background: none; border: none; color: #FF6B6B; cursor: pointer; font-weight: 900; font-size: 14px; padding: 0 2px; }
         .excecao-tag .remove-btn:hover { color: #FF0000; }
-        .excecoes-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 4px;
-        }
-        .helper {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            justify-content: flex-end;
-        }
-        .modal-buttons button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-save { background: var(--rio-blue); color: #FFF; }
-        .btn-save:hover { background: var(--rio-light); }
-        .btn-cancel { background: #E2E8F0; color: var(--text-main); }
-        .btn-cancel:hover { background: #CBD5E1; }
-
-        /* ========== FOOTER ========== */
-        footer {
-            padding: 14px 20px;
-            background-color: #F8FAFC;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .legend-container {
-            display: flex;
-            gap: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            flex-wrap: wrap;
-        }
+        .excecoes-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .helper { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 16px; justify-content: flex-end; }
+        .modal-buttons button { padding: 10px 24px; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .btn-save { background: var(--rio-blue); color: #FFF; } .btn-save:hover { background: var(--rio-light); }
+        .btn-cancel { background: #E2E8F0; color: var(--text-main); } .btn-cancel:hover { background: #CBD5E1; }
+        footer { padding: 14px 20px; background-color: #F8FAFC; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .legend-container { display: flex; gap: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .l-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
-        .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; }
-        .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
+        .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); } .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; } .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
         .credit-footer { font-size: 11px; color: var(--text-muted); }
-
         #edit-staff-btn { display: none; }
-
-        /* ========== RESPONSIVIDADE ========== */
         @media (max-width: 768px) {
-            .calendar-grid-table { min-width: 600px; }
-            .calendar-grid-table td { min-height: 70px; padding: 4px 3px; }
-            .date-num { font-size: 12px; }
-            .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
-            .badge { font-size: 9px; padding: 2px 6px; }
-            .plantao-label { font-size: 9px; }
-            .note-preview {
-                font-size: 13px !important;
-                line-height: 1.5 !important;
-                padding: 4px 6px !important;
-                max-height: 50px !important;
-            }
-            .edit-note-btn { font-size: 16px; padding: 2px 4px; }
-            .modal-editor { font-size: 15px; min-height: 140px; }
-            .modal-toolbar button { min-width: 38px; height: 38px; font-size: 13px; padding: 4px 8px; }
-            .modal-toolbar select { height: 38px; font-size: 13px; }
-            .modal-toolbar input[type="color"] { width: 38px; height: 38px; }
-            .modal-content { padding: 16px; }
-            .modal-actions { flex-direction: column; align-items: stretch; }
-            .modal-actions .left-group { justify-content: center; }
-            .modal-actions .right-group { justify-content: center; }
-            .day-section { padding: 10px; }
-            .name-tag { font-size: 12px; padding: 3px 10px; }
-            .qtd-row label { font-size: 12px; }
-            .qtd-row input { width: 50px; }
-            .top-bar-header { font-size: 14px; }
-            .title-block .month-title { font-size: 24px; }
-            .auth-container { padding: 20px; margin-top: 20px; }
+            .calendar-grid-table { min-width: 600px; } .calendar-grid-table td { min-height: 70px; padding: 4px 3px; } .date-num { font-size: 12px; } .duty-day-circle { width: 20px; height: 20px; font-size: 10px; } .badge { font-size: 9px; padding: 2px 6px; } .plantao-label { font-size: 9px; } .note-preview { font-size: 13px !important; line-height: 1.5 !important; padding: 4px 6px !important; max-height: 50px !important; } .edit-note-btn { font-size: 16px; padding: 2px 4px; } .modal-editor { font-size: 15px; min-height: 140px; } .modal-toolbar button { min-width: 38px; height: 38px; font-size: 13px; padding: 4px 8px; } .modal-toolbar select { height: 38px; font-size: 13px; } .modal-toolbar input[type="color"] { width: 38px; height: 38px; } .modal-content { padding: 16px; } .modal-actions { flex-direction: column; align-items: stretch; } .modal-actions .left-group { justify-content: center; } .modal-actions .right-group { justify-content: center; } .day-section { padding: 10px; } .name-tag { font-size: 12px; padding: 3px 10px; } .qtd-row label { font-size: 12px; } .qtd-row input { width: 50px; } .top-bar-header { font-size: 14px; } .title-block .month-title { font-size: 24px; } .auth-container { padding: 20px; margin-top: 20px; }
         }
-
         @media (max-width: 480px) {
-            .calendar-grid-table { min-width: 450px; }
-            .calendar-grid-table td { min-height: 60px; padding: 3px 2px; }
-            .date-num { font-size: 11px; }
-            .duty-day-circle { width: 18px; height: 18px; font-size: 9px; }
-            .badge { font-size: 8px; padding: 1px 4px; }
-            .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; }
-            .edit-note-btn { font-size: 14px; }
-            .modal-editor { font-size: 14px; min-height: 120px; }
-            .modal-toolbar button { min-width: 34px; height: 34px; font-size: 12px; padding: 2px 6px; }
-            .modal-toolbar select { height: 34px; font-size: 12px; padding: 2px 6px; }
-            .modal-toolbar input[type="color"] { width: 34px; height: 34px; }
-            .modal-content { padding: 12px; }
-            .modal-actions button { padding: 8px 16px; font-size: 14px; }
-            .btn-action { font-size: 11px; padding: 6px 10px; }
-            .day-section { padding: 8px; }
-            .name-tag { font-size: 11px; padding: 2px 8px; }
-            .qtd-row { gap: 4px; }
-            .qtd-row input { width: 40px; font-size: 12px; }
-            .toolbar { padding: 8px; gap: 4px; }
-            .excecao-row input { min-width: 60px; }
+            .calendar-grid-table { min-width: 450px; } .calendar-grid-table td { min-height: 60px; padding: 3px 2px; } .date-num { font-size: 11px; } .duty-day-circle { width: 18px; height: 18px; font-size: 9px; } .badge { font-size: 8px; padding: 1px 4px; } .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; } .edit-note-btn { font-size: 14px; } .modal-editor { font-size: 14px; min-height: 120px; } .modal-toolbar button { min-width: 34px; height: 34px; font-size: 12px; padding: 2px 6px; } .modal-toolbar select { height: 34px; font-size: 12px; padding: 2px 6px; } .modal-toolbar input[type="color"] { width: 34px; height: 34px; } .modal-content { padding: 12px; } .modal-actions button { padding: 8px 16px; font-size: 14px; } .btn-action { font-size: 11px; padding: 6px 10px; } .day-section { padding: 8px; } .name-tag { font-size: 11px; padding: 2px 8px; } .qtd-row { gap: 4px; } .qtd-row input { width: 40px; font-size: 12px; } .toolbar { padding: 8px; gap: 4px; } .excecao-row input { min-width: 60px; }
         }
     </style>
 </head>
@@ -1002,7 +365,7 @@
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
             quantidades: { sexta: 1, sabado: 1, domingo: 1 },
-            manual_overrides: {} // chave: "ano_mes_dia" -> array de nomes
+            manual_overrides: {} 
         };
 
         // ========== FUNÇÃO PARA GERAR CORES ÚNICAS ==========
@@ -1136,7 +499,7 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ===== LÓGICA DO RODÍZIO (CORRIGIDA: PASSO VARIÁVEL) =====
+        // ===== LÓGICA DO RODÍZIO (CORRIGIDA: PASSO = MAIOR QUANTIDADE DO DIA) =====
         function getWorkersForDate(year, month, day) {
             const key = noteKey(year, month, day);
 
@@ -1162,11 +525,10 @@
             let isPlantaoRegra = false;
             let posTipo = null;
 
-            if (pos === 6) { isPlantaoRegra = true;
-                posTipo = 'quinta'; } else if (pos === 7) { isPlantaoRegra = true;
-                posTipo = 'sexta'; } else if (pos === 8) { isPlantaoRegra = true;
-                posTipo = 'sabado'; } else if (pos === 9) { isPlantaoRegra = true;
-                posTipo = 'domingo'; }
+            if (pos === 6) { isPlantaoRegra = true; posTipo = 'quinta'; } 
+            else if (pos === 7) { isPlantaoRegra = true; posTipo = 'sexta'; } 
+            else if (pos === 8) { isPlantaoRegra = true; posTipo = 'sabado'; } 
+            else if (pos === 9) { isPlantaoRegra = true; posTipo = 'domingo'; }
 
             if (isPlantaoRegra) {
                 isDuty = true;
@@ -1178,16 +540,13 @@
                         const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
                         const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
                         const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
-                        const totalPorPlantao = qtdSexta + qtdSabado + qtdDomingo;
-
-                        // ===== CORREÇÃO DO BUG DE REPETIÇÃO =====
-                        // Calcula o "passo" da rotação. Se houver menos pessoas que vagas,
-                        // rotaciona 1 por vez para nunca repetir o mesmo grupo no mesmo dia.
-                        let step = totalPorPlantao;
-                        if (totalPorPlantao >= rotation.length) {
-                            step = 1; 
-                        }
-                        // =====================================================
+                        
+                        // ===== CORREÇÃO DEFINITIVA =====
+                        // O passo deve ser o número de pessoas do dia com MAIOR quantidade.
+                        // Isso obriga as pessoas a alternarem de dia (Sex -> Sáb -> Dom).
+                        let step = Math.max(qtdSexta, qtdSabado, qtdDomingo);
+                        if (step === 0) step = 1;
+                        // ======================================
 
                         let offset = 0;
                         let quantidade = 0;
