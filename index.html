@@ -2,10 +2,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
-    <title>Plantão - Escala</title>
+    <meta name="viewport" content="width=1024">
+    <title>Plantão Invertido - Escala</title>
     <style>
-        /* ===== MESMO CSS ANTERIOR (não alterado) ===== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -17,68 +16,37 @@
             --border-color: #E2E8F0;
             --bg-annotated: #F0FDF4;
             --border-annotated: #BBF7D0;
-            --font-base: 14px;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: var(--font-base);
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 12px;
-            touch-action: manipulation;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            padding: 16px;
         }
-        @media (max-width: 768px) {
-            :root { --font-base: 15px; }
-            body { padding: 8px; }
-        }
-        @media (max-width: 480px) {
-            :root { --font-base: 16px; }
-            body { padding: 4px; }
-        }
-
-        /* ===== MOBILE: NA TELA DE LOGIN, OCULTA A PRÉVIA DA ESCALA =====
-           No desktop nada muda. Após autenticar, a classe guest-mode é removida
-           e a escala volta a ser exibida normalmente também no celular. */
-        @media (max-width: 768px) {
-            body.guest-mode #calendar-screen {
-                display: none !important;
-            }
-
-            body.guest-mode {
-                justify-content: center;
-            }
-
-            body.guest-mode #auth-screen {
-                margin-top: 24px;
-            }
-        }
-
+        
         .auth-container {
             width: 100%;
             max-width: 400px;
             background: #FFF;
-            padding: 24px 20px;
+            padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-top: 40px;
+            margin-top: 50px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
-        .auth-container h2 { color: var(--rio-blue); text-align: center; font-size: 1.4rem; margin-bottom: 6px; }
+        .auth-container h2 { color: var(--rio-blue); text-align: center; margin-bottom: 10px; }
         .auth-input {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 1rem;
             outline: none;
         }
         .auth-btn {
@@ -87,8 +55,7 @@
             border: none;
             padding: 12px;
             border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -96,110 +63,7 @@
         .btn-login:hover { background: var(--rio-light); }
         .btn-register { background: #475569; margin-top: 5px; }
         .btn-register:hover { background: #334155; }
-        .auth-divider { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin: 5px 0; }
-
-        .forgot-password-btn {
-            align-self: flex-end;
-            background: transparent;
-            border: none;
-            color: var(--rio-light);
-            font-size: 0.82rem;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 0 2px;
-            margin-top: -6px;
-            text-decoration: none;
-        }
-        .forgot-password-btn:hover { text-decoration: underline; }
-        .forgot-password-btn:disabled { opacity: 0.55; cursor: wait; text-decoration: none; }
-
-        /* ===== POP-UP DE RECUPERAÇÃO DE SENHA ===== */
-        .password-reset-card {
-            width: min(92vw, 430px);
-            background: #FFF;
-            border-radius: 20px;
-            padding: 28px 24px 22px;
-            text-align: center;
-            box-shadow: 0 24px 70px rgba(0, 45, 94, 0.28);
-            animation: resetModalIn 0.22s ease-out;
-        }
-        .password-reset-icon {
-            width: 68px;
-            height: 68px;
-            margin: 0 auto 14px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #EAF4FF;
-            border: 1px solid #C9DDF5;
-            font-size: 2rem;
-        }
-        .password-reset-card h2 {
-            color: var(--rio-blue);
-            font-size: 1.45rem;
-            margin-bottom: 8px;
-        }
-        .password-reset-card p {
-            color: var(--text-muted);
-            line-height: 1.5;
-            font-size: 0.92rem;
-        }
-        .password-reset-email {
-            margin: 14px 0;
-            padding: 10px 12px;
-            border-radius: 10px;
-            background: #F8FAFC;
-            border: 1px solid var(--border-color);
-            color: var(--rio-blue);
-            font-size: 0.88rem;
-            font-weight: 800;
-            overflow-wrap: anywhere;
-        }
-        .password-reset-tip {
-            margin: 14px 0 18px;
-            padding: 12px;
-            border-radius: 12px;
-            background: #FFFBEB;
-            border: 1px solid #FDE68A;
-            color: #92400E;
-            font-size: 0.82rem;
-            line-height: 1.45;
-            text-align: left;
-        }
-        .password-reset-ok {
-            width: 100%;
-            margin-top: 4px;
-        }
-        @keyframes resetModalIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* ---- NOVO: estilos para o campo de convite ---- */
-        .convite-wrapper {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .convite-wrapper input {
-            flex: 1;
-        }
-        .convite-status {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        .convite-status.valido {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-        .convite-status.invalido {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
+        .auth-divider { text-align: center; font-size: 12px; color: var(--text-muted); margin: 5px 0; position: relative; }
 
         .calendar-container {
             width: 100%;
@@ -208,60 +72,108 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             overflow: hidden;
-            display: none;
+            display: none; 
             flex-direction: column;
             margin-bottom: 20px;
+            position: relative;
         }
         .top-bar-header {
             background-color: var(--rio-blue);
             color: #FFF;
             text-align: center;
-            padding: 14px 12px;
-            font-size: 1.1rem;
+            padding: 14px;
+            font-size: 16px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             position: relative;
         }
         .logout-btn {
             position: absolute;
-            right: 12px; top: 50%;
-            transform: translateY(-50%);
+            right: 14px; top: 11px;
             background: rgba(255,255,255,0.2);
             color: #FFF; border: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: bold; cursor: pointer;
         }
         header {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 16px 12px;
+            padding: 20px;
             background: #FFF;
-            gap: 12px;
+            gap: 16px;
             border-bottom: 1px solid var(--border-color);
+            position: relative;
         }
-        .title-block { width: 100%; }
-        .title-block .month-title { font-size: 1.8rem; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
-        .title-block .year-title { font-size: 0.9rem; color: var(--accent-bronze); font-weight: 700; letter-spacing: 4px; margin-top: 2px; }
+        .title-block { position: relative; width: 100%; }
+        .title-block .month-title { font-size: 36px; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
+        .title-block .year-title { font-size: 15px; color: var(--accent-bronze); font-weight: 700; letter-spacing: 6px; margin-top: 4px; }
         
-        .toolbar {
-            display: flex; flex-wrap: wrap; gap: 10px; width: 100%; justify-content: center; align-items: center;
-            background: #F8FAFC; padding: 12px 16px; border-bottom: 1px solid var(--border-color);
+        /* Barra de ferramentas para anotações */
+        .toolbar-notes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #F1F5F9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
         }
-        .toolbar select, .toolbar input { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.85rem; background: #FFF; }
+        .toolbar-notes button {
+            background: #FFF;
+            border: 1px solid #CBD5E1;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toolbar-notes button:hover { background: #E2E8F0; }
+        .toolbar-notes input[type="color"] {
+            width: 32px;
+            height: 32px;
+            padding: 2px;
+            border: 1px solid #CBD5E1;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #FFF;
+        }
+        .toolbar-notes .separator {
+            width: 1px;
+            height: 28px;
+            background: #CBD5E1;
+            margin: 0 4px;
+        }
+        .toolbar-notes .btn-clear {
+            color: #B91C1C;
+        }
+        .toolbar-notes .btn-clear:hover { background: #FEE2E2; }
+
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 12px; width: 100%; justify-content: center; align-items: center;
+            background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color);
+        }
+        .nav-controls, .view-controls, .search-control, .jump-control { display: flex; align-items: center; gap: 6px; }
+        .toolbar select, .toolbar input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 13px; background: #FFF; }
+        
         .btn-action {
-            background: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
-            padding: 6px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border-radius: 20px;
-            transition: all 0.2s; text-transform: uppercase;
-            white-space: nowrap;
+            background-color: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
+            padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 20px; transition: all 0.2s ease; text-transform: uppercase;
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
-
+        
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -275,51 +187,51 @@
         .modal-content {
             background: #FFF;
             border-radius: 16px;
-            padding: 24px 20px;
+            padding: 30px;
             max-width: 700px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        .modal-content h2 { color: var(--rio-blue); margin-bottom: 16px; text-align: center; font-size: 1.4rem; }
+        .modal-content h2 { color: var(--rio-blue); margin-bottom: 20px; text-align: center; }
 
         .day-section {
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 14px 12px;
-            margin-bottom: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
             background: #FAFBFC;
         }
         .day-section h3 {
-            font-size: 0.95rem;
+            font-size: 14px;
             color: var(--rio-blue);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .day-section .badge-info {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: normal;
         }
         .name-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 6px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .name-tag {
             background: var(--rio-blue);
             color: #FFF;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
         .name-tag .remove-btn {
             background: none;
@@ -327,23 +239,22 @@
             color: #FF6B6B;
             cursor: pointer;
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 14px;
             padding: 0 2px;
         }
+        .name-tag .remove-btn:hover { color: #FF0000; }
         .add-name-row {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
         }
         .add-name-row input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 13px;
             outline: none;
-            min-width: 100px;
         }
         .add-name-row input:focus { border-color: var(--rio-light); }
         .btn-add-name {
@@ -353,7 +264,7 @@
             border-radius: 50%;
             width: 32px;
             height: 32px;
-            font-size: 1.2rem;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -368,69 +279,79 @@
             border-radius: 50%;
             width: 28px;
             height: 28px;
-            font-size: 1rem;
+            font-size: 16px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            margin-left: 4px;
             transition: 0.2s;
         }
         .btn-remove-day:hover { background: #FECACA; }
 
+        .day-section .helper {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Quantidades */
         .qtd-row {
             display: flex;
             gap: 12px;
             align-items: center;
+            margin-top: 8px;
             flex-wrap: wrap;
-            margin-top: 6px;
         }
-        .qtd-row label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .qtd-row label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
         .qtd-row input {
             width: 60px;
-            padding: 4px 6px;
+            padding: 4px 8px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 14px;
             text-align: center;
         }
-        .qtd-row input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin: 0 4px 0 0;
-        }
+        .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
 
+        /* Exceções */
         .excecao-row {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
             margin-top: 6px;
+            flex-wrap: wrap;
         }
         .excecao-row select {
-            padding: 6px 8px;
+            padding: 6px 10px;
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 13px;
             background: #FFF;
         }
         .excecao-row input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 13px;
             outline: none;
-            min-width: 100px;
+            min-width: 120px;
         }
+        .excecao-row input:focus { border-color: var(--rio-light); }
         .excecao-tag {
             background: #8B5CF6;
             color: #FFF;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 13px;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             margin: 2px;
         }
         .excecao-tag .remove-btn {
@@ -439,22 +360,28 @@
             color: #FF6B6B;
             cursor: pointer;
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 14px;
+            padding: 0 2px;
         }
-        .excecoes-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .excecao-tag .remove-btn:hover { color: #FF0000; }
+        .excecoes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
 
         .modal-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 16px;
+            margin-top: 20px;
             justify-content: flex-end;
         }
         .modal-buttons button {
-            padding: 10px 20px;
+            padding: 10px 24px;
             border: none;
             border-radius: 8px;
             font-weight: 700;
-            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -463,142 +390,106 @@
         .btn-cancel { background: #E2E8F0; color: var(--text-main); }
         .btn-cancel:hover { background: #CBD5E1; }
 
-        .calendar-content {
-            padding: 10px;
+        .calendar-content { 
+            padding: 12px; 
             width: 100%;
-            overflow-x: auto;
+            overflow-x: auto; 
             -webkit-overflow-scrolling: touch;
-            touch-action: pan-x pan-y;
         }
-        .calendar-grid-table {
-            width: 100%;
-            min-width: 700px;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
+        .calendar-grid-table { 
+            width: 100%; 
+            min-width: 900px; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            table-layout: fixed; 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            overflow: hidden; 
         }
-        .calendar-grid-table th {
-            background-color: var(--rio-blue);
-            color: #FFF;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 8px 2px;
-            text-align: center;
-        }
-        .calendar-grid-table td {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-            padding: 4px 3px;
-            height: 120px;
-            background-color: #FFF;
-            position: relative;
-            transition: background-color 0.2s, border-color 0.2s;
-            font-size: 0.85rem;
-        }
+        .calendar-grid-table th { background-color: var(--rio-blue); color: #FFF; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 10px 4px; text-align: center; }
+        .calendar-grid-table td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); vertical-align: top; padding: 6px 4px; height: 150px; background-color: #FFF; position: relative; transition: background-color 0.2s, border-color 0.2s; }
         .calendar-grid-table .empty-cell { background-color: #F8FAFC; }
-        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
+        
+        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; box-shadow: inset 0 0 0 1px var(--border-annotated); }
         .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
-
-        .calendar-grid-table td.bate-volta-cell {
-            border: 2px solid #F59E0B !important;
-            background-color: #FFFBEB !important;
-        }
-        .mobile-card.bate-volta-card {
-            border: 2px solid #F59E0B !important;
-            background-color: #FFFBEB !important;
-        }
 
         :root {
             --plantao-bg: #EAF4FF;
             --plantao-border: #C9DDF5;
             --plantao-text: #315F8C;
         }
+
         .calendar-grid-table td.plantao-cell {
             background-color: var(--plantao-bg) !important;
             border-color: var(--plantao-border) !important;
             box-shadow: inset 0 0 0 1px var(--plantao-border);
         }
-        .calendar-grid-table td.plantao-cell.weekday-plantao {
-            background-color: #E8F5E9 !important;
-            border-color: #A5D6A7 !important;
-        }
 
         .plantao-label {
             display: block;
-            margin-top: 2px;
-            margin-bottom: 4px;
-            font-size: 0.6rem;
+            margin-top: 4px;
+            margin-bottom: 5px;
+            font-size: 10px;
             line-height: 1.2;
             font-weight: 900;
             color: var(--plantao-text);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.9px;
             text-align: right;
             text-transform: uppercase;
         }
-        .plantao-label.weekday-label { color: #2E7D32; }
 
         .mobile-card.plantao-card {
             background-color: var(--plantao-bg) !important;
             border-color: var(--plantao-border) !important;
         }
-        .mobile-card.plantao-card.weekday-plantao {
-            background-color: #E8F5E9 !important;
-            border-color: #A5D6A7 !important;
-        }
+
         .mobile-card .plantao-label {
             margin: 0 0 0 6px;
             text-align: left;
             align-self: center;
         }
 
-        .date-row { display: flex; justify-content: flex-end; margin-bottom: 2px; }
-        .date-num { font-weight: 700; font-size: 0.8rem; color: #94A3B8; }
-        .duty-day-circle {
-            width: 22px; height: 22px;
-            border: 2px solid var(--rio-light);
-            background: transparent;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--rio-light);
-            font-size: 0.75rem;
-            font-weight: 800;
-        }
+        .date-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+        .date-num { font-weight: 700; font-size: 11px; color: #94A3B8; }
+        .duty-day-circle { width: 22px; height: 22px; border: 2px solid var(--rio-light); background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rio-light); font-size: 10px; font-weight: 800; }
         
-        .agenda-input {
+        /* Editor de anotações */
+        .agenda-editor {
             width: 100%;
-            height: 50px;
-            margin-top: 4px;
+            min-height: 55px;
+            max-height: 90px;
+            margin-top: 6px;
             border: 1px solid #CBD5E1;
             border-radius: 6px;
-            resize: none;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 6px;
+            padding: 6px;
+            font-size: 12px;
             background: #F8FAFC;
-            color: #000;
+            color: #000000;
             outline: none;
             transition: all 0.2s;
-            overflow: hidden;
+            overflow-y: auto;
+            line-height: 1.4;
+            word-wrap: break-word;
         }
-        .agenda-input:hover { border-color: #94A3B8; background: #F1F5F9; }
-        .agenda-input:focus { border-color: var(--rio-light); background: #FFF; box-shadow: 0 0 0 2px rgba(0,45,94,0.15); overflow-y: auto; }
+        .agenda-editor:hover { border-color: #94A3B8; background: #F1F5F9; }
+        .agenda-editor:focus { border-color: var(--rio-light); background: #FFF; box-shadow: 0 0 0 2px rgba(0,45,94,0.15); }
+
+        .agenda-editor:empty::before {
+            content: "Anotar...";
+            color: #94A3B8;
+        }
+
+        .agenda-editor p { margin: 0 0 4px 0; }
+        .agenda-editor br { display: block; content: ""; margin: 4px 0; }
 
         .cancel-sequence-btn {
             width: 100%;
-            margin-top: 2px;
+            margin-top: 3px;
             padding: 2px 0;
             border: none;
             background: transparent;
             color: #B91C1C;
-            font-size: 0.6rem;
+            font-size: 9px;
             font-weight: 800;
             text-align: right;
             text-transform: uppercase;
@@ -607,248 +498,42 @@
         .cancel-sequence-btn:hover { text-decoration: underline; }
 
         .mobile-list-view { display: none; flex-direction: column; gap: 10px; padding: 8px; width: 100%; }
-        .mobile-card {
-            background: #FFF;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
+        .mobile-card { background: #FFF; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; transition: background-color 0.2s, border-color 0.2s; }
         .mobile-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .mobile-card-date { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .mobile-day-name { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .mobile-card-date { display: flex; align-items: center; gap: 8px; }
+        .mobile-day-name { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         
-        .badges-list { display: flex; flex-direction: column; gap: 2px; width: 100%; }
-        .badge {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: #FFF;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .badge-coringa {
-            background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important;
-            border: 1px solid #5B21B6;
-        }
-        .badge-bate-volta {
-            background: #F59E0B !important;
-            border: 1px solid #D97706;
-            color: #000 !important;
-        }
-        .readonly-note {
-            font-size: 0.75rem;
-            color: #333;
-            margin-top: 4px;
-            background: #f1f5f9;
-            padding: 4px 6px;
-            border-radius: 4px;
-            border-left: 3px solid #94A3B8;
-        }
-
+        .badges-list { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+        .badge { font-size: 9px; font-weight: 800; color: #FFF; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badge-default { background-color: #6B7280; }
+        
         .today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; box-shadow: none !important; }
         .today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
         
-        footer {
-            padding: 12px 16px;
-            background: #F8FAFC;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-        }
-        .legend-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
+        footer { padding: 16px 20px; background-color: #F8FAFC; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .legend-container { display: flex; gap: 14px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
-        .l-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .l-dot { width: 10px; height: 10px; border-radius: 50%; }
         .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
-        .l-coringa { background: linear-gradient(135deg, #8B5CF6, #6D28D9); border: 1px solid #5B21B6; }
-        .l-bate-volta { background: #F59E0B; border: 1px solid #D97706; }
-        .l-today { background: #FFFBEB; border: 2px solid #F59E0B; }
-        .l-annotated { background: var(--bg-annotated); border: 1px solid var(--border-annotated); }
+        .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; }
+        .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
 
-        #edit-staff-btn, #manage-invites-btn { display: none; }
-
-        /* ===== GERENCIAMENTO DE CONVITES ===== */
-        .title-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 8px;
-        }
-        .invite-create-row {
-            display: grid;
-            grid-template-columns: minmax(200px, 1fr) auto auto;
-            gap: 8px;
-            align-items: center;
-        }
-        .invite-create-row input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .invite-create-row input:focus {
-            border-color: var(--rio-light);
-            box-shadow: 0 0 0 2px rgba(0,45,94,0.12);
-        }
-        .invite-btn {
-            border: none;
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
-        .invite-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-        .invite-btn-primary { background: var(--rio-blue); color: #FFF; }
-        .invite-btn-primary:hover { background: var(--rio-light); }
-        .invite-btn-secondary { background: #E2E8F0; color: var(--text-main); }
-        .invite-btn-secondary:hover { background: #CBD5E1; }
-        .invite-btn-danger { background: #FEE2E2; color: #B91C1C; }
-        .invite-btn-danger:hover { background: #FECACA; }
-        .invite-helper {
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            line-height: 1.45;
-        }
-        .generated-invite-box {
+        #edit-staff-btn {
             display: none;
-            margin-top: 12px;
-            padding: 12px;
-            border: 1px solid #BFDBFE;
-            border-radius: 10px;
-            background: #EFF6FF;
         }
-        .generated-invite-box.active { display: block; }
-        .generated-code-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .generated-code {
-            font-family: Consolas, Monaco, monospace;
-            font-weight: 900;
-            font-size: 1.15rem;
-            color: var(--rio-blue);
-            letter-spacing: 1px;
-        }
-        .generated-actions { display: flex; flex-wrap: wrap; gap: 6px; }
-        .invite-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .invite-list-header h3 { margin: 0; }
-        .invite-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .invite-empty {
-            padding: 18px 10px;
-            text-align: center;
-            color: var(--text-muted);
-            border: 1px dashed var(--border-color);
-            border-radius: 10px;
-            background: #FFF;
-        }
-        .invite-item {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: #FFF;
-            padding: 10px 12px;
-            display: grid;
-            grid-template-columns: minmax(140px, 0.8fr) minmax(180px, 1.2fr) auto;
-            gap: 10px;
-            align-items: center;
-        }
-        .invite-item-code {
-            font-family: Consolas, Monaco, monospace;
-            font-weight: 900;
-            color: var(--rio-blue);
-            word-break: break-word;
-        }
-        .invite-item-meta {
-            font-size: 0.75rem;
-            line-height: 1.45;
-            color: var(--text-muted);
-            word-break: break-word;
-        }
-        .invite-status-pill {
-            display: inline-block;
-            padding: 3px 7px;
-            border-radius: 999px;
-            font-size: 0.68rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        .invite-status-pill.available { background: #D1FAE5; color: #065F46; }
-        .invite-status-pill.used { background: #E2E8F0; color: #475569; }
-        .invite-item-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            justify-content: flex-end;
-        }
-        .invite-item-actions .invite-btn { padding: 7px 9px; font-size: 0.7rem; }
 
-        .badge-color-0 { background-color: #3B82F6; }
-        .badge-color-1 { background-color: #10B981; }
-        .badge-color-2 { background-color: #F59E0B; }
-        .badge-color-3 { background-color: #EF4444; }
-        .badge-color-4 { background-color: #8B5CF6; }
-        .badge-color-5 { background-color: #EC4899; }
-        .badge-color-6 { background-color: #14B8A6; }
-        .badge-color-7 { background-color: #F97316; }
-        .badge-color-8 { background-color: #6366F1; }
-        .badge-color-9 { background-color: #84CC16; }
+        .name-tag, .excecao-tag {
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-        @media (max-width: 480px) {
-            .calendar-grid-table td { height: 100px; padding: 3px 2px; font-size: 0.75rem; }
-            .calendar-grid-table th { font-size: 0.6rem; padding: 6px 1px; }
-            .duty-day-circle { width: 18px; height: 18px; font-size: 0.65rem; }
-            .date-num { font-size: 0.7rem; }
-            .agenda-input { height: 40px; font-size: 0.7rem; }
-            .badge { font-size: 0.6rem; padding: 1px 4px; }
-            .plantao-label { font-size: 0.5rem; }
-            .toolbar { gap: 6px; padding: 8px 10px; }
-            .btn-action { font-size: 0.65rem; padding: 4px 10px; }
-            .title-block .month-title { font-size: 1.4rem; }
-            .modal-content { padding: 16px 12px; }
-            .day-section { padding: 10px 8px; }
-            .title-actions { gap: 6px; }
-            .invite-create-row { grid-template-columns: 1fr; }
-            .invite-item { grid-template-columns: 1fr; }
-            .invite-item-actions { justify-content: flex-start; }
-            .generated-code-row { align-items: flex-start; }
+        /* Responsivo para a barra de ferramentas */
+        @media (max-width: 600px) {
+            .toolbar-notes button { font-size: 11px; padding: 2px 6px; min-width: 28px; height: 28px; }
+            .toolbar-notes input[type="color"] { width: 28px; height: 28px; }
         }
     </style>
 </head>
@@ -858,47 +543,34 @@
         <h2>Acesso à Escala</h2>
         <input type="email" id="auth-email" class="auth-input" placeholder="Seu e-mail">
         <input type="password" id="auth-password" class="auth-input" placeholder="Sua senha">
-        <button type="button" id="forgot-password-btn" class="forgot-password-btn">Esqueci minha senha</button>
-
-        <!-- NOVO: campo de convite -->
-        <div class="convite-wrapper">
-            <input type="text" id="auth-convite" class="auth-input" placeholder="Código de convite" style="flex:1;">
-            <span id="convite-status" class="convite-status"></span>
-        </div>
-
+        
         <button id="auth-login-btn" class="auth-btn btn-login">Entrar</button>
         <div class="auth-divider">ou se for seu primeiro acesso</div>
         <button id="auth-register-btn" class="auth-btn btn-register">Criar Nova Conta</button>
     </div>
 
-    <!-- POP-UP DE RECUPERAÇÃO DE SENHA -->
-    <div class="modal-overlay" id="password-reset-modal" role="dialog" aria-modal="true" aria-labelledby="password-reset-title">
-        <div class="password-reset-card">
-            <div class="password-reset-icon" aria-hidden="true">🔐</div>
-            <h2 id="password-reset-title">Pedido de recuperação enviado!</h2>
-            <p>Enviamos um link para redefinir sua senha para o e-mail informado:</p>
-            <div class="password-reset-email" id="password-reset-email"></div>
-            <div class="password-reset-tip">
-                📩 A mensagem pode levar alguns minutos para chegar. Verifique também a pasta <strong>Spam/Lixo eletrônico</strong>.
-            </div>
-            <p>Depois é só criar uma nova senha e voltar para o <strong>Plantão</strong>. 😉</p>
-            <button type="button" class="auth-btn btn-login password-reset-ok" id="password-reset-ok-btn">Entendi 👍</button>
-        </div>
-    </div>
-
     <div class="calendar-container" id="calendar-screen">
         <div class="top-bar-header">
-            Plantão
+            Plantão Invertido
             <button class="logout-btn" id="logout-btn">Sair</button>
         </div>
         <header>
             <div class="title-block">
                 <div class="month-title" id="month-label">Julho</div>
                 <div class="year-title" id="year-label">2026</div>
-                <div class="title-actions">
-                    <button id="edit-staff-btn" class="btn-action">📝 Editar Escala</button>
-                    <button id="manage-invites-btn" class="btn-action">✉️ Convites</button>
-                </div>
+                <button id="edit-staff-btn" class="btn-action" style="margin-top: 10px;">📝 Editar Escala</button>
+            </div>
+            <!-- Barra de ferramentas para anotações -->
+            <div class="toolbar-notes" id="note-toolbar">
+                <button onclick="formatNote('bold')" title="Negrito (Ctrl+B)"><strong>B</strong></button>
+                <button onclick="formatNote('italic')" title="Itálico (Ctrl+I)"><em>I</em></button>
+                <button onclick="formatNote('underline')" title="Sublinhado (Ctrl+U)"><u>U</u></button>
+                <button onclick="formatNote('strikeThrough')" title="Tachado"><s>S</s></button>
+                <div class="separator"></div>
+                <label title="Cor do texto"><input type="color" id="text-color" value="#000000" onchange="formatNote('foreColor', this.value)"></label>
+                <label title="Cor de fundo"><input type="color" id="bg-color" value="#FFFF00" onchange="formatNote('hiliteColor', this.value)"></label>
+                <div class="separator"></div>
+                <button onclick="formatNote('removeFormat')" class="btn-clear" title="Limpar formatação">✕</button>
             </div>
         </header>
 
@@ -934,39 +606,41 @@
         <footer>
             <div class="legend-container">
                 <div class="legend-item"><div class="l-dot l-active"></div> Plantão</div>
-                <div class="legend-item"><div class="l-dot l-coringa"></div> Coringa</div>
-                <div class="legend-item"><div class="l-dot l-bate-volta"></div> Bate e Volta</div>
                 <div class="legend-item"><div class="l-dot l-today"></div> Hoje</div>
                 <div class="legend-item"><div class="l-dot l-annotated"></div> Com Anotação</div>
             </div>
-            <span class="credit-footer" style="font-size:0.7rem;">Desenvolvido por <strong>Felipe Souza</strong></span>
+            <span class="credit-footer">Desenvolvido por <strong>Felipe Souza</strong></span>
         </footer>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (mesmo de antes) -->
+    <!-- ===== MODAL DE EDIÇÃO ===== -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:12px;">
-                Defina os nomes do rodízio (sexta, sábado e domingo), exceções e configure o Bate e Volta.
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; text-align: center;">
+                Defina os nomes do rodízio e quantas pessoas aparecem em cada dia.
             </p>
 
+            <!-- RODÍZIO -->
             <div class="day-section" id="section-rotation">
                 <h3>
-                    🔄 Rodízio (sexta, sábado e domingo)
-                    <span class="badge-info">— alterna a cada 15 dias</span>
-                    <button class="btn-remove-day" onclick="removeLastFromList('rotation')">−</button>
+                    🔄 Rodízio
+                    <span class="badge-info">— nomes que se alternam</span>
+                    <button class="btn-remove-day" onclick="removeLastFromList('rotation')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="rotation-list"></div>
                 <div class="add-name-row">
                     <input type="text" id="rotation-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'rotation')">
                     <button class="btn-add-name" onclick="addNameToList('rotation')">+</button>
                 </div>
-                <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Ex: Carlos, Leticia, Gustavo, Tatiane</div>
+                <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (quantos quiser)</div>
             </div>
 
-            <div class="day-section" style="border-color:#F59E0B; background:#FFFBEB;">
-                <h3 style="color:#D97706;">🔢 Quantos nomes do rodízio em cada dia?</h3>
+            <!-- QUANTIDADES POR DIA -->
+            <div class="day-section" style="border-color: #F59E0B; background: #FFFBEB;">
+                <h3 style="color: #D97706;">
+                    🔢 Quantos nomes do rodízio em cada dia?
+                </h3>
                 <div class="qtd-row">
                     <label>Sexta:</label>
                     <input type="number" id="qtd-sexta" min="0" max="10" value="1">
@@ -975,33 +649,29 @@
                     <label>Domingo:</label>
                     <input type="number" id="qtd-domingo" min="0" max="10" value="1">
                 </div>
-                <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Quantas pessoas do rodízio em cada dia. A soma não deve ultrapassar o número de nomes do rodízio.</div>
+                <div class="helper">Digite quantas pessoas do rodízio você quer em cada dia. Ex: sexta 2, sábado 3, domingo 1.</div>
             </div>
 
-            <!-- BATE E VOLTA -->
-            <div class="day-section" style="border-color:#F59E0B; background:#FEF3C7;">
-                <h3 style="color:#D97706;">🔄 Bate e Volta</h3>
-                <div class="qtd-row">
-                    <label>Ativar:</label>
-                    <input type="checkbox" id="bate-volta-ativo">
-                    <label style="margin-left:12px;">Dia da semana:</label>
-                    <select id="bate-volta-dia">
-                        <option value="0">Domingo</option>
-                        <option value="1">Segunda</option>
-                        <option value="2">Terça</option>
-                        <option value="3">Quarta</option>
-                        <option value="4">Quinta</option>
-                        <option value="5">Sexta</option>
-                        <option value="6">Sábado</option>
-                    </select>
+            <!-- QUINTA -->
+            <div class="day-section" id="section-quinta">
+                <h3>
+                    📅 Quinta-feira (fixos)
+                    <span class="badge-info">— sempre aparecem na quinta</span>
+                    <button class="btn-remove-day" onclick="removeLastFromList('quinta')" title="Remover último nome">−</button>
+                </h3>
+                <div class="name-list" id="quinta-list"></div>
+                <div class="add-name-row">
+                    <input type="text" id="quinta-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'quinta')">
+                    <button class="btn-add-name" onclick="addNameToList('quinta')">+</button>
                 </div>
-                <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">No dia selecionado, um nome extra será escolhido automaticamente (quem está há mais tempo sem folga).</div>
+                <div class="helper">Ex: Leandro, Paulo... (sempre aparecem na quinta)</div>
             </div>
 
-            <div class="day-section" style="border-color:#8B5CF6; background:#F5F3FF;">
-                <h3 style="color:#6D28D9;">
+            <!-- EXCEÇÕES -->
+            <div class="day-section" style="border-color: #8B5CF6; background: #F5F3FF;">
+                <h3 style="color: #6D28D9;">
                     ⭐ Exceções (coringas)
-                    <span class="badge-info">— nomes extras em dias específicos</span>
+                    <span class="badge-info">— nomes que aparecem em dias específicos, apenas nos plantões</span>
                 </h3>
                 <div class="excecao-row">
                     <input type="text" id="excecao-input" placeholder="Nome..." style="flex:1; min-width:100px;">
@@ -1014,65 +684,15 @@
                         <option value="5">Sexta</option>
                         <option value="6">Sábado</option>
                     </select>
-                    <button class="btn-add-name" onclick="addExcecao()" style="background:#6D28D9;">+</button>
+                    <button class="btn-add-name" onclick="addExcecao()" style="background: #6D28D9;">+</button>
                 </div>
                 <div class="excecoes-list" id="excecoes-list"></div>
-                <div class="helper" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Nome aparece no dia escolhido se for plantão.</div>
+                <div class="helper">Digite um nome, escolha o dia e clique em +. Esse nome aparecerá sempre nesse dia, <strong>quando for plantão</strong>.</div>
             </div>
 
             <div class="modal-buttons">
                 <button class="btn-cancel" id="edit-cancel-btn">Cancelar</button>
                 <button class="btn-save" id="edit-save-btn">💾 Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE CONVITES -->
-    <div class="modal-overlay" id="invites-modal">
-        <div class="modal-content" style="max-width:820px;">
-            <h2>✉️ Gerenciar Convites</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:14px; line-height:1.45;">
-                Qualquer usuário logado pode gerar convites. O código é salvo na coleção <strong>convites</strong> do Firestore e só pode ser usado uma vez.
-            </p>
-
-            <div class="day-section">
-                <h3>🎟️ Novo convite</h3>
-                <div class="invite-create-row">
-                    <input type="email" id="invite-recipient-email" placeholder="E-mail do convidado (opcional)">
-                    <button type="button" class="invite-btn invite-btn-secondary" id="generate-invite-btn">Gerar código</button>
-                    <button type="button" class="invite-btn invite-btn-primary" id="generate-send-invite-btn">✉️ Gerar e enviar</button>
-                </div>
-                <div class="invite-helper">
-                    “Gerar e enviar” cria o código e abre o seu aplicativo/programa de e-mail com destinatário, assunto e mensagem já preenchidos. Você só precisa confirmar o envio.
-                </div>
-
-                <div class="generated-invite-box" id="generated-invite-box">
-                    <div class="generated-code-row">
-                        <div>
-                            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700; margin-bottom:3px;">ÚLTIMO CONVITE GERADO</div>
-                            <div class="generated-code" id="generated-invite-code">—</div>
-                            <div id="generated-invite-email" style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;"></div>
-                        </div>
-                        <div class="generated-actions">
-                            <button type="button" class="invite-btn invite-btn-secondary" id="copy-generated-invite-btn">📋 Copiar</button>
-                            <button type="button" class="invite-btn invite-btn-primary" id="email-generated-invite-btn">✉️ Enviar por e-mail</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="day-section">
-                <div class="invite-list-header">
-                    <h3>📋 Convites cadastrados</h3>
-                    <button type="button" class="invite-btn invite-btn-secondary" id="refresh-invites-btn">↻ Atualizar</button>
-                </div>
-                <div class="invite-list" id="invites-list">
-                    <div class="invite-empty">Carregando convites...</div>
-                </div>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn-cancel" id="invites-close-btn">Fechar</button>
             </div>
         </div>
     </div>
@@ -1083,7 +703,6 @@
             getAuth,
             createUserWithEmailAndPassword,
             signInWithEmailAndPassword,
-            sendPasswordResetEmail,
             signOut,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -1097,11 +716,10 @@
             deleteDoc,
             deleteField,
             writeBatch,
-            serverTimestamp,
-            query,
-            where
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
+        // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
             authDomain: "escalaaberta-d968c.firebaseapp.com",
@@ -1111,28 +729,27 @@
             appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
             measurementId: "G-ETSK8NEHDF"
         };
+        // ========================================================
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        auth.languageCode = "pt-BR";
         const db = getFirestore(app);
 
         let sessionUser = null;
         let notesCache = {};
         let noteMetaCache = {};
         const saveTimers = new Map();
+        let activeEditor = null; // referência ao editor atual
 
+        // Configuração da escala
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
+            quinta: ["Leandro"],
             excecoes: {},
             quantidades: {
                 sexta: 1,
                 sabado: 1,
                 domingo: 1
-            },
-            bateVolta: {
-                ativo: false,
-                dia: 0
             }
         };
 
@@ -1159,324 +776,12 @@
         const logoutBtn = document.getElementById("logout-btn");
         const emailInput = document.getElementById("auth-email");
         const passwordInput = document.getElementById("auth-password");
-        const forgotPasswordBtn = document.getElementById("forgot-password-btn");
-        const passwordResetModal = document.getElementById("password-reset-modal");
-        const passwordResetEmail = document.getElementById("password-reset-email");
-        const passwordResetOkBtn = document.getElementById("password-reset-ok-btn");
-        const conviteInput = document.getElementById("auth-convite");
-        const conviteStatus = document.getElementById("convite-status");
         const monthSelect = document.getElementById("jump-month-select");
 
         monthSelect.value = String(activeMonth);
         yearSelect.value = String(activeYear);
 
-        const ALTERNANCIA_REF = new Date(2026, 7, 25);
-
-        // ==================== CONVITE ====================
-        // Função para verificar se o código de convite é válido
-        async function validarConvite(codigo) {
-            if (!codigo) return { valido: false, mensagem: "Digite um código de convite." };
-            try {
-                const convitesRef = collection(db, "convites");
-                const q = query(convitesRef, where("codigo", "==", codigo.trim()));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    return { valido: false, mensagem: "Código inválido." };
-                }
-                const docSnap = querySnapshot.docs[0];
-                const data = docSnap.data();
-                if (data.usado === true) {
-                    return { valido: false, mensagem: "Este convite já foi usado." };
-                }
-                // O convite é válido e não foi usado. Retornamos o ID e os dados do documento.
-                return { valido: true, docId: docSnap.id, data, mensagem: "Convite válido! ✅" };
-            } catch (error) {
-                console.error("Erro ao validar convite:", error);
-                return { valido: false, mensagem: "Erro ao validar convite. Tente novamente." };
-            }
-        }
-
-        // Função para marcar o convite como usado somente depois que a conta for criada.
-        async function marcarConviteUsado(docId, user) {
-            try {
-                const ref = doc(db, "convites", docId);
-                await setDoc(ref, {
-                    usado: true,
-                    usadoEm: serverTimestamp(),
-                    usadoPor: user?.email || null,
-                    usadoPorUid: user?.uid || null
-                }, { merge: true });
-                return true;
-            } catch (error) {
-                console.error("Erro ao marcar convite como usado:", error);
-                return false;
-            }
-        }
-
-        // Validação em tempo real (quando o usuário digita)
-        let timeoutConvite = null;
-        conviteInput.addEventListener("input", async () => {
-            clearTimeout(timeoutConvite);
-            const codigo = conviteInput.value.trim();
-            if (!codigo) {
-                conviteStatus.textContent = "";
-                conviteStatus.className = "convite-status";
-                return;
-            }
-            timeoutConvite = setTimeout(async () => {
-                const resultado = await validarConvite(codigo);
-                conviteStatus.textContent = resultado.mensagem;
-                conviteStatus.className = "convite-status " + (resultado.valido ? "valido" : "invalido");
-                // Guardamos o docId no dataset para uso no registro
-                conviteInput.dataset.docId = resultado.docId || "";
-                conviteInput.dataset.valido = resultado.valido ? "true" : "false";
-            }, 500);
-        });
-
-        // ==================== GERENCIAMENTO DE CONVITES ====================
-        const APP_URL = "https://flpsouzza.github.io/paulinho/";
-        let lastGeneratedInvite = null;
-
-        function normalizarEmail(email) {
-            return String(email || "").trim().toLowerCase();
-        }
-
-        function gerarCodigoConvite() {
-            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            const values = new Uint32Array(6);
-            crypto.getRandomValues(values);
-            let code = "COR-";
-            for (const value of values) code += chars[value % chars.length];
-            return code;
-        }
-
-        async function criarNovoConvite(email = "") {
-            if (!sessionUser) throw new Error("Faça login para gerar convites.");
-            const destinatario = normalizarEmail(email);
-
-            // Tenta algumas vezes para garantir que o código ainda não exista.
-            for (let attempt = 0; attempt < 10; attempt++) {
-                const codigo = gerarCodigoConvite();
-                const ref = doc(db, "convites", codigo);
-                const existing = await getDoc(ref);
-                if (existing.exists()) continue;
-
-                await setDoc(ref, {
-                    codigo,
-                    usado: false,
-                    email: destinatario || null,
-                    criadoEm: serverTimestamp(),
-                    criadoPor: sessionUser.email || sessionUser.uid,
-                    criadoPorUid: sessionUser.uid
-                });
-
-                return { docId: codigo, codigo, email: destinatario, usado: false };
-            }
-            throw new Error("Não foi possível gerar um código único. Tente novamente.");
-        }
-
-        function buildInviteEmailBody(invite) {
-            return [
-                "Olá!",
-                "",
-                "Você foi convidado para acessar a página de Plantão.",
-                "",
-                `Acesse: ${APP_URL}`,
-                `Código de convite: ${invite.codigo}`,
-                "",
-                "No primeiro acesso, informe seu e-mail, crie uma senha e digite o código de convite acima.",
-                "",
-                "Este código só pode ser utilizado uma vez."
-            ].join("\n");
-        }
-
-        function abrirEmailConvite(invite, emailOverride = "") {
-            const destinatario = normalizarEmail(emailOverride || invite?.email || "");
-            if (!destinatario) {
-                const informado = prompt("Digite o e-mail do convidado:", "");
-                if (!informado) return;
-                invite = { ...invite, email: normalizarEmail(informado) };
-            }
-            const finalEmail = normalizarEmail(invite.email || destinatario);
-            const subject = encodeURIComponent("Convite para acesso à escala de Plantão");
-            const body = encodeURIComponent(buildInviteEmailBody(invite));
-            window.location.href = `mailto:${encodeURIComponent(finalEmail)}?subject=${subject}&body=${body}`;
-        }
-
-        async function copiarTexto(text) {
-            try {
-                await navigator.clipboard.writeText(text);
-                return true;
-            } catch (_) {
-                const ta = document.createElement("textarea");
-                ta.value = text;
-                ta.style.position = "fixed";
-                ta.style.opacity = "0";
-                document.body.appendChild(ta);
-                ta.select();
-                const ok = document.execCommand("copy");
-                ta.remove();
-                return ok;
-            }
-        }
-
-        function formatTimestamp(value) {
-            if (!value) return "—";
-            try {
-                const date = typeof value.toDate === "function" ? value.toDate() : new Date(value);
-                if (Number.isNaN(date.getTime())) return "—";
-                return new Intl.DateTimeFormat("pt-BR", {
-                    dateStyle: "short",
-                    timeStyle: "short"
-                }).format(date);
-            } catch (_) {
-                return "—";
-            }
-        }
-
-        function showGeneratedInvite(invite) {
-            lastGeneratedInvite = invite;
-            const box = document.getElementById("generated-invite-box");
-            document.getElementById("generated-invite-code").textContent = invite.codigo;
-            document.getElementById("generated-invite-email").textContent = invite.email ? `Para: ${invite.email}` : "Sem e-mail vinculado";
-            box.classList.add("active");
-        }
-
-        async function loadInvitesList() {
-            const list = document.getElementById("invites-list");
-            if (!sessionUser) {
-                list.innerHTML = '<div class="invite-empty">Faça login para visualizar os convites.</div>';
-                return;
-            }
-
-            list.innerHTML = '<div class="invite-empty">Carregando convites...</div>';
-            try {
-                const snapshot = await getDocs(collection(db, "convites"));
-                const invites = snapshot.docs.map(snap => ({ docId: snap.id, ...snap.data() }));
-                invites.sort((a, b) => {
-                    const ta = a.criadoEm?.toMillis?.() || 0;
-                    const tb = b.criadoEm?.toMillis?.() || 0;
-                    return tb - ta;
-                });
-
-                list.innerHTML = "";
-                if (!invites.length) {
-                    list.innerHTML = '<div class="invite-empty">Nenhum convite cadastrado.</div>';
-                    return;
-                }
-
-                for (const invite of invites) {
-                    const item = document.createElement("div");
-                    item.className = "invite-item";
-
-                    const codeCol = document.createElement("div");
-                    const status = document.createElement("span");
-                    status.className = `invite-status-pill ${invite.usado ? "used" : "available"}`;
-                    status.textContent = invite.usado ? "Utilizado" : "Disponível";
-                    const code = document.createElement("div");
-                    code.className = "invite-item-code";
-                    code.textContent = invite.codigo || invite.docId;
-                    codeCol.append(status, code);
-
-                    const meta = document.createElement("div");
-                    meta.className = "invite-item-meta";
-                    const metaLines = [];
-                    if (invite.email) metaLines.push(`Destinatário: ${invite.email}`);
-                    metaLines.push(`Criado: ${formatTimestamp(invite.criadoEm)}`);
-                    if (invite.criadoPor) metaLines.push(`Por: ${invite.criadoPor}`);
-                    if (invite.usado) {
-                        if (invite.usadoPor) metaLines.push(`Usado por: ${invite.usadoPor}`);
-                        metaLines.push(`Usado em: ${formatTimestamp(invite.usadoEm)}`);
-                    }
-                    meta.textContent = metaLines.join(" • ");
-
-                    const actions = document.createElement("div");
-                    actions.className = "invite-item-actions";
-
-                    const copyBtn = document.createElement("button");
-                    copyBtn.type = "button";
-                    copyBtn.className = "invite-btn invite-btn-secondary";
-                    copyBtn.textContent = "📋 Copiar";
-                    copyBtn.onclick = async () => {
-                        const ok = await copiarTexto(invite.codigo || invite.docId);
-                        alert(ok ? "Código copiado!" : "Não foi possível copiar o código.");
-                    };
-                    actions.appendChild(copyBtn);
-
-                    if (!invite.usado) {
-                        const emailBtn = document.createElement("button");
-                        emailBtn.type = "button";
-                        emailBtn.className = "invite-btn invite-btn-primary";
-                        emailBtn.textContent = "✉️ E-mail";
-                        emailBtn.onclick = () => abrirEmailConvite({
-                            codigo: invite.codigo || invite.docId,
-                            email: invite.email || ""
-                        });
-                        actions.appendChild(emailBtn);
-                    }
-
-                    const deleteBtn = document.createElement("button");
-                    deleteBtn.type = "button";
-                    deleteBtn.className = "invite-btn invite-btn-danger";
-                    deleteBtn.textContent = "Excluir";
-                    deleteBtn.onclick = async () => {
-                        const codigo = invite.codigo || invite.docId;
-                        if (!confirm(`Excluir o convite ${codigo}?`)) return;
-                        try {
-                            await deleteDoc(doc(db, "convites", invite.docId));
-                            if (lastGeneratedInvite?.docId === invite.docId) {
-                                lastGeneratedInvite = null;
-                                document.getElementById("generated-invite-box").classList.remove("active");
-                            }
-                            await loadInvitesList();
-                        } catch (error) {
-                            console.error("Erro ao excluir convite:", error);
-                            alert("Erro ao excluir convite: " + (error?.message || "falha desconhecida"));
-                        }
-                    };
-                    actions.appendChild(deleteBtn);
-
-                    item.append(codeCol, meta, actions);
-                    list.appendChild(item);
-                }
-            } catch (error) {
-                console.error("Erro ao carregar convites:", error);
-                list.innerHTML = '<div class="invite-empty">Erro ao carregar convites. Verifique as regras do Firestore.</div>';
-            }
-        }
-
-        async function gerarConvitePelaTela(enviarDepois = false) {
-            if (!sessionUser) return alert("Faça login para gerar convites.");
-            const emailInputConvite = document.getElementById("invite-recipient-email");
-            const email = normalizarEmail(emailInputConvite.value);
-            if (enviarDepois && !email) {
-                emailInputConvite.focus();
-                return alert("Digite o e-mail do convidado para gerar e enviar.");
-            }
-            if (email && !emailInputConvite.checkValidity()) {
-                emailInputConvite.focus();
-                return alert("Digite um e-mail válido.");
-            }
-
-            const generateBtn = document.getElementById("generate-invite-btn");
-            const generateSendBtn = document.getElementById("generate-send-invite-btn");
-            generateBtn.disabled = true;
-            generateSendBtn.disabled = true;
-            try {
-                const invite = await criarNovoConvite(email);
-                showGeneratedInvite(invite);
-                await loadInvitesList();
-                if (enviarDepois) abrirEmailConvite(invite, email);
-            } catch (error) {
-                console.error("Erro ao gerar convite:", error);
-                alert("Erro ao gerar convite: " + (error?.message || "falha desconhecida"));
-            } finally {
-                generateBtn.disabled = false;
-                generateSendBtn.disabled = false;
-            }
-        }
-
-        // ==================== CONFIG ====================
+        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
         async function loadStaffConfig() {
             try {
                 const docRef = doc(db, "config", "staff");
@@ -1484,50 +789,54 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
+                    staffConfig.quinta = data.quinta || staffConfig.quinta;
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    staffConfig.bateVolta = data.bateVolta || { ativo: false, dia: 0 };
                 } else {
-                    await saveStaffConfig(staffConfig.rotation, staffConfig.excecoes, staffConfig.quantidades, staffConfig.bateVolta);
+                    await saveStaffConfig(staffConfig.rotation, staffConfig.quinta, staffConfig.excecoes, staffConfig.quantidades);
                 }
-            } catch (error) { console.error("Erro ao carregar configuração:", error); }
+            } catch (error) {
+                console.error("Erro ao carregar configuração:", error);
+            }
         }
 
-        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newBateVolta) {
+        async function saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
                 await setDoc(docRef, {
                     rotation: newRotation,
+                    quinta: newQuinta,
                     excecoes: newExcecoes || {},
-                    quantidades: newQuantidades || { sexta:1, sabado:1, domingo:1 },
-                    bateVolta: newBateVolta || { ativo: false, dia: 0 }
+                    quantidades: newQuantidades || { sexta:1, sabado:1, domingo:1 }
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
+                staffConfig.quinta = newQuinta;
                 staffConfig.excecoes = newExcecoes || {};
                 staffConfig.quantidades = newQuantidades || { sexta:1, sabado:1, domingo:1 };
-                staffConfig.bateVolta = newBateVolta || { ativo: false, dia: 0 };
                 buildCalendar();
             } catch (error) {
-                alert("Erro ao salvar: " + error.message);
+                console.error("Erro ao salvar configuração:", error);
+                alert("Não foi possível salvar a configuração.\n" + error.message);
             }
         }
 
-        // ==================== AUXILIARES ====================
+        // ==================== FUNÇÕES DO CALENDÁRIO ====================
         function friendlyFirebaseError(error) {
             const code = error?.code || "";
             const messages = {
-                "auth/invalid-email": "E-mail inválido.",
+                "auth/invalid-email": "O e-mail informado é inválido.",
                 "auth/missing-password": "Digite a senha.",
                 "auth/invalid-credential": "E-mail ou senha incorretos.",
                 "auth/user-not-found": "Usuário não encontrado.",
                 "auth/wrong-password": "E-mail ou senha incorretos.",
-                "auth/email-already-in-use": "E-mail já cadastrado.",
-                "auth/weak-password": "Senha precisa ter 6+ caracteres.",
-                "auth/too-many-requests": "Muitas tentativas. Aguarde.",
-                "auth/network-request-failed": "Falha de conexão."
+                "auth/email-already-in-use": "Esse e-mail já possui uma conta.",
+                "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
+                "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+                "auth/network-request-failed": "Falha de conexão com o Firebase. Verifique a internet e tente novamente.",
+                "permission-denied": "O usuário não tem permissão para acessar o Firestore. Confira as Regras do banco."
             };
-            return messages[code] || error?.message || "Erro inesperado.";
+            return messages[code] || error?.message || "Ocorreu um erro inesperado.";
         }
 
         function setAuthLoading(isLoading, action = "login") {
@@ -1537,263 +846,139 @@
             registerBtn.innerText = isLoading && action === "register" ? "Cadastrando..." : "Criar Nova Conta";
         }
 
-        function noteKey(year, month, day) { return `${year}_${month}_${day}`; }
+        function noteKey(year, month, day) {
+            return `${year}_${month}_${day}`;
+        }
+
+        function calculateDaysFromAnchor(y,m,d) {
+            const anchor = Date.UTC(2026,6,3);
+            const target = Date.UTC(y,m,d);
+            return Math.floor((target - anchor) / (1000*60*60*24));
+        }
+
         function mathematicalMod(n,m) { return ((n%m)+m)%m; }
-        function cleanStringForClass(text) { return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
+
+        function cleanStringForClass(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+        }
+
         function escapeHtml(text) {
-            return String(text ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+            return String(text ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        const colorPalette = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
-        const colorMap = {};
-        let colorIndex = 0;
-        function getColorForName(name) {
-            if (!name) return '#6B7280';
-            const trimmed = name.trim();
-            if (!trimmed) return '#6B7280';
-            if (colorMap[trimmed]) return colorMap[trimmed];
-            const color = colorPalette[colorIndex % colorPalette.length];
-            colorMap[trimmed] = color;
-            colorIndex++;
-            return color;
-        }
-
-        function daysBetween(date1, date2) {
-            const msPerDay = 1000*60*60*24;
-            const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
-            const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
-            return Math.floor((utc1 - utc2) / msPerDay);
-        }
-
-        // ===== BATE E VOLTA =====
-        function calcularNomeBateVolta(year, month, day) {
-            const rotation = staffConfig.rotation || [];
-            if (rotation.length === 0) return null;
-
-            let bestStreak = -1;
-            const candidates = [];
-            const currentDate = new Date(year, month, day);
-            const startDate = new Date(currentDate);
-            startDate.setDate(startDate.getDate() - 60);
-
-            for (const nome of rotation) {
-                let streak = 0;
-                const checkDate = new Date(currentDate);
-                checkDate.setDate(checkDate.getDate() - 1);
-                while (checkDate >= startDate) {
-                    const { isDuty, activeWorkers } = getWorkersForDateHelper(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
-                    if (isDuty && activeWorkers.includes(nome)) {
-                        streak++;
-                        checkDate.setDate(checkDate.getDate() - 1);
-                    } else {
-                        break;
-                    }
-                }
-                if (streak > bestStreak) {
-                    bestStreak = streak;
-                    candidates.length = 0;
-                    candidates.push(nome);
-                } else if (streak === bestStreak) {
-                    candidates.push(nome);
-                }
-            }
-
-            if (candidates.length === 0) return rotation[0];
-            const randomIndex = Math.floor(Math.random() * candidates.length);
-            return candidates[randomIndex];
-        }
-
-        function getWorkersForDateHelper(year, month, day) {
+        // ===== LÓGICA INVERTIDA COM QUANTIDADES CONFIGURÁVEIS =====
+        function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
-            const currentDate = new Date(year, month, day);
-            const dayOfWeek = currentDate.getDay();
-            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+            const diff = calculateDaysFromAnchor(year, month, day);
+            const pos = mathematicalMod(diff, 14);
 
-            if (isWeekday) {
-                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) isDuty = true;
+            const rotation = staffConfig.rotation || [];
+            const quintaList = staffConfig.quinta || [];
+            const excecoes = staffConfig.excecoes || {};
+            const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
+
+            const dayOfWeek = new Date(year, month, day).getDay();
+            const excecaoNomes = excecoes[dayOfWeek] || [];
+
+            let isPlantaoRegra = false;
+            let posTipo = null;
+
+            if (pos === 6) {
+                isPlantaoRegra = true;
+                posTipo = 'quinta';
+            } else if (pos === 7) {
+                isPlantaoRegra = true;
+                posTipo = 'sexta';
+            } else if (pos === 8) {
+                isPlantaoRegra = true;
+                posTipo = 'sabado';
+            } else if (pos === 9) {
+                isPlantaoRegra = true;
+                posTipo = 'domingo';
             }
 
-            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
-                const anchor = new Date(2026, 6, 3);
-                const diff = daysBetween(currentDate, anchor);
-                const pos = mathematicalMod(diff, 14);
-                let isWeekendPlantao = false;
-                if (pos === 7 && dayOfWeek === 5) isWeekendPlantao = true;
-                else if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
-                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
-
-                if (isWeekendPlantao) {
-                    isDuty = true;
-                    const rotation = staffConfig.rotation || [];
-                    const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
-                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
-                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
-                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
-
-                    if (rotation.length > 0 && totalPorFDS > 0) {
+            if (isPlantaoRegra) {
+                isDuty = true;
+                if (posTipo === 'quinta') {
+                    activeWorkers.push(...quintaList);
+                } else {
+                    if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
-                        const getSlice = (start, count) => {
-                            const slice = [];
-                            for (let i = 0; i < count; i++) {
-                                const idx = mathematicalMod(start + i, rotation.length);
-                                slice.push(rotation[idx]);
-                            }
-                            return slice;
-                        };
-                        let offsetSexta = offsetBase;
-                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
-                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
-
-                        if (dayOfWeek === 5) {
-                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
-                        } else if (dayOfWeek === 6) {
-                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
-                        } else if (dayOfWeek === 0) {
-                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
+                        let offset = mathematicalMod(weekendIdx, rotation.length);
+                        if (posTipo === 'sexta') {
+                            offset = mathematicalMod(weekendIdx, rotation.length);
+                        } else if (posTipo === 'sabado') {
+                            offset = mathematicalMod(weekendIdx + 1, rotation.length);
+                        } else if (posTipo === 'domingo') {
+                            offset = mathematicalMod(weekendIdx + 2, rotation.length);
+                        }
+                        let quantidade = 0;
+                        if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
+                        else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
+                        else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
+                        for (let i = 0; i < quantidade; i++) {
+                            const idx = mathematicalMod(offset + i, rotation.length);
+                            activeWorkers.push(rotation[idx]);
                         }
                     }
                 }
             }
 
-            if (isDuty) {
-                const excecoes = staffConfig.excecoes || {};
-                const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
+            if (isPlantaoRegra && excecaoNomes.length > 0) {
+                activeWorkers.push(...excecaoNomes);
             }
 
             activeWorkers = [...new Set(activeWorkers)];
             return { isDuty, activeWorkers };
         }
 
-        // ===== LÓGICA DE PLANTÃO (COM BATE E VOLTA) =====
-        function getWorkersForDate(year, month, day) {
-            let activeWorkers = [];
-            let isDuty = false;
-            let isBateVolta = false;
-            let nomeBateVolta = null;
-            const currentDate = new Date(year, month, day);
-            const dayOfWeek = currentDate.getDay();
-            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-
-            if (isWeekday) {
-                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) isDuty = true;
-            }
-
-            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
-                const anchor = new Date(2026, 6, 3);
-                const diff = daysBetween(currentDate, anchor);
-                const pos = mathematicalMod(diff, 14);
-                let isWeekendPlantao = false;
-                if (pos === 7 && dayOfWeek === 5) isWeekendPlantao = true;
-                else if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
-                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
-
-                if (isWeekendPlantao) {
-                    isDuty = true;
-                    const rotation = staffConfig.rotation || [];
-                    const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
-                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
-                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
-                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
-
-                    if (rotation.length > 0 && totalPorFDS > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
-
-                        const getSlice = (start, count) => {
-                            const slice = [];
-                            for (let i = 0; i < count; i++) {
-                                const idx = mathematicalMod(start + i, rotation.length);
-                                slice.push(rotation[idx]);
-                            }
-                            return slice;
-                        };
-
-                        let offsetSexta = offsetBase;
-                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
-                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
-
-                        if (dayOfWeek === 5) {
-                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
-                        } else if (dayOfWeek === 6) {
-                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
-                        } else if (dayOfWeek === 0) {
-                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
-                        }
-                    }
-                }
-            }
-
-            if (isDuty) {
-                const excecoes = staffConfig.excecoes || {};
-                const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
-            }
-
-            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-            if (bateVolta.ativo && dayOfWeek === bateVolta.dia) {
-                if (isDuty) {
-                    const nomeExtra = calcularNomeBateVolta(year, month, day);
-                    if (nomeExtra) {
-                        if (!activeWorkers.includes(nomeExtra)) {
-                            activeWorkers.push(nomeExtra);
-                            isBateVolta = true;
-                            nomeBateVolta = nomeExtra;
-                        }
-                    }
-                }
-            }
-
-            activeWorkers = [...new Set(activeWorkers)];
-            return { isDuty, activeWorkers, isBateVolta, nomeBateVolta };
+        function isPlantaoDia(year, month, day, isDutyOriginal) {
+            return isDutyOriginal;
         }
 
-        function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
-
-        // ==================== NOTAS ====================
-        async function loadNotesFromServer() {
-            try {
-                const snapshot = await getDocs(collection(db, "agenda"));
-                notesCache = {};
-                noteMetaCache = {};
-                snapshot.forEach(docSnap => {
-                    const item = docSnap.data();
-                    if (typeof item.nota === "string" && item.nota.trim()) {
-                        notesCache[docSnap.id] = item.nota;
-                        noteMetaCache[docSnap.id] = { sequenceId: item.sequenceId || null };
-                    }
-                });
-            } catch (error) {
-                if (sessionUser) alert("Erro ao carregar anotações.");
-            }
-            buildCalendar();
+        // ===== FUNÇÕES DE ANOTAÇÃO (com HTML) =====
+        function getEditorContent(editor) {
+            if (!editor) return '';
+            // Se estiver vazio, retorna string vazia
+            const html = editor.innerHTML.trim();
+            if (html === '<br>' || html === '' || html === '<div><br></div>') return '';
+            return html;
         }
 
-        function saveNoteToServer(dayNum, text) {
+        function setEditorContent(editor, html) {
+            if (!editor) return;
+            if (!html || html.trim() === '') {
+                editor.innerHTML = '';
+            } else {
+                editor.innerHTML = html;
+            }
+        }
+
+        // Salvar anotação (agora com HTML)
+        function saveNoteToServer(dayNum, htmlContent) {
             if (!sessionUser) return;
             const key = noteKey(activeYear, activeMonth, dayNum);
-            notesCache[key] = text;
+            // Armazena o HTML
+            notesCache[key] = htmlContent;
+
             if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+
             const timer = setTimeout(async () => {
                 try {
                     const ref = doc(db, "agenda", key);
-                    if (!text.trim()) {
+                    if (!htmlContent || htmlContent.trim() === '') {
                         await deleteDoc(ref);
                         delete notesCache[key];
                         delete noteMetaCache[key];
                     } else {
                         await setDoc(ref, {
-                            nota: text,
+                            nota: htmlContent, // agora salva HTML
                             atualizadoPor: sessionUser.email || sessionUser.uid,
                             atualizadoPorUid: sessionUser.uid,
                             atualizadoEm: serverTimestamp(),
@@ -1802,111 +987,213 @@
                         noteMetaCache[key] = { sequenceId: null };
                     }
                 } catch (error) {
-                    alert("Erro ao salvar anotação.");
-                } finally { saveTimers.delete(key); }
+                    console.error(`Erro ao salvar ${key}:`, error);
+                    alert("Não foi possível salvar a anotação.\n\n" + friendlyFirebaseError(error));
+                } finally {
+                    saveTimers.delete(key);
+                }
             }, 500);
+
             saveTimers.set(key, timer);
         }
 
+        // Carregar anotações
+        async function loadNotesFromServer() {
+            try {
+                const snapshot = await getDocs(collection(db, "agenda"));
+                notesCache = {};
+                noteMetaCache = {};
+                snapshot.forEach(documentSnapshot => {
+                    const item = documentSnapshot.data();
+                    if (typeof item.nota === "string" && item.nota.trim()) {
+                        notesCache[documentSnapshot.id] = item.nota; // HTML
+                        noteMetaCache[documentSnapshot.id] = {
+                            sequenceId: item.sequenceId || null
+                        };
+                    }
+                });
+                buildCalendar();
+            } catch (error) {
+                console.error("Erro ao carregar anotações:", error);
+                if (sessionUser) alert("Não foi possível carregar as anotações.\n\n" + friendlyFirebaseError(error));
+                buildCalendar();
+            }
+        }
+
+        // ===== FUNÇÕES DE FORMATAÇÃO (barra de ferramentas) =====
+        window.formatNote = function(command, value) {
+            // Usa o editor ativo (o que está com foco)
+            const editor = activeEditor;
+            if (!editor) {
+                // Se nenhum editor estiver ativo, tenta encontrar o primeiro visível?
+                // Melhor: alertar o usuário para clicar em uma anotação primeiro.
+                alert('Clique em uma anotação para formatá-la.');
+                return;
+            }
+            // Dá foco ao editor
+            editor.focus();
+            // Aplica o comando
+            if (command === 'removeFormat') {
+                document.execCommand('removeFormat', false, null);
+            } else if (command === 'foreColor' || command === 'hiliteColor') {
+                document.execCommand(command, false, value);
+            } else {
+                document.execCommand(command, false, null);
+            }
+            // Após formatar, atualiza o cache e salva
+            const dayNum = editor.dataset.day;
+            if (dayNum) {
+                const html = getEditorContent(editor);
+                saveNoteToServer(parseInt(dayNum), html);
+                // Atualiza visualmente a classe de "anotado"
+                const td = editor.closest('td');
+                if (td) {
+                    if (html.trim()) {
+                        td.classList.add('annotated-cell');
+                    } else {
+                        td.classList.remove('annotated-cell');
+                    }
+                }
+                // Sincroniza com a versão mobile
+                const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${dayNum}"]`);
+                if (mobileEditor) {
+                    setEditorContent(mobileEditor, html);
+                }
+            }
+        };
+
+        // ===== FUNÇÕES DE REPLICAÇÃO E CANCELAMENTO (adaptadas) =====
         function dateFromNoteKey(key) {
             const [year, month, day] = key.split("_").map(Number);
             return new Date(year, month, day);
         }
 
-        async function cancelConsecutiveReminder(startDay, text) {
+        async function cancelConsecutiveReminder(startDay, editor) {
             if (!sessionUser) return;
-            const clickedKey = noteKey(activeYear, activeMonth, startDay);
-            const targetText = String(text || "").trim();
-            if (!targetText) return alert("Não há lembrete neste dia.");
-            const sequenceId = noteMetaCache[clickedKey]?.sequenceId || null;
+            const key = noteKey(activeYear, activeMonth, startDay);
+            const targetText = getEditorContent(editor).trim();
+
+            if (!targetText) {
+                alert('Não há anotação neste dia para cancelar.');
+                return;
+            }
+
+            // (lógica similar à anterior, mas comparando HTML)
+            const sequenceId = noteMetaCache[key]?.sequenceId || null;
             let sequenceKeys = [];
+
             if (sequenceId) {
-                sequenceKeys = Object.keys(notesCache).filter(key => noteMetaCache[key]?.sequenceId === sequenceId);
+                sequenceKeys = Object.keys(notesCache).filter(k =>
+                    noteMetaCache[k]?.sequenceId === sequenceId
+                );
             } else {
+                // Busca sequência pelo conteúdo HTML idêntico
                 const clickedDate = new Date(activeYear, activeMonth, startDay);
-                const startDate = new Date(clickedDate);
+                let startDate = new Date(clickedDate);
                 while (true) {
-                    const prev = new Date(startDate); prev.setDate(prev.getDate()-1);
-                    const prevKey = noteKey(prev.getFullYear(), prev.getMonth(), prev.getDate());
-                    const prevText = String(notesCache[prevKey] || "").trim();
+                    const prevDate = new Date(startDate);
+                    prevDate.setDate(prevDate.getDate() - 1);
+                    const prevKey = noteKey(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate());
+                    const prevText = (notesCache[prevKey] || '').trim();
                     if (prevText !== targetText) break;
-                    startDate.setTime(prev.getTime());
+                    startDate.setTime(prevDate.getTime());
                 }
                 const cursor = new Date(startDate);
-                for (let i=0; i<5000; i++) {
-                    const key = noteKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
-                    const curText = String(notesCache[key] || "").trim();
-                    if (curText !== targetText) break;
-                    sequenceKeys.push(key);
-                    cursor.setDate(cursor.getDate()+1);
+                for (let i = 0; i < 5000; i++) {
+                    const k = noteKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
+                    const currentText = (notesCache[k] || '').trim();
+                    if (currentText !== targetText) break;
+                    sequenceKeys.push(k);
+                    cursor.setDate(cursor.getDate() + 1);
                 }
             }
-            sequenceKeys.sort((a,b) => dateFromNoteKey(a) - dateFromNoteKey(b));
-            if (!sequenceKeys.length) return alert("Não foi possível localizar a sequência.");
+
+            sequenceKeys.sort((a, b) => dateFromNoteKey(a) - dateFromNoteKey(b));
+            if (!sequenceKeys.length) {
+                alert('Não foi possível localizar a sequência.');
+                return;
+            }
+
             const total = sequenceKeys.length;
-            const confirmed = confirm(`Cancelar este lembrete em ${total} dia${total===1?"":"s"} de uma só vez?`);
+            const startDate = dateFromNoteKey(sequenceKeys[0]);
+            const endDate = dateFromNoteKey(sequenceKeys[sequenceKeys.length - 1]);
+            const confirmed = confirm(
+                `Cancelar esta anotação em ${total} dia${total === 1 ? '' : 's'}?\n\n` +
+                `Período: ${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`
+            );
             if (!confirmed) return;
+
             try {
-                sequenceKeys.forEach(key => { if (saveTimers.has(key)) { clearTimeout(saveTimers.get(key)); saveTimers.delete(key); } });
-                for (let i=0; i<sequenceKeys.length; i+=500) {
+                for (let i = 0; i < sequenceKeys.length; i += 500) {
                     const batch = writeBatch(db);
-                    const chunk = sequenceKeys.slice(i, i+500);
-                    chunk.forEach(key => batch.delete(doc(db, "agenda", key)));
+                    const chunk = sequenceKeys.slice(i, i + 500);
+                    chunk.forEach(k => batch.delete(doc(db, "agenda", k)));
                     await batch.commit();
                 }
-                sequenceKeys.forEach(key => { delete notesCache[key]; delete noteMetaCache[key]; });
+                sequenceKeys.forEach(k => {
+                    delete notesCache[k];
+                    delete noteMetaCache[k];
+                });
                 buildCalendar();
-                alert(`Lembrete cancelado em ${total} dia${total===1?"":"s"}.`);
+                alert(`Anotação cancelada em ${total} dia${total === 1 ? '' : 's'}.`);
             } catch (error) {
-                alert("Erro ao cancelar.");
+                console.error('Erro ao cancelar:', error);
+                alert('Erro ao cancelar: ' + friendlyFirebaseError(error));
             }
         }
 
-        async function replicateNoteInBulk(startDay, text) {
+        async function replicateNoteInBulk(startDay, editor) {
             if (!sessionUser) return;
-            const isEmpty = !text.trim();
-            const promptMsg = isEmpty ? "Quantos dias para APAGAR (incluindo hoje)?" : "Quantos dias para REPLICAR (incluindo hoje)?";
-            const promptDays = prompt(promptMsg, "10");
+            const htmlContent = getEditorContent(editor).trim();
+            const isEmpty = !htmlContent;
+            const promptMsg = isEmpty
+                ? 'O campo está vazio. Digite a quantidade de dias para APAGAR/LIMPAR (incluindo hoje):'
+                : 'Replicar esta anotação por quantos dias corridos (incluindo hoje)?';
+
+            const promptDays = prompt(promptMsg, '10');
             if (!promptDays) return;
-            const totalDaysToApply = parseInt(promptDays, 10);
-            if (isNaN(totalDaysToApply) || totalDaysToApply <= 0) return alert("Número inválido.");
-            if (totalDaysToApply > 500) return alert("Máximo 500 dias.");
+            const totalDays = parseInt(promptDays, 10);
+            if (isNaN(totalDays) || totalDays <= 0) return alert('Número inválido.');
+            if (totalDays > 500) return alert('Máximo 500 dias por segurança.');
+
             const currentDateObj = new Date(activeYear, activeMonth, startDay);
             const batch = writeBatch(db);
-            const sequenceId = isEmpty ? null : (crypto.randomUUID ? crypto.randomUUID() : `seq_${Date.now()}_${Math.random().toString(36).slice(2)}`);
-            for (let i=0; i<totalDaysToApply; i++) {
-                const targetYear = currentDateObj.getFullYear();
-                const targetMonth = currentDateObj.getMonth();
-                const targetDay = currentDateObj.getDate();
-                const key = noteKey(targetYear, targetMonth, targetDay);
+            const sequenceId = isEmpty ? null : (crypto.randomUUID ? crypto.randomUUID() : `seq_${Date.now()}`);
+
+            for (let i = 0; i < totalDays; i++) {
+                const y = currentDateObj.getFullYear();
+                const m = currentDateObj.getMonth();
+                const d = currentDateObj.getDate();
+                const key = noteKey(y, m, d);
                 const ref = doc(db, "agenda", key);
                 if (isEmpty) {
                     batch.delete(ref);
                     delete notesCache[key];
                     delete noteMetaCache[key];
                 } else {
-                    notesCache[key] = text;
+                    notesCache[key] = htmlContent;
                     noteMetaCache[key] = { sequenceId };
                     batch.set(ref, {
-                        nota: text,
+                        nota: htmlContent,
                         atualizadoPor: sessionUser.email || sessionUser.uid,
                         atualizadoPorUid: sessionUser.uid,
                         atualizadoEm: serverTimestamp(),
                         sequenceId: sequenceId
                     }, { merge: true });
                 }
-                currentDateObj.setDate(currentDateObj.getDate()+1);
+                currentDateObj.setDate(currentDateObj.getDate() + 1);
             }
             try {
                 await batch.commit();
                 buildCalendar();
-                alert(isEmpty ? "Anotações apagadas!" : "Anotações replicadas!");
+                alert(isEmpty ? 'Anotações apagadas!' : 'Anotações replicadas!');
             } catch (error) {
-                alert("Erro ao atualizar.");
+                console.error('Erro:', error);
+                alert('Erro: ' + friendlyFirebaseError(error));
             }
         }
 
-        // ==================== BUILD CALENDAR ====================
+        // ===== CONSTRUÇÃO DO CALENDÁRIO =====
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
             const daysInMonth = new Date(activeYear, activeMonth+1, 0).getDate();
@@ -1927,8 +1214,10 @@
             for (let w=0; w<6; w++) {
                 const tr = document.createElement("tr");
                 let hasData = false;
+
                 for (let d=0; d<7; d++) {
                     const td = document.createElement("td");
+
                     if ((w===0 && d<firstDay) || dayNum > daysInMonth) {
                         td.className = "empty-cell";
                     } else {
@@ -1936,18 +1225,11 @@
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
 
-                        const result = getWorkersForDate(activeYear, activeMonth, currentDayNum);
-                        const { isDuty, activeWorkers, isBateVolta, nomeBateVolta } = result;
+                        const { isDuty, activeWorkers } = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
-                        const dayOfWeek = new Date(activeYear, activeMonth, currentDayNum).getDay();
-                        const isWeekend = dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0;
 
-                        if (isPlantao) {
-                            td.classList.add("plantao-cell");
-                            if (!isWeekend) td.classList.add("weekday-plantao");
-                        }
+                        if (isPlantao) td.classList.add("plantao-cell");
                         if (isToday) td.classList.add("today-cell");
-                        if (isBateVolta) td.classList.add("bate-volta-cell");
 
                         const savedNote = notesCache[noteKey(activeYear, activeMonth, currentDayNum)] || "";
                         if (savedNote.trim() && !isToday && !isPlantao) td.classList.add("annotated-cell");
@@ -1955,161 +1237,197 @@
                         let html = `<div class="date-row">`;
                         html += isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`;
                         html += `</div>`;
-                        if (isPlantao) {
-                            const labelClass = !isWeekend ? 'weekday-label' : '';
-                            html += `<span class="plantao-label ${labelClass}">Plantão</span>`;
-                        }
+                        if (isPlantao) html += `<span class="plantao-label">Plantão</span>`;
                         html += `<div class="badges-list">`;
                         if (activeWorkers.length === 0) {
-                            html += ``;
+                            html += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
                         } else {
-                            const excecoes = staffConfig.excecoes || {};
-                            const excecaoNomes = excecoes[dayOfWeek] || [];
-                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            const nomeBateVoltaCalculado = nomeBateVolta; // já vem do result
-
                             activeWorkers.forEach(worker => {
-                                const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
-                                const color = getColorForName(worker);
-                                let coringaClass = isCoringa ? 'badge-coringa' : '';
-                                let bateClass = isBate ? 'badge-bate-volta' : '';
-                                let badgeText = escapeHtml(worker);
-                                if (isBate) {
-                                    badgeText += ' 🔄 B&V';
-                                }
-                                html += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
+                                const cls = cleanStringForClass(worker);
+                                html += `<span class="badge badge-default">${escapeHtml(worker)}</span>`;
                             });
                         }
                         html += `</div>`;
 
                         if (isEditable) {
-                            html += `<textarea class="agenda-input" data-day="${currentDayNum}" placeholder="Anotar..." title="Duplo clique para replicar. Use Cancelar lembrete para apagar toda a sequência de uma só vez.">${escapeHtml(savedNote)}</textarea>`;
+                            // Editor rich-text
+                            html += `<div class="agenda-editor" contenteditable="true" data-day="${currentDayNum}" data-mobile-sync="true">${savedNote}</div>`;
                             html += `<button type="button" class="cancel-sequence-btn" style="display:${savedNote.trim() ? 'block' : 'none'}">Cancelar lembrete</button>`;
                         } else {
                             if (savedNote.trim()) {
-                                html += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
+                                html += `<div class="readonly-note" style="font-size:12px; color:#333; margin-top:4px; background:#f1f5f9; padding:4px 6px; border-radius:4px;">${savedNote}</div>`;
                             }
                         }
 
                         td.innerHTML = html;
 
                         if (isEditable) {
-                            const tx = td.querySelector('.agenda-input');
+                            const editor = td.querySelector('.agenda-editor');
                             const cancelBtn = td.querySelector('.cancel-sequence-btn');
-                            if (tx) {
-                                tx.oninput = e => {
-                                    const val = e.target.value;
-                                    saveNoteToServer(currentDayNum, val);
-                                    if (val.trim()) {
-                                        if (!isToday && !isPlantao) td.classList.add("annotated-cell");
-                                        cancelBtn.style.display = "block";
-                                    } else {
-                                        td.classList.remove("annotated-cell");
-                                        cancelBtn.style.display = "none";
+                            if (editor) {
+                                // Eventos do editor
+                                editor.addEventListener('focus', () => {
+                                    activeEditor = editor;
+                                });
+                                editor.addEventListener('blur', () => {
+                                    // Quando perde foco, salva
+                                    const day = parseInt(editor.dataset.day);
+                                    const content = getEditorContent(editor);
+                                    saveNoteToServer(day, content);
+                                    // Atualiza classes
+                                    const parentTd = editor.closest('td');
+                                    if (parentTd) {
+                                        if (content.trim()) {
+                                            parentTd.classList.add('annotated-cell');
+                                        } else {
+                                            parentTd.classList.remove('annotated-cell');
+                                        }
                                     }
-                                    const mobileTx = listView.querySelector(`textarea[data-mobile-day="${currentDayNum}"]`);
-                                    if (mobileTx && mobileTx.value !== val) mobileTx.value = val;
-                                    const mobileCancelBtn = listView.querySelector(`button[data-mobile-cancel-day="${currentDayNum}"]`);
-                                    if (mobileCancelBtn) mobileCancelBtn.style.display = val.trim() ? "block" : "none";
-                                };
-                                tx.ondblclick = e => replicateNoteInBulk(currentDayNum, e.target.value);
-                            }
-                            if (cancelBtn) {
-                                cancelBtn.onclick = () => cancelConsecutiveReminder(currentDayNum, tx?.value || '');
+                                    // Sincroniza com mobile
+                                    const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${day}"]`);
+                                    if (mobileEditor) {
+                                        setEditorContent(mobileEditor, content);
+                                    }
+                                });
+                                // Atalhos de teclado (Ctrl+B, I, U)
+                                editor.addEventListener('keydown', (e) => {
+                                    if (e.ctrlKey || e.metaKey) {
+                                        let command = null;
+                                        if (e.key === 'b') { command = 'bold'; e.preventDefault(); }
+                                        else if (e.key === 'i') { command = 'italic'; e.preventDefault(); }
+                                        else if (e.key === 'u') { command = 'underline'; e.preventDefault(); }
+                                        if (command) {
+                                            document.execCommand(command, false, null);
+                                            // Salva após formatação
+                                            const day = parseInt(editor.dataset.day);
+                                            const content = getEditorContent(editor);
+                                            saveNoteToServer(day, content);
+                                            // Atualiza mobile
+                                            const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${day}"]`);
+                                            if (mobileEditor) {
+                                                setEditorContent(mobileEditor, content);
+                                            }
+                                        }
+                                    }
+                                    // Enter duplo para replicar
+                                    if (e.key === 'Enter' && e.shiftKey) {
+                                        // Shift+Enter para quebra de linha (padrão)
+                                    }
+                                });
+                                // Duplo clique para replicar
+                                editor.addEventListener('dblclick', (e) => {
+                                    const day = parseInt(editor.dataset.day);
+                                    replicateNoteInBulk(day, editor);
+                                });
+                                // Atualiza o cancel button
+                                if (cancelBtn) {
+                                    cancelBtn.onclick = () => {
+                                        const day = parseInt(editor.dataset.day);
+                                        cancelConsecutiveReminder(day, editor);
+                                    };
+                                }
                             }
                         }
 
-                        // MOBILE CARD
+                        // Versão mobile (lista)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
-                        if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
                         if (savedNote.trim() && !isToday && !isPlantao) card.classList.add("annotated-card");
-                        if (isBateVolta) card.classList.add('bate-volta-card');
 
                         let cardHtml = `
                             <div class="mobile-card-header">
                                 <div class="mobile-card-date">
                                     <div class="mobile-day-name">${dayNamesList[d]}</div>
                                     ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
-                                    ${isPlantao ? `<span class="plantao-label ${!isWeekend ? 'weekday-label' : ''}">Plantão</span>` : ''}
+                                    ${isPlantao ? `<span class="plantao-label">Plantão</span>` : ''}
                                 </div>
                                 <div class="badges-list">
                         `;
                         if (activeWorkers.length === 0) {
-                            cardHtml += ``;
+                            cardHtml += `<span style="font-size:9px; color:#94A3B8;">(vazio)</span>`;
                         } else {
-                            const excecoes = staffConfig.excecoes || {};
-                            const excecaoNomes = excecoes[dayOfWeek] || [];
-                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            const nomeBateVoltaCalculado = nomeBateVolta;
-
                             activeWorkers.forEach(worker => {
-                                const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
-                                const color = getColorForName(worker);
-                                let coringaClass = isCoringa ? 'badge-coringa' : '';
-                                let bateClass = isBate ? 'badge-bate-volta' : '';
-                                let badgeText = escapeHtml(worker);
-                                if (isBate) {
-                                    badgeText += ' 🔄 B&V';
-                                }
-                                cardHtml += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
+                                cardHtml += `<span class="badge badge-default">${escapeHtml(worker)}</span>`;
                             });
                         }
                         cardHtml += `</div></div>`;
 
                         if (isEditable) {
-                            cardHtml += `<textarea class="agenda-input" data-mobile-day="${currentDayNum}" placeholder="Anotar..." title="Duplo clique para replicar. Use Cancelar lembrete para apagar toda a sequência de uma só vez.">${escapeHtml(savedNote)}</textarea>`;
+                            cardHtml += `<div class="agenda-editor" contenteditable="true" data-mobile-day="${currentDayNum}">${savedNote}</div>`;
                             cardHtml += `<button type="button" class="cancel-sequence-btn" data-mobile-cancel-day="${currentDayNum}" style="display:${savedNote.trim() ? 'block' : 'none'}">Cancelar lembrete</button>`;
                         } else {
                             if (savedNote.trim()) {
-                                cardHtml += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
+                                cardHtml += `<div class="readonly-note" style="font-size:12px; color:#333; margin-top:4px; background:#f1f5f9; padding:4px 6px; border-radius:4px;">${savedNote}</div>`;
                             }
                         }
 
                         card.innerHTML = cardHtml;
 
                         if (isEditable) {
-                            const mobileTx = card.querySelector('.agenda-input');
+                            const mobileEditor = card.querySelector('.agenda-editor');
                             const mobileCancelBtn = card.querySelector('.cancel-sequence-btn');
-                            if (mobileTx) {
-                                mobileTx.oninput = e => {
-                                    const val = e.target.value;
-                                    saveNoteToServer(currentDayNum, val);
-                                    if (val.trim()) {
-                                        if (!isToday && !isPlantao) card.classList.add("annotated-card");
-                                        mobileCancelBtn.style.display = "block";
-                                    } else {
-                                        card.classList.remove("annotated-card");
-                                        mobileCancelBtn.style.display = "none";
+                            if (mobileEditor) {
+                                mobileEditor.addEventListener('focus', () => {
+                                    activeEditor = mobileEditor;
+                                });
+                                mobileEditor.addEventListener('blur', () => {
+                                    const day = parseInt(mobileEditor.dataset.mobileDay);
+                                    const content = getEditorContent(mobileEditor);
+                                    saveNoteToServer(day, content);
+                                    // Sincroniza com desktop
+                                    const desktopEditor = document.querySelector(`.agenda-editor[data-day="${day}"]`);
+                                    if (desktopEditor) {
+                                        setEditorContent(desktopEditor, content);
                                     }
-                                    const desktopTx = tbody.querySelector(`textarea[data-day="${currentDayNum}"]`);
-                                    if (desktopTx) {
-                                        desktopTx.value = val;
-                                        const parentTd = desktopTx.closest('td');
-                                        if (parentTd && !isToday) {
-                                            if (val.trim()) parentTd.classList.add("annotated-cell");
-                                            else parentTd.classList.remove("annotated-cell");
+                                    // Atualiza classe
+                                    const parentCard = mobileEditor.closest('.mobile-card');
+                                    if (parentCard) {
+                                        if (content.trim()) {
+                                            parentCard.classList.add('annotated-card');
+                                        } else {
+                                            parentCard.classList.remove('annotated-card');
                                         }
-                                        const desktopCancelBtn = parentTd?.querySelector('.cancel-sequence-btn');
-                                        if (desktopCancelBtn) desktopCancelBtn.style.display = val.trim() ? "block" : "none";
                                     }
-                                };
-                                mobileTx.ondblclick = e => replicateNoteInBulk(currentDayNum, e.target.value);
+                                });
+                                mobileEditor.addEventListener('keydown', (e) => {
+                                    if (e.ctrlKey || e.metaKey) {
+                                        let command = null;
+                                        if (e.key === 'b') { command = 'bold'; e.preventDefault(); }
+                                        else if (e.key === 'i') { command = 'italic'; e.preventDefault(); }
+                                        else if (e.key === 'u') { command = 'underline'; e.preventDefault(); }
+                                        if (command) {
+                                            document.execCommand(command, false, null);
+                                            const day = parseInt(mobileEditor.dataset.mobileDay);
+                                            const content = getEditorContent(mobileEditor);
+                                            saveNoteToServer(day, content);
+                                            const desktopEditor = document.querySelector(`.agenda-editor[data-day="${day}"]`);
+                                            if (desktopEditor) {
+                                                setEditorContent(desktopEditor, content);
+                                            }
+                                        }
+                                    }
+                                });
+                                mobileEditor.addEventListener('dblclick', (e) => {
+                                    const day = parseInt(mobileEditor.dataset.mobileDay);
+                                    replicateNoteInBulk(day, mobileEditor);
+                                });
                             }
                             if (mobileCancelBtn) {
-                                mobileCancelBtn.onclick = () => cancelConsecutiveReminder(currentDayNum, mobileTx?.value || '');
+                                mobileCancelBtn.onclick = () => {
+                                    const day = parseInt(mobileCancelBtn.dataset.mobileCancelDay);
+                                    const editor = card.querySelector('.agenda-editor');
+                                    if (editor) cancelConsecutiveReminder(day, editor);
+                                };
                             }
                         }
 
                         listView.appendChild(card);
                         dayNum++;
                     }
+
                     tr.appendChild(td);
                 }
+
                 if (hasData) tbody.appendChild(tr);
                 if (dayNum > daysInMonth) break;
             }
@@ -2120,94 +1438,30 @@
             const email = emailInput.value.trim();
             const password = passwordInput.value;
             if (!email || !password) return alert("Preencha todos os campos!");
+
             setAuthLoading(true, "login");
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                alert("Erro: " + friendlyFirebaseError(error));
-            } finally { setAuthLoading(false); }
-        }
-
-        function showPasswordResetSuccess(email) {
-            passwordResetEmail.textContent = email;
-            passwordResetModal.classList.add("active");
-            setTimeout(() => passwordResetOkBtn.focus(), 50);
-        }
-
-        function closePasswordResetModal() {
-            passwordResetModal.classList.remove("active");
-            forgotPasswordBtn.focus();
-        }
-
-        async function doPasswordReset() {
-            const email = emailInput.value.trim();
-            if (!email) {
-                alert("Digite seu e-mail no campo acima para recuperar a senha.");
-                emailInput.focus();
-                return;
-            }
-
-            forgotPasswordBtn.disabled = true;
-            const originalText = forgotPasswordBtn.textContent;
-            forgotPasswordBtn.textContent = "Enviando...";
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showPasswordResetSuccess(email);
-            } catch (error) {
-                console.error("Erro ao enviar recuperação de senha:", error);
-                const code = error?.code || "";
-                if (code === "auth/invalid-email") {
-                    alert("E-mail inválido. Confira o endereço digitado.");
-                } else if (code === "auth/too-many-requests") {
-                    alert("Muitas tentativas de recuperação. Aguarde alguns minutos e tente novamente.");
-                } else if (code === "auth/network-request-failed") {
-                    alert("Falha de conexão. Verifique sua internet e tente novamente.");
-                } else {
-                    alert("Não foi possível enviar o e-mail de recuperação. Tente novamente.");
-                }
+                console.error("Erro no login Firebase:", error);
+                alert("Erro ao entrar: " + friendlyFirebaseError(error));
             } finally {
-                forgotPasswordBtn.disabled = false;
-                forgotPasswordBtn.textContent = originalText;
+                setAuthLoading(false);
             }
         }
 
         async function doRegister() {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
-            const codigo = conviteInput.value.trim();
-
-            if (!email || !password) return alert("Preencha e-mail e senha!");
-            if (password.length < 6) return alert("Senha precisa ter 6+ caracteres!");
-
-            // Validação do convite
-            if (!codigo) {
-                alert("Digite o código de convite.");
-                return;
-            }
+            if (!email || !password) return alert("Preencha o e-mail e a senha que deseja cadastrar!");
+            if (password.length < 6) return alert("A senha precisa ter pelo menos 6 caracteres!");
 
             setAuthLoading(true, "register");
-
             try {
-                const resultado = await validarConvite(codigo);
-                if (!resultado.valido) {
-                    alert("Convite inválido: " + resultado.mensagem);
-                    setAuthLoading(false);
-                    return;
-                }
-
-                // Criar a conta primeiro. Assim, se o cadastro falhar (por exemplo, e-mail já existente),
-                // o convite não é perdido.
-                const credential = await createUserWithEmailAndPassword(auth, email, password);
-
-                // Só depois do cadastro concluído marcamos o convite como usado.
-                const marcado = await marcarConviteUsado(resultado.docId, credential.user);
-                if (!marcado) {
-                    alert("Conta criada com sucesso, mas não foi possível marcar o convite como usado. Avise um editor para verificar o Firestore.");
-                } else {
-                    alert("Conta criada com sucesso! Você já está conectado.");
-                }
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert("Conta criada com sucesso! Você já está conectado.");
             } catch (error) {
+                console.error("Erro no cadastro Firebase:", error);
                 alert("Erro ao criar conta: " + friendlyFirebaseError(error));
             } finally {
                 setAuthLoading(false);
@@ -2215,66 +1469,41 @@
         }
 
         loginBtn.onclick = doLogin;
-        forgotPasswordBtn.onclick = doPasswordReset;
-        passwordResetOkBtn.onclick = closePasswordResetModal;
-        passwordResetModal.addEventListener("click", e => {
-            if (e.target === passwordResetModal) closePasswordResetModal();
-        });
-        document.addEventListener("keydown", e => {
-            if (e.key === "Escape" && passwordResetModal.classList.contains("active")) {
-                closePasswordResetModal();
-            }
-        });
         registerBtn.onclick = doRegister;
         passwordInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+
         logoutBtn.onclick = async () => {
-            try { await signOut(auth); } catch (error) { alert("Erro ao sair."); }
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Erro no logout Firebase:", error);
+                alert("Não foi possível sair: " + friendlyFirebaseError(error));
+            }
         };
 
-        // ==================== MODAL DE CONVITES ====================
-        const invitesModal = document.getElementById("invites-modal");
-        const manageInvitesBtn = document.getElementById("manage-invites-btn");
-
-        async function openInvitesModal() {
-            if (!sessionUser) return alert("Faça login para gerenciar convites.");
-            invitesModal.classList.add("active");
-            await loadInvitesList();
-        }
-
-        function closeInvitesModal() {
-            invitesModal.classList.remove("active");
-        }
-
-        manageInvitesBtn.addEventListener("click", openInvitesModal);
-        document.getElementById("invites-close-btn").addEventListener("click", closeInvitesModal);
-        document.getElementById("refresh-invites-btn").addEventListener("click", loadInvitesList);
-        document.getElementById("generate-invite-btn").addEventListener("click", () => gerarConvitePelaTela(false));
-        document.getElementById("generate-send-invite-btn").addEventListener("click", () => gerarConvitePelaTela(true));
-        document.getElementById("copy-generated-invite-btn").addEventListener("click", async () => {
-            if (!lastGeneratedInvite) return;
-            const ok = await copiarTexto(lastGeneratedInvite.codigo);
-            alert(ok ? "Código copiado!" : "Não foi possível copiar o código.");
-        });
-        document.getElementById("email-generated-invite-btn").addEventListener("click", () => {
-            if (!lastGeneratedInvite) return;
-            abrirEmailConvite(lastGeneratedInvite, document.getElementById("invite-recipient-email").value);
-        });
-        invitesModal.addEventListener("click", e => { if (e.target === invitesModal) closeInvitesModal(); });
-
-        // ==================== MODAL ====================
+        // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
         const modalOverlay = document.getElementById("edit-modal");
 
         window.addNameToList = function(section) {
-            if (section !== 'rotation') return;
-            const name = document.getElementById('rotation-input').value.trim();
+            const inputMap = {
+                rotation: 'rotation-input',
+                quinta: 'quinta-input'
+            };
+            const listMap = {
+                rotation: 'rotation-list',
+                quinta: 'quinta-list'
+            };
+            const input = document.getElementById(inputMap[section]);
+            const name = input.value.trim();
             if (!name) return alert('Digite um nome!');
-            const list = document.getElementById('rotation-list');
+            
+            const list = document.getElementById(listMap[section]);
             const tag = document.createElement('span');
             tag.className = 'name-tag';
-            tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
+            tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('${section}', this)">×</button>`;
             list.appendChild(tag);
-            document.getElementById('rotation-input').value = '';
-            document.getElementById('rotation-input').focus();
+            input.value = '';
+            input.focus();
         };
 
         window.removeNameFromList = function(section, btn) {
@@ -2283,10 +1512,13 @@
         };
 
         window.removeLastFromList = function(section) {
-            const list = document.getElementById('rotation-list');
-            if (!list) return;
-            const last = list.lastElementChild;
-            if (last) last.remove();
+            const listMap = {
+                rotation: 'rotation-list',
+                quinta: 'quinta-list'
+            };
+            const list = document.getElementById(listMap[section]);
+            const lastChild = list.lastElementChild;
+            if (lastChild) lastChild.remove();
         };
 
         window.handleAddKey = function(event, section) {
@@ -2296,8 +1528,12 @@
             }
         };
 
-        function getNamesFromList() {
-            const list = document.getElementById('rotation-list');
+        function getNamesFromList(section) {
+            const listMap = {
+                rotation: 'rotation-list',
+                quinta: 'quinta-list'
+            };
+            const list = document.getElementById(listMap[section]);
             const tags = list.querySelectorAll('.name-tag');
             const names = [];
             tags.forEach(tag => {
@@ -2314,6 +1550,7 @@
             if (!nome) return alert('Digite um nome!');
             const dia = diaSelect.value;
             const diaNome = diaSelect.options[diaSelect.selectedIndex].text;
+            
             const list = document.getElementById('excecoes-list');
             const tag = document.createElement('span');
             tag.className = 'excecao-tag';
@@ -2345,135 +1582,140 @@
         }
 
         function getQuantidadesFromUI() {
-            return {
-                sexta: parseInt(document.getElementById('qtd-sexta').value) || 0,
-                sabado: parseInt(document.getElementById('qtd-sabado').value) || 0,
-                domingo: parseInt(document.getElementById('qtd-domingo').value) || 0
-            };
-        }
-
-        function getBateVoltaFromUI() {
-            return {
-                ativo: document.getElementById('bate-volta-ativo').checked,
-                dia: parseInt(document.getElementById('bate-volta-dia').value) || 0
-            };
+            const sexta = parseInt(document.getElementById('qtd-sexta').value) || 0;
+            const sabado = parseInt(document.getElementById('qtd-sabado').value) || 0;
+            const domingo = parseInt(document.getElementById('qtd-domingo').value) || 0;
+            return { sexta, sabado, domingo };
         }
 
         function openEditModal() {
-            if (!sessionUser) return alert("Faça login para editar.");
-            const list = document.getElementById('rotation-list');
-            list.innerHTML = '';
+            if (!sessionUser) {
+                alert("Você precisa estar logado para editar a escala.");
+                return;
+            }
+
+            const rotationList = document.getElementById('rotation-list');
+            rotationList.innerHTML = '';
             (staffConfig.rotation || []).forEach(name => {
                 const tag = document.createElement('span');
                 tag.className = 'name-tag';
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
-                list.appendChild(tag);
+                rotationList.appendChild(tag);
             });
-            const exList = document.getElementById('excecoes-list');
-            exList.innerHTML = '';
+
+            const quintaList = document.getElementById('quinta-list');
+            quintaList.innerHTML = '';
+            (staffConfig.quinta || []).forEach(name => {
+                const tag = document.createElement('span');
+                tag.className = 'name-tag';
+                tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('quinta', this)">×</button>`;
+                quintaList.appendChild(tag);
+            });
+
+            const excecoesList = document.getElementById('excecoes-list');
+            excecoesList.innerHTML = '';
             const excecoes = staffConfig.excecoes || {};
-            const diaNomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+            const diaNomes = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
             for (const [dia, nomes] of Object.entries(excecoes)) {
                 nomes.forEach(nome => {
                     const tag = document.createElement('span');
                     tag.className = 'excecao-tag';
                     tag.dataset.dia = dia;
                     tag.innerHTML = `${escapeHtml(nome)} (${diaNomes[parseInt(dia)]}) <button class="remove-btn" onclick="removeExcecao(this)">×</button>`;
-                    exList.appendChild(tag);
+                    excecoesList.appendChild(tag);
                 });
             }
+
             const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
             document.getElementById('qtd-sexta').value = qtd.sexta || 1;
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
             document.getElementById('qtd-domingo').value = qtd.domingo || 1;
 
-            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-            document.getElementById('bate-volta-ativo').checked = bateVolta.ativo;
-            document.getElementById('bate-volta-dia').value = bateVolta.dia;
-
             modalOverlay.classList.add('active');
         }
 
-        function closeEditModal() { modalOverlay.classList.remove('active'); }
+        function closeEditModal() {
+            modalOverlay.classList.remove('active');
+        }
 
         async function saveEditModal() {
             if (!sessionUser) return;
-            const newRotation = getNamesFromList();
+
+            const newRotation = getNamesFromList('rotation');
+            const newQuinta = getNamesFromList('quinta');
             const newExcecoes = getExcecoesFromList();
             const newQuantidades = getQuantidadesFromUI();
-            const newBateVolta = getBateVoltaFromUI();
 
             if (newRotation.length === 0) {
-                if (!confirm('Rodízio vazio. Manter padrão?')) return;
-                newRotation.push('Carlos','Leticia','Gustavo','Tatiane');
+                if (!confirm('O rodízio está vazio. Deseja manter os valores padrão?')) return;
+                newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
-            const total = newQuantidades.sexta + newQuantidades.sabado + newQuantidades.domingo;
-            if (total > newRotation.length) {
-                alert(`A soma das quantidades (${total}) não pode ser maior que o número de nomes do rodízio (${newRotation.length}). Ajuste as quantidades.`);
-                return;
-            }
-            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, newBateVolta);
+
+            await saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades);
             closeEditModal();
-            alert('✅ Escala atualizada!');
+            alert('✅ Escala atualizada com sucesso!');
         }
 
-        document.getElementById('edit-staff-btn').addEventListener('click', openEditModal);
-        document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
-        document.getElementById('edit-save-btn').addEventListener('click', saveEditModal);
-        modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeEditModal(); });
+        document.getElementById("edit-staff-btn").addEventListener("click", openEditModal);
+        document.getElementById("edit-cancel-btn").addEventListener("click", closeEditModal);
+        document.getElementById("edit-save-btn").addEventListener("click", saveEditModal);
+        modalOverlay.addEventListener("click", (e) => {
+            if (e.target === modalOverlay) closeEditModal();
+        });
 
         // ==================== NAVEGAÇÃO ====================
-        document.getElementById('view-grid-btn').onclick = () => {
-            currentViewMode = 'grid';
-            document.getElementById('main-grid-view').style.display = 'table';
-            document.getElementById('main-list-view').style.display = 'none';
-            document.getElementById('view-grid-btn').classList.add('active');
-            document.getElementById('view-list-btn').classList.remove('active');
+        document.getElementById("view-grid-btn").onclick = () => {
+            currentViewMode = "grid";
+            document.getElementById("main-grid-view").style.display = "table";
+            document.getElementById("main-list-view").style.display = "none";
+            document.getElementById("view-grid-btn").classList.add("active");
+            document.getElementById("view-list-btn").classList.remove("active");
         };
-        document.getElementById('view-list-btn').onclick = () => {
-            currentViewMode = 'list';
-            document.getElementById('main-grid-view').style.display = 'none';
-            document.getElementById('main-list-view').style.display = 'flex';
-            document.getElementById('view-list-btn').classList.add('active');
-            document.getElementById('view-grid-btn').classList.remove('active');
+
+        document.getElementById("view-list-btn").onclick = () => {
+            currentViewMode = "list";
+            document.getElementById("main-grid-view").style.display = "none";
+            document.getElementById("main-list-view").style.display = "flex";
+            document.getElementById("view-list-btn").classList.add("active");
+            document.getElementById("view-grid-btn").classList.remove("active");
         };
-        document.getElementById('btn-prev-month').onclick = () => {
+
+        document.getElementById("btn-prev-month").onclick = () => {
             activeMonth--;
             if (activeMonth < 0) { activeMonth = 11; activeYear--; }
             if (activeYear < 2026) { activeYear = 2026; activeMonth = 0; }
             buildCalendar();
         };
-        document.getElementById('btn-next-month').onclick = () => {
+
+        document.getElementById("btn-next-month").onclick = () => {
             activeMonth++;
             if (activeMonth > 11) { activeMonth = 0; activeYear++; }
             if (activeYear > 2035) { activeYear = 2035; activeMonth = 11; }
             buildCalendar();
         };
-        document.getElementById('jump-submit-btn').onclick = () => {
+
+        document.getElementById("jump-submit-btn").onclick = () => {
             activeMonth = parseInt(monthSelect.value, 10);
             activeYear = parseInt(yearSelect.value, 10);
             buildCalendar();
         };
 
-        // ==================== INIT ====================
+        // ==================== INICIALIZAÇÃO ====================
         onAuthStateChanged(auth, async (user) => {
             await loadStaffConfig();
+
             if (user) {
                 sessionUser = user;
-                document.body.classList.remove('guest-mode');
-                authScreen.style.display = 'none';
-                calendarScreen.style.display = 'flex';
-                document.getElementById('edit-staff-btn').style.display = 'inline-block';
-                document.getElementById('manage-invites-btn').style.display = 'inline-block';
+                authScreen.style.display = "none";
+                calendarScreen.style.display = "flex";
+                document.getElementById("edit-staff-btn").style.display = "inline-block";
             } else {
                 sessionUser = null;
-                document.body.classList.add('guest-mode');
-                authScreen.style.display = 'flex';
-                calendarScreen.style.display = 'flex';
-                document.getElementById('edit-staff-btn').style.display = 'none';
-                document.getElementById('manage-invites-btn').style.display = 'none';
-                closeInvitesModal();
+                authScreen.style.display = "flex";
+                calendarScreen.style.display = "flex";
+                document.getElementById("edit-staff-btn").style.display = "none";
             }
+
             await loadNotesFromServer();
         });
     </script>
