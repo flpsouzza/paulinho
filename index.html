@@ -265,7 +265,7 @@
                     <input type="text" id="rotation-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'rotation')">
                     <button class="btn-add-name" onclick="addNameToList('rotation')">+</button>
                 </div>
-                <div class="helper">⚠️ <strong>Regra da Folga:</strong> Para que ninguém repita o mesmo dia e todos folguem (Sex -> Folga -> Sáb -> Folga -> Dom), cadastre <strong>o dobro de pessoas</strong> (ex: se precisa de 2 por dia em 3 dias, cadastre 12 pessoas).</div>
+                <div class="helper">⚠️ <strong>Importante:</strong> Para a fila rodar certinho (Sex -> Sáb -> Dom -> Sex), adicione pelo menos a soma de todas as vagas + 1 (Ex: 2 Sex + 2 Sáb + 2 Dom = 6 vagas. Adicione 6 ou 7 nomes).</div>
             </div>
 
             <!-- Quantidades -->
@@ -491,7 +491,7 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ===== LÓGICA DO RODÍZIO (CORRIGIDA: PASSO = TOTAL DE VAGAS POR FDS) =====
+        // ===== LÓGICA DO RODÍZIO (CORRIGIDA: PASSO = MAIOR QUANTIDADE DE PESSOAS POR DIA) =====
         function getWorkersForDate(year, month, day) {
             const key = noteKey(year, month, day);
 
@@ -532,9 +532,13 @@
                     const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
                     const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
                     
-                    // PASSO CORRETO: Total de vagas por final de semana.
-                    // Isso faz com que no próximo FDS, a fila pule exatamente 6 pessoas.
-                    let step = qtdSexta + qtdSabado + qtdDomingo;
+                    // ===== A CORREÇÃO QUE VOCÊ PEDIU =====
+                    // O passo é o número de pessoas por dia (2).
+                    // Isso faz a fila andar exatamente 2 casas por fim de semana,
+                    // criando o ciclo Sex -> Sáb -> Dom -> Sex que você descreveu.
+                    let step = Math.max(qtdSexta, qtdSabado, qtdDomingo);
+                    if (step === 0) step = 1;
+                    // =====================================
 
                     let offset = 0;
                     let quantidade = 0;
@@ -1135,7 +1139,10 @@
 
         async function clearScale() {
             if (!sessionUser) return;
-            if (!confirm("Tem certeza que deseja apagar TODOS os nomes e configurações da escala?")) return;
+            
+            if (!confirm("Tem certeza que deseja apagar TODOS os nomes e configurações da escala?\n\nIsso limpará o rodízio, as exceções e as quantidades.")) {
+                return;
+            }
 
             try {
                 await saveStaffConfig([], {}, { sexta: 0, sabado: 0, domingo: 0 }, {});
