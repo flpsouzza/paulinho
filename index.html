@@ -134,7 +134,7 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        /* ========== CALENDÁRIO GRADE - CORREÇÃO DE PROPORÇÃO ========== */
+        /* ========== CALENDÁRIO GRADE ========== */
         .calendar-content { padding: 8px; width: 100%; overflow-x: auto; }
         .calendar-grid-table {
             width: 100%;
@@ -160,7 +160,7 @@
             vertical-align: top;
             padding: 6px 4px;
             height: auto;
-            min-height: 100px;
+            min-height: 90px;
             background-color: #FFF;
             transition: background-color 0.2s, border-color 0.2s;
             overflow: hidden;
@@ -265,20 +265,7 @@
         }
         .edit-note-btn:hover { background: #E2E8F0; }
 
-        .cancel-sequence-btn {
-            width: 100%;
-            margin-top: 2px;
-            padding: 2px 0;
-            border: none;
-            background: transparent;
-            color: #B91C1C;
-            font-size: 9px;
-            font-weight: 800;
-            text-align: right;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-        .cancel-sequence-btn:hover { text-decoration: underline; }
+        /* Removido o botão Cancelar lembrete daqui */
 
         /* ========== MOBILE LIST VIEW ========== */
         .mobile-list-view {
@@ -321,7 +308,7 @@
             text-transform: uppercase;
         }
 
-        /* ========== MODAIS ========== */
+        /* ========== MODAL DE ANOTAÇÃO ========== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -430,19 +417,56 @@
 
         .modal-actions {
             display: flex;
-            gap: 12px;
-            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             flex-shrink: 0;
             padding-top: 8px;
         }
-        .modal-actions button {
-            padding: 12px 28px;
+        .modal-actions .left-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .modal-actions .left-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .modal-actions .left-group input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .modal-actions .left-group button {
+            background: #FEE2E2;
+            color: #B91C1C;
             border: none;
-            border-radius: 10px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .modal-actions .left-group button:hover { background: #FECACA; }
+        .modal-actions .right-group {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
-            font-size: 16px;
+            font-size: 15px;
             touch-action: manipulation;
         }
         .btn-save-modal { background: var(--rio-blue); color: #FFF; }
@@ -572,6 +596,8 @@
             font-size: 13px;
             background: #FFF;
         }
+
+        /* Exceções - ajustado para caber na janela */
         .excecao-row {
             display: flex;
             gap: 6px;
@@ -585,15 +611,16 @@
             border-radius: 20px;
             font-size: 13px;
             background: #FFF;
+            flex: 0 1 auto;
         }
         .excecao-row input {
-            flex: 1;
+            flex: 1 1 120px;
             padding: 6px 12px;
             border: 1px solid var(--border-color);
             border-radius: 20px;
             font-size: 13px;
             outline: none;
-            min-width: 100px;
+            min-width: 80px;
         }
         .excecao-row input:focus { border-color: var(--rio-light); }
         .excecao-tag {
@@ -680,7 +707,7 @@
         /* ========== RESPONSIVIDADE ========== */
         @media (max-width: 768px) {
             .calendar-grid-table { min-width: 600px; }
-            .calendar-grid-table td { min-height: 80px; padding: 4px 3px; }
+            .calendar-grid-table td { min-height: 70px; padding: 4px 3px; }
             .date-num { font-size: 12px; }
             .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
             .badge { font-size: 8px; padding: 1px 4px; }
@@ -697,6 +724,9 @@
             .modal-toolbar select { height: 38px; font-size: 13px; }
             .modal-toolbar input[type="color"] { width: 38px; height: 38px; }
             .modal-content { padding: 16px; }
+            .modal-actions { flex-direction: column; align-items: stretch; }
+            .modal-actions .left-group { justify-content: center; }
+            .modal-actions .right-group { justify-content: center; }
             .day-section { padding: 10px; }
             .name-tag { font-size: 12px; padding: 3px 10px; }
             .qtd-row label { font-size: 12px; }
@@ -708,7 +738,7 @@
 
         @media (max-width: 480px) {
             .calendar-grid-table { min-width: 450px; }
-            .calendar-grid-table td { min-height: 70px; padding: 3px 2px; }
+            .calendar-grid-table td { min-height: 60px; padding: 3px 2px; }
             .date-num { font-size: 11px; }
             .duty-day-circle { width: 18px; height: 18px; font-size: 9px; }
             .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; }
@@ -725,6 +755,7 @@
             .qtd-row { gap: 4px; }
             .qtd-row input { width: 40px; font-size: 12px; }
             .toolbar { padding: 8px; gap: 4px; }
+            .excecao-row input { min-width: 60px; }
         }
     </style>
 </head>
@@ -827,8 +858,16 @@
             </div>
             <div class="modal-editor" id="modal-editor" contenteditable="true"></div>
             <div class="modal-actions">
-                <button class="btn-cancel-modal" id="modal-cancel-btn">Cancelar</button>
-                <button class="btn-save-modal" id="modal-save-btn">💾 Salvar</button>
+                <div class="left-group">
+                    <label>Repetir por</label>
+                    <input type="number" id="repeat-days" value="10" min="1" max="500">
+                    <label>dias</label>
+                    <button id="cancel-repeat-btn" title="Cancelar/limpar esta anotação em todos os dias da sequência">🗑️ Cancelar</button>
+                </div>
+                <div class="right-group">
+                    <button class="btn-cancel-modal" id="modal-cancel-btn">Cancelar</button>
+                    <button class="btn-save-modal" id="modal-save-btn">💾 Salvar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -877,29 +916,14 @@
                 <div class="helper">Digite quantas pessoas do rodízio por dia. No modo aleatório, os nomes são sorteados a cada plantão.</div>
             </div>
 
-            <!-- Quinta -->
-            <div class="day-section" id="section-quinta">
-                <h3>
-                    📅 Quinta-feira (fixos)
-                    <span class="badge-info">— sempre aparecem na quinta</span>
-                    <button class="btn-remove-day" onclick="removeLastFromList('quinta')" title="Remover último nome">−</button>
-                </h3>
-                <div class="name-list" id="quinta-list"></div>
-                <div class="add-name-row">
-                    <input type="text" id="quinta-input" placeholder="Digite um nome..." onkeypress="handleAddKey(event, 'quinta')">
-                    <button class="btn-add-name" onclick="addNameToList('quinta')">+</button>
-                </div>
-                <div class="helper">Ex: Leandro, Paulo... (sempre aparecem na quinta)</div>
-            </div>
-
-            <!-- Exceções -->
+            <!-- Exceções (coringas) -->
             <div class="day-section" style="border-color: #8B5CF6; background: #F5F3FF;">
                 <h3 style="color: #6D28D9;">
                     ⭐ Exceções (coringas)
                     <span class="badge-info">— nomes que aparecem em dias específicos, apenas nos plantões</span>
                 </h3>
                 <div class="excecao-row">
-                    <input type="text" id="excecao-input" placeholder="Nome..." style="flex:1; min-width:100px;">
+                    <input type="text" id="excecao-input" placeholder="Nome..." style="flex:1; min-width:80px;">
                     <select id="excecao-dia">
                         <option value="0">Domingo</option>
                         <option value="1">Segunda</option>
@@ -924,8 +948,7 @@
 
     <!-- ========== JAVASCRIPT ========== -->
     <script type="module">
-        // ========== CONFIGURAÇÃO DO FIREBASE ==========
-        // COLOQUE AQUI AS SUAS CHAVES DO FIREBASE
+        // ========== CONFIGURAÇÃO FIREBASE (SUAS CHAVES) ==========
         const firebaseConfig = {
             apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
             authDomain: "escalaaberta-d968c.firebaseapp.com",
@@ -935,7 +958,7 @@
             appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
             measurementId: "G-ETSK8NEHDF"
         };
-        // ================================================
+        // =========================================================
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
@@ -969,7 +992,6 @@
 
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
-            quinta: ["Leandro"],
             excecoes: {},
             quantidades: { sexta: 1, sabado: 1, domingo: 1 },
             modo_rotacao: "sequencial"
@@ -980,7 +1002,6 @@
         let activeMonth = new Date().getMonth();
         let activeYear = Math.min(Math.max(new Date().getFullYear(), 2026), 2035);
 
-        // Preencher selects de ano e mês
         const yearSelect = document.getElementById("jump-year-select");
         for (let y = 2026; y <= 2035; y++) {
             const opt = document.createElement("option");
@@ -1005,7 +1026,7 @@
         const passwordInput = document.getElementById("auth-password");
         const editStaffBtn = document.getElementById("edit-staff-btn");
 
-        // ========== FUNÇÕES DE CONFIGURAÇÃO ==========
+        // ==================== CONFIGURAÇÃO ====================
         async function loadStaffConfig() {
             try {
                 const docRef = doc(db, "config", "staff");
@@ -1013,14 +1034,12 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
-                    staffConfig.quinta = data.quinta || staffConfig.quinta;
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
                     staffConfig.modo_rotacao = data.modo_rotacao || "sequencial";
                 } else {
                     await saveStaffConfig(
                         staffConfig.rotation,
-                        staffConfig.quinta,
                         staffConfig.excecoes,
                         staffConfig.quantidades,
                         staffConfig.modo_rotacao
@@ -1031,19 +1050,17 @@
             }
         }
 
-        async function saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades, newModoRotacao) {
+        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
                 await setDoc(docRef, {
                     rotation: newRotation,
-                    quinta: newQuinta,
                     excecoes: newExcecoes || {},
                     quantidades: newQuantidades || { sexta: 1, sabado: 1, domingo: 1 },
                     modo_rotacao: newModoRotacao || "sequencial"
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
-                staffConfig.quinta = newQuinta;
                 staffConfig.excecoes = newExcecoes || {};
                 staffConfig.quantidades = newQuantidades || { sexta: 1, sabado: 1, domingo: 1 };
                 staffConfig.modo_rotacao = newModoRotacao || "sequencial";
@@ -1054,7 +1071,7 @@
             }
         }
 
-        // ========== FUNÇÕES AUXILIARES ==========
+        // ==================== FUNÇÕES AUXILIARES ====================
         function friendlyFirebaseError(error) {
             const code = error?.code || "";
             const messages = {
@@ -1120,7 +1137,6 @@
             const pos = mathematicalMod(diff, 14);
 
             const rotation = staffConfig.rotation || [];
-            const quintaList = staffConfig.quinta || [];
             const excecoes = staffConfig.excecoes || {};
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
             const modo = staffConfig.modo_rotacao || "sequencial";
@@ -1140,7 +1156,7 @@
             if (isPlantaoRegra) {
                 isDuty = true;
                 if (posTipo === 'quinta') {
-                    activeWorkers.push(...quintaList);
+                    // Não há mais quinta fixa, apenas exceções
                 } else {
                     if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
@@ -1182,7 +1198,7 @@
 
         function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
 
-        // ========== ANOTAÇÕES ==========
+        // ==================== ANOTAÇÕES ====================
         function saveNoteToServer(dayNum, htmlContent) {
             if (!sessionUser) return;
             const key = noteKey(activeYear, activeMonth, dayNum);
@@ -1238,7 +1254,7 @@
             }
         }
 
-        // ========== MODAL DE ANOTAÇÃO ==========
+        // ==================== MODAL DE ANOTAÇÃO ====================
         const noteModal = document.getElementById('note-modal');
         const modalEditor = document.getElementById('modal-editor');
         const modalTitle = document.getElementById('note-modal-title');
@@ -1283,58 +1299,42 @@
             buildCalendar();
         }
 
-        document.getElementById('modal-save-btn').addEventListener('click', saveNoteFromModal);
-        document.getElementById('modal-cancel-btn').addEventListener('click', closeNoteModal);
-        noteModal.addEventListener('click', (e) => { if (e.target === noteModal) closeNoteModal(); });
-        modalEditor.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                saveNoteFromModal();
-            }
-        });
-
-        // ========== REPLICAR E CANCELAR ==========
-        function dateFromNoteKey(key) {
-            const [year, month, day] = key.split("_").map(Number);
-            return new Date(year, month, day);
-        }
-
-        async function cancelConsecutiveReminder(startDay) {
-            if (!sessionUser) return;
-            const key = noteKey(activeYear, activeMonth, startDay);
+        async function cancelNoteSequenceFromModal() {
+            if (currentEditingDay === null) return;
+            const day = currentEditingDay;
+            const key = noteKey(activeYear, activeMonth, day);
             const targetText = (notesCache[key] || '').trim();
-            if (!targetText) { alert('Não há anotação para cancelar.'); return; }
+            if (!targetText) { alert('Esta anotação está vazia.'); return; }
 
-            const sequenceId = noteMetaCache[key]?.sequenceId || null;
-            let sequenceKeys = [];
-            if (sequenceId) {
-                sequenceKeys = Object.keys(notesCache).filter(k => noteMetaCache[k]?.sequenceId === sequenceId);
-            } else {
-                const clickedDate = new Date(activeYear, activeMonth, startDay);
-                let startDate = new Date(clickedDate);
-                while (true) {
-                    const prevDate = new Date(startDate);
-                    prevDate.setDate(prevDate.getDate() - 1);
-                    const prevKey = noteKey(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate());
-                    const prevText = (notesCache[prevKey] || '').trim();
-                    if (prevText !== targetText) break;
-                    startDate.setTime(prevDate.getTime());
-                }
-                const cursor = new Date(startDate);
-                for (let i = 0; i < 5000; i++) {
-                    const k = noteKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
-                    const currentText = (notesCache[k] || '').trim();
-                    if (currentText !== targetText) break;
+            const repeatDays = parseInt(document.getElementById('repeat-days').value) || 10;
+            if (repeatDays <= 0 || repeatDays > 500) { alert('Número de dias inválido (1-500).'); return; }
+
+            const startDate = new Date(activeYear, activeMonth, day);
+            const sequenceKeys = [];
+            const cursor = new Date(startDate);
+            for (let i = 0; i < repeatDays; i++) {
+                const y = cursor.getFullYear();
+                const m = cursor.getMonth();
+                const d = cursor.getDate();
+                const k = noteKey(y, m, d);
+                const currentText = (notesCache[k] || '').trim();
+                if (currentText === targetText) {
                     sequenceKeys.push(k);
-                    cursor.setDate(cursor.getDate() + 1);
+                } else {
+                    break;
                 }
+                cursor.setDate(cursor.getDate() + 1);
             }
-            sequenceKeys.sort((a, b) => dateFromNoteKey(a) - dateFromNoteKey(b));
-            if (!sequenceKeys.length) { alert('Não foi possível localizar a sequência.'); return; }
+
+            if (sequenceKeys.length === 0) {
+                alert('Nenhum dia com esta anotação encontrado.');
+                return;
+            }
+
             const total = sequenceKeys.length;
-            const startDate = dateFromNoteKey(sequenceKeys[0]);
-            const endDate = dateFromNoteKey(sequenceKeys[sequenceKeys.length - 1]);
-            if (!confirm(`Cancelar em ${total} dia(s)?\nDe ${startDate.toLocaleDateString('pt-BR')} a ${endDate.toLocaleDateString('pt-BR')}`)) return;
+            const startLabel = dateFromNoteKey(sequenceKeys[0]).toLocaleDateString('pt-BR');
+            const endLabel = dateFromNoteKey(sequenceKeys[sequenceKeys.length - 1]).toLocaleDateString('pt-BR');
+            if (!confirm(`Cancelar esta anotação em ${total} dia(s)?\nDe ${startLabel} a ${endLabel}`)) return;
 
             try {
                 for (let i = 0; i < sequenceKeys.length; i += 500) {
@@ -1345,6 +1345,7 @@
                 }
                 sequenceKeys.forEach(k => { delete notesCache[k];
                     delete noteMetaCache[k]; });
+                closeNoteModal();
                 buildCalendar();
                 alert(`Cancelado em ${total} dia(s).`);
             } catch (error) {
@@ -1353,56 +1354,23 @@
             }
         }
 
-        async function replicateNoteInBulk(startDay) {
-            if (!sessionUser) return;
-            const htmlContent = (notesCache[noteKey(activeYear, activeMonth, startDay)] || '').trim();
-            const isEmpty = !htmlContent;
-            const promptMsg = isEmpty ?
-                'Quantos dias para APAGAR (incluindo hoje)?' :
-                'Replicar por quantos dias (incluindo hoje)?';
-            const promptDays = prompt(promptMsg, '10');
-            if (!promptDays) return;
-            const totalDays = parseInt(promptDays, 10);
-            if (isNaN(totalDays) || totalDays <= 0 || totalDays > 500) return alert('Número inválido (1-500).');
-
-            const currentDateObj = new Date(activeYear, activeMonth, startDay);
-            const batch = writeBatch(db);
-            const sequenceId = isEmpty ? null : (crypto.randomUUID ? crypto.randomUUID() : `seq_${Date.now()}`);
-
-            for (let i = 0; i < totalDays; i++) {
-                const y = currentDateObj.getFullYear();
-                const m = currentDateObj.getMonth();
-                const d = currentDateObj.getDate();
-                const key = noteKey(y, m, d);
-                const ref = doc(db, "agenda", key);
-                if (isEmpty) {
-                    batch.delete(ref);
-                    delete notesCache[key];
-                    delete noteMetaCache[key];
-                } else {
-                    notesCache[key] = htmlContent;
-                    noteMetaCache[key] = { sequenceId };
-                    batch.set(ref, {
-                        nota: htmlContent,
-                        atualizadoPor: sessionUser.email || sessionUser.uid,
-                        atualizadoPorUid: sessionUser.uid,
-                        atualizadoEm: serverTimestamp(),
-                        sequenceId: sequenceId
-                    }, { merge: true });
-                }
-                currentDateObj.setDate(currentDateObj.getDate() + 1);
+        document.getElementById('modal-save-btn').addEventListener('click', saveNoteFromModal);
+        document.getElementById('modal-cancel-btn').addEventListener('click', closeNoteModal);
+        document.getElementById('cancel-repeat-btn').addEventListener('click', cancelNoteSequenceFromModal);
+        noteModal.addEventListener('click', (e) => { if (e.target === noteModal) closeNoteModal(); });
+        modalEditor.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                saveNoteFromModal();
             }
-            try {
-                await batch.commit();
-                buildCalendar();
-                alert(isEmpty ? 'Anotações apagadas!' : 'Anotações replicadas!');
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro: ' + friendlyFirebaseError(error));
-            }
+        });
+
+        function dateFromNoteKey(key) {
+            const [year, month, day] = key.split("_").map(Number);
+            return new Date(year, month, day);
         }
 
-        // ========== CONSTRUIR CALENDÁRIO ==========
+        // ==================== CONSTRUIR CALENDÁRIO ====================
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
             const daysInMonth = new Date(activeYear, activeMonth + 1, 0).getDate();
@@ -1459,13 +1427,9 @@
                         if (hasNote) {
                             html += `<div class="note-preview" data-day="${currentDayNum}">${savedNote}</div>`;
                         }
-                        if (isEditable && hasNote) {
-                            html += `<button class="cancel-sequence-btn" data-day="${currentDayNum}">Cancelar lembrete</button>`;
-                        }
 
                         td.innerHTML = html;
 
-                        // Eventos
                         if (isEditable) {
                             const editBtn = td.querySelector('.edit-note-btn');
                             if (editBtn) {
@@ -1476,24 +1440,12 @@
                                     openNoteModal(day, content);
                                 });
                             }
-                            const cancelBtn = td.querySelector('.cancel-sequence-btn');
-                            if (cancelBtn) {
-                                cancelBtn.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    const day = parseInt(cancelBtn.dataset.day);
-                                    cancelConsecutiveReminder(day);
-                                });
-                            }
                             const preview = td.querySelector('.note-preview');
                             if (preview) {
                                 preview.addEventListener('click', (e) => {
                                     const day = parseInt(preview.dataset.day);
                                     const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
                                     openNoteModal(day, content);
-                                });
-                                preview.addEventListener('dblclick', (e) => {
-                                    const day = parseInt(preview.dataset.day);
-                                    replicateNoteInBulk(day);
                                 });
                             }
                         }
@@ -1518,9 +1470,6 @@
                         if (hasNote) {
                             cardHtml += `<div class="note-preview" data-mobile-day="${currentDayNum}">${savedNote}</div>`;
                         }
-                        if (isEditable && hasNote) {
-                            cardHtml += `<button class="cancel-sequence-btn" data-mobile-day="${currentDayNum}">Cancelar lembrete</button>`;
-                        }
                         card.innerHTML = cardHtml;
 
                         if (isEditable) {
@@ -1533,24 +1482,12 @@
                                     openNoteModal(day, content);
                                 });
                             }
-                            const mobileCancel = card.querySelector('.cancel-sequence-btn');
-                            if (mobileCancel) {
-                                mobileCancel.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    const day = parseInt(mobileCancel.dataset.mobileDay);
-                                    cancelConsecutiveReminder(day);
-                                });
-                            }
                             const mobilePreview = card.querySelector('.note-preview');
                             if (mobilePreview) {
                                 mobilePreview.addEventListener('click', (e) => {
                                     const day = parseInt(mobilePreview.dataset.mobileDay);
                                     const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
                                     openNoteModal(day, content);
-                                });
-                                mobilePreview.addEventListener('dblclick', (e) => {
-                                    const day = parseInt(mobilePreview.dataset.mobileDay);
-                                    replicateNoteInBulk(day);
                                 });
                             }
                         }
@@ -1565,7 +1502,7 @@
             }
         }
 
-        // ========== AUTENTICAÇÃO ==========
+        // ==================== AUTENTICAÇÃO ====================
         async function doLogin() {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -1611,12 +1548,12 @@
             }
         };
 
-        // ========== MODAL DE EDIÇÃO DA ESCALA ==========
+        // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
         const editModal = document.getElementById('edit-modal');
 
         window.addNameToList = function(section) {
-            const inputMap = { rotation: 'rotation-input', quinta: 'quinta-input' };
-            const listMap = { rotation: 'rotation-list', quinta: 'quinta-list' };
+            const listMap = { rotation: 'rotation-list' };
+            const inputMap = { rotation: 'rotation-input' };
             const input = document.getElementById(inputMap[section]);
             const name = input.value.trim();
             if (!name) return alert('Digite um nome!');
@@ -1635,7 +1572,7 @@
         };
 
         window.removeLastFromList = function(section) {
-            const listMap = { rotation: 'rotation-list', quinta: 'quinta-list' };
+            const listMap = { rotation: 'rotation-list' };
             const list = document.getElementById(listMap[section]);
             const lastChild = list.lastElementChild;
             if (lastChild) lastChild.remove();
@@ -1647,7 +1584,7 @@
         };
 
         function getNamesFromList(section) {
-            const listMap = { rotation: 'rotation-list', quinta: 'quinta-list' };
+            const listMap = { rotation: 'rotation-list' };
             const list = document.getElementById(listMap[section]);
             const tags = list.querySelectorAll('.name-tag');
             const names = [];
@@ -1709,6 +1646,7 @@
 
         function openEditModal() {
             if (!sessionUser) { alert("Faça login para editar a escala."); return; }
+            // Preencher rodízio
             const rotationList = document.getElementById('rotation-list');
             rotationList.innerHTML = '';
             (staffConfig.rotation || []).forEach(name => {
@@ -1717,14 +1655,7 @@
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
                 rotationList.appendChild(tag);
             });
-            const quintaList = document.getElementById('quinta-list');
-            quintaList.innerHTML = '';
-            (staffConfig.quinta || []).forEach(name => {
-                const tag = document.createElement('span');
-                tag.className = 'name-tag';
-                tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('quinta', this)">×</button>`;
-                quintaList.appendChild(tag);
-            });
+            // Exceções
             const excecoesList = document.getElementById('excecoes-list');
             excecoesList.innerHTML = '';
             const excecoes = staffConfig.excecoes || {};
@@ -1738,6 +1669,7 @@
                     excecoesList.appendChild(tag);
                 });
             }
+            // Quantidades
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
             document.getElementById('qtd-sexta').value = qtd.sexta || 1;
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
@@ -1751,7 +1683,6 @@
         async function saveEditModal() {
             if (!sessionUser) return;
             const newRotation = getNamesFromList('rotation');
-            const newQuinta = getNamesFromList('quinta');
             const newExcecoes = getExcecoesFromList();
             const newQuantidades = getQuantidadesFromUI();
             const newModoRotacao = getModoRotacaoFromUI();
@@ -1760,7 +1691,7 @@
                 if (!confirm('O rodízio está vazio. Manter padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
-            await saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades, newModoRotacao);
+            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao);
             closeEditModal();
             alert('✅ Escala atualizada!');
         }
@@ -1770,7 +1701,7 @@
         document.getElementById('edit-save-btn').addEventListener('click', saveEditModal);
         editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
 
-        // ========== NAVEGAÇÃO ==========
+        // ==================== NAVEGAÇÃO ====================
         document.getElementById('view-grid-btn').onclick = () => {
             document.getElementById('main-grid-view').style.display = 'table';
             document.getElementById('main-list-view').style.display = 'none';
@@ -1805,7 +1736,7 @@
             buildCalendar();
         };
 
-        // ========== INICIALIZAÇÃO ==========
+        // ==================== INICIALIZAÇÃO ====================
         onAuthStateChanged(auth, async (user) => {
             await loadStaffConfig();
             if (user) {
