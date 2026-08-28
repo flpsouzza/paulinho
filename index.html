@@ -265,8 +265,6 @@
         }
         .edit-note-btn:hover { background: #E2E8F0; }
 
-        /* Removido o botão Cancelar lembrete daqui */
-
         /* ========== MOBILE LIST VIEW ========== */
         .mobile-list-view {
             display: none;
@@ -597,7 +595,7 @@
             background: #FFF;
         }
 
-        /* Exceções - ajustado para caber na janela */
+        /* Exceções */
         .excecao-row {
             display: flex;
             gap: 6px;
@@ -877,7 +875,7 @@
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px; text-align: center;">
-                Defina os nomes do rodízio, quantas pessoas aparecem em cada dia e o modo de rotação.
+                Defina os nomes do rodízio, quantas pessoas aparecem em cada dia e a distribuição.
             </p>
 
             <!-- Rodízio -->
@@ -913,7 +911,14 @@
                         <option value="aleatorio">Aleatório (sorteia a cada plantão)</option>
                     </select>
                 </div>
-                <div class="helper">Digite quantas pessoas do rodízio por dia. No modo aleatório, os nomes são sorteados a cada plantão.</div>
+                <div class="qtd-row" style="margin-top: 12px;">
+                    <label>Distribuição:</label>
+                    <select id="distribuicao">
+                        <option value="sobreposicao">Com sobreposição (padrão)</option>
+                        <option value="sem_sobreposicao" selected>Sem sobreposição (blocos exclusivos)</option>
+                    </select>
+                </div>
+                <div class="helper">Sem sobreposição: cada dia recebe nomes únicos no plantão.</div>
             </div>
 
             <!-- Exceções (coringas) -->
@@ -994,7 +999,8 @@
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
             quantidades: { sexta: 1, sabado: 1, domingo: 1 },
-            modo_rotacao: "sequencial"
+            modo_rotacao: "sequencial",
+            distribuicao: "sem_sobreposicao"  // NOVO: padrão sem sobreposição
         };
 
         const monthNamesList = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -1037,12 +1043,14 @@
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
                     staffConfig.modo_rotacao = data.modo_rotacao || "sequencial";
+                    staffConfig.distribuicao = data.distribuicao || "sem_sobreposicao";
                 } else {
                     await saveStaffConfig(
                         staffConfig.rotation,
                         staffConfig.excecoes,
                         staffConfig.quantidades,
-                        staffConfig.modo_rotacao
+                        staffConfig.modo_rotacao,
+                        staffConfig.distribuicao
                     );
                 }
             } catch (error) {
@@ -1050,7 +1058,7 @@
             }
         }
 
-        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao) {
+        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao, newDistribuicao) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
@@ -1058,12 +1066,14 @@
                     rotation: newRotation,
                     excecoes: newExcecoes || {},
                     quantidades: newQuantidades || { sexta: 1, sabado: 1, domingo: 1 },
-                    modo_rotacao: newModoRotacao || "sequencial"
+                    modo_rotacao: newModoRotacao || "sequencial",
+                    distribuicao: newDistribuicao || "sem_sobreposicao"
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
                 staffConfig.excecoes = newExcecoes || {};
                 staffConfig.quantidades = newQuantidades || { sexta: 1, sabado: 1, domingo: 1 };
                 staffConfig.modo_rotacao = newModoRotacao || "sequencial";
+                staffConfig.distribuicao = newDistribuicao || "sem_sobreposicao";
                 buildCalendar();
             } catch (error) {
                 console.error("Erro ao salvar configuração:", error);
@@ -1130,6 +1140,7 @@
             return arr;
         }
 
+        // ===== NOVA FUNÇÃO DE DISTRIBUIÇÃO (SEM SOBREPOSIÇÃO) =====
         function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
@@ -1140,6 +1151,7 @@
             const excecoes = staffConfig.excecoes || {};
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
             const modo = staffConfig.modo_rotacao || "sequencial";
+            const distribuicao = staffConfig.distribuicao || "sem_sobreposicao";
 
             const dayOfWeek = new Date(year, month, day).getDay();
             const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -1156,33 +1168,39 @@
             if (isPlantaoRegra) {
                 isDuty = true;
                 if (posTipo === 'quinta') {
-                    // Não há mais quinta fixa, apenas exceções
+                    // sem quinta fixa
                 } else {
                     if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
                         let listaNomes = [...rotation];
                         if (modo === "aleatorio") listaNomes = shuffleArray(rotation, weekendIdx);
-                        let offset = 0;
-                        if (modo === "sequencial") {
-                            if (posTipo === 'sexta') offset = mathematicalMod(weekendIdx, rotation.length);
-                            else if (posTipo === 'sabado') offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                            else if (posTipo === 'domingo') offset = mathematicalMod(weekendIdx + 2, rotation.length);
-                        }
+
                         let quantidade = 0;
                         if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
                         else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
                         else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
 
-                        if (modo === "sequencial") {
-                            for (let i = 0; i < quantidade; i++) {
-                                const idx = mathematicalMod(offset + i, rotation.length);
-                                activeWorkers.push(rotation[idx]);
-                            }
+                        let offset = 0;
+                        if (distribuicao === "sem_sobreposicao") {
+                            // Cálculo de bloco contíguo: soma das quantidades dos dias anteriores
+                            let offsetBase = 0;
+                            if (posTipo === 'sexta') offsetBase = 0;
+                            else if (posTipo === 'sabado') offsetBase = parseInt(qtd.sexta) || 1;
+                            else if (posTipo === 'domingo') offsetBase = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1);
+
+                            const totalPorPlantao = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1) + (parseInt(qtd.domingo) || 1);
+                            offset = mathematicalMod(weekendIdx * totalPorPlantao + offsetBase, rotation.length);
                         } else {
-                            const shuffled = shuffleArray(rotation, weekendIdx);
-                            for (let i = 0; i < Math.min(quantidade, shuffled.length); i++) {
-                                activeWorkers.push(shuffled[i]);
-                            }
+                            // Sobreposição (original)
+                            if (posTipo === 'sexta') offset = mathematicalMod(weekendIdx, rotation.length);
+                            else if (posTipo === 'sabado') offset = mathematicalMod(weekendIdx + 1, rotation.length);
+                            else if (posTipo === 'domingo') offset = mathematicalMod(weekendIdx + 2, rotation.length);
+                        }
+
+                        // Pega os nomes a partir do offset
+                        for (let i = 0; i < quantidade; i++) {
+                            const idx = mathematicalMod(offset + i, rotation.length);
+                            activeWorkers.push(rotation[idx]);
                         }
                     }
                 }
@@ -1644,6 +1662,10 @@
             return document.getElementById('modo-rotacao').value;
         }
 
+        function getDistribuicaoFromUI() {
+            return document.getElementById('distribuicao').value;
+        }
+
         function openEditModal() {
             if (!sessionUser) { alert("Faça login para editar a escala."); return; }
             // Preencher rodízio
@@ -1675,6 +1697,7 @@
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
             document.getElementById('qtd-domingo').value = qtd.domingo || 1;
             document.getElementById('modo-rotacao').value = staffConfig.modo_rotacao || 'sequencial';
+            document.getElementById('distribuicao').value = staffConfig.distribuicao || 'sem_sobreposicao';
             editModal.classList.add('active');
         }
 
@@ -1686,12 +1709,13 @@
             const newExcecoes = getExcecoesFromList();
             const newQuantidades = getQuantidadesFromUI();
             const newModoRotacao = getModoRotacaoFromUI();
+            const newDistribuicao = getDistribuicaoFromUI();
 
             if (newRotation.length === 0) {
                 if (!confirm('O rodízio está vazio. Manter padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
-            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao);
+            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao, newDistribuicao);
             closeEditModal();
             alert('✅ Escala atualizada!');
         }
