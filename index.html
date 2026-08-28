@@ -111,55 +111,6 @@
         .title-block .month-title { font-size: 36px; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
         .title-block .year-title { font-size: 15px; color: var(--accent-bronze); font-weight: 700; letter-spacing: 6px; margin-top: 4px; }
         
-        /* Barra de ferramentas para anotações */
-        .toolbar-notes {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #F1F5F9;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-color);
-        }
-        .toolbar-notes button {
-            background: #FFF;
-            border: 1px solid #CBD5E1;
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.15s;
-            min-width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .toolbar-notes button:hover { background: #E2E8F0; }
-        .toolbar-notes input[type="color"] {
-            width: 32px;
-            height: 32px;
-            padding: 2px;
-            border: 1px solid #CBD5E1;
-            border-radius: 4px;
-            cursor: pointer;
-            background: #FFF;
-        }
-        .toolbar-notes .separator {
-            width: 1px;
-            height: 28px;
-            background: #CBD5E1;
-            margin: 0 4px;
-        }
-        .toolbar-notes .btn-clear {
-            color: #B91C1C;
-        }
-        .toolbar-notes .btn-clear:hover { background: #FEE2E2; }
-
         .toolbar {
             display: flex; flex-wrap: wrap; gap: 12px; width: 100%; justify-content: center; align-items: center;
             background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color);
@@ -178,218 +129,132 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 9999;
             justify-content: center;
             align-items: center;
+            padding: 16px;
         }
         .modal-overlay.active { display: flex; }
         .modal-content {
             background: #FFF;
             border-radius: 16px;
-            padding: 30px;
+            padding: 20px;
             max-width: 700px;
-            width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
+            width: 100%;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        .modal-content h2 { color: var(--rio-blue); margin-bottom: 20px; text-align: center; }
-
-        .day-section {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background: #FAFBFC;
-        }
-        .day-section h3 {
-            font-size: 14px;
+        .modal-content h2 {
             color: var(--rio-blue);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .day-section .badge-info {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: normal;
-        }
-        .name-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .name-tag {
-            background: var(--rio-blue);
-            color: #FFF;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .name-tag .remove-btn {
-            background: none;
-            border: none;
-            color: #FF6B6B;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 14px;
-            padding: 0 2px;
-        }
-        .name-tag .remove-btn:hover { color: #FF0000; }
-        .add-name-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .add-name-row input {
-            flex: 1;
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 13px;
-            outline: none;
-        }
-        .add-name-row input:focus { border-color: var(--rio-light); }
-        .btn-add-name {
-            background: var(--rio-blue);
-            color: #FFF;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            margin-bottom: 12px;
             font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
+            text-align: center;
+            flex-shrink: 0;
         }
-        .btn-add-name:hover { background: var(--rio-light); }
-        .btn-remove-day {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
+        /* Barra de ferramentas do modal */
+        .modal-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 10px;
+            background: #F1F5F9;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-toolbar button {
+            background: #FFF;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
+            transition: 0.15s;
+            min-width: 40px;
+            height: 40px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-left: 4px;
-            transition: 0.2s;
+            touch-action: manipulation;
         }
-        .btn-remove-day:hover { background: #FECACA; }
-
-        .day-section .helper {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* Quantidades */
-        .qtd-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        .qtd-row label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .qtd-row input {
-            width: 60px;
-            padding: 4px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
-
-        /* Exceções */
-        .excecao-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
-        .excecao-row select {
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 13px;
+        .modal-toolbar button:active { background: #CBD5E1; }
+        .modal-toolbar button:hover { background: #E2E8F0; }
+        .modal-toolbar input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 2px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            cursor: pointer;
             background: #FFF;
         }
-        .excecao-row input {
-            flex: 1;
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
+        .modal-toolbar select {
+            padding: 6px 8px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
             font-size: 13px;
-            outline: none;
-            min-width: 120px;
+            background: #FFF;
+            height: 40px;
         }
-        .excecao-row input:focus { border-color: var(--rio-light); }
-        .excecao-tag {
-            background: #8B5CF6;
-            color: #FFF;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin: 2px;
+        .modal-toolbar .separator {
+            width: 1px;
+            height: 30px;
+            background: #CBD5E1;
+            margin: 0 4px;
         }
-        .excecao-tag .remove-btn {
-            background: none;
-            border: none;
-            color: #FF6B6B;
-            cursor: pointer;
-            font-weight: 900;
-            font-size: 14px;
-            padding: 0 2px;
-        }
-        .excecao-tag .remove-btn:hover { color: #FF0000; }
-        .excecoes-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
+        .modal-toolbar .btn-clear { color: #B91C1C; }
+        .modal-toolbar .btn-clear:hover { background: #FEE2E2; }
 
-        .modal-buttons {
+        .modal-editor {
+            flex: 1;
+            min-height: 200px;
+            max-height: 50vh;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #FFF;
+            outline: none;
+            word-wrap: break-word;
+        }
+        .modal-editor:empty::before {
+            content: "Digite sua anotação aqui...";
+            color: #94A3B8;
+        }
+        .modal-editor p { margin: 0 0 8px 0; }
+
+        .modal-actions {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
             justify-content: flex-end;
+            flex-shrink: 0;
+            padding-top: 8px;
         }
-        .modal-buttons button {
+        .modal-actions button {
             padding: 10px 24px;
             border: none;
             border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
+            font-size: 15px;
+            touch-action: manipulation;
         }
-        .btn-save { background: var(--rio-blue); color: #FFF; }
-        .btn-save:hover { background: var(--rio-light); }
-        .btn-cancel { background: #E2E8F0; color: var(--text-main); }
-        .btn-cancel:hover { background: #CBD5E1; }
+        .btn-save-modal { background: var(--rio-blue); color: #FFF; }
+        .btn-save-modal:hover { background: var(--rio-light); }
+        .btn-cancel-modal { background: #E2E8F0; color: var(--text-main); }
+        .btn-cancel-modal:hover { background: #CBD5E1; }
 
+        /* Estilos para o calendário */
         .calendar-content { 
             padding: 12px; 
             width: 100%;
@@ -449,38 +314,37 @@
             align-self: center;
         }
 
-        .date-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+        .date-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .date-num { font-weight: 700; font-size: 11px; color: #94A3B8; }
         .duty-day-circle { width: 22px; height: 22px; border: 2px solid var(--rio-light); background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rio-light); font-size: 10px; font-weight: 800; }
         
-        /* Editor de anotações */
-        .agenda-editor {
-            width: 100%;
-            min-height: 55px;
-            max-height: 90px;
-            margin-top: 6px;
-            border: 1px solid #CBD5E1;
-            border-radius: 6px;
-            padding: 6px;
+        .note-preview {
             font-size: 12px;
-            background: #F8FAFC;
-            color: #000000;
-            outline: none;
-            transition: all 0.2s;
-            overflow-y: auto;
             line-height: 1.4;
+            margin-top: 4px;
+            padding: 4px;
+            background: #F8FAFC;
+            border-radius: 4px;
+            max-height: 50px;
+            overflow: hidden;
             word-wrap: break-word;
+            cursor: pointer;
         }
-        .agenda-editor:hover { border-color: #94A3B8; background: #F1F5F9; }
-        .agenda-editor:focus { border-color: var(--rio-light); background: #FFF; box-shadow: 0 0 0 2px rgba(0,45,94,0.15); }
+        .note-preview:hover { background: #F1F5F9; }
+        .note-preview:empty { display: none; }
 
-        .agenda-editor:empty::before {
-            content: "Anotar...";
-            color: #94A3B8;
+        .edit-note-btn {
+            background: transparent;
+            border: none;
+            color: var(--rio-light);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: 0.15s;
+            touch-action: manipulation;
         }
-
-        .agenda-editor p { margin: 0 0 4px 0; }
-        .agenda-editor br { display: block; content: ""; margin: 4px 0; }
+        .edit-note-btn:hover { background: #E2E8F0; }
 
         .cancel-sequence-btn {
             width: 100%;
@@ -522,18 +386,14 @@
             display: none;
         }
 
-        .name-tag, .excecao-tag {
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* Responsivo para a barra de ferramentas */
+        /* Responsivo */
         @media (max-width: 600px) {
-            .toolbar-notes button { font-size: 11px; padding: 2px 6px; min-width: 28px; height: 28px; }
-            .toolbar-notes input[type="color"] { width: 28px; height: 28px; }
+            .modal-toolbar button { min-width: 36px; height: 36px; font-size: 12px; padding: 4px 8px; }
+            .modal-toolbar select { height: 36px; font-size: 12px; }
+            .modal-toolbar input[type="color"] { width: 36px; height: 36px; }
+            .modal-content { padding: 16px; }
+            .modal-editor { min-height: 150px; }
+            .modal-actions button { padding: 8px 16px; font-size: 14px; }
         }
     </style>
 </head>
@@ -559,18 +419,6 @@
                 <div class="month-title" id="month-label">Julho</div>
                 <div class="year-title" id="year-label">2026</div>
                 <button id="edit-staff-btn" class="btn-action" style="margin-top: 10px;">📝 Editar Escala</button>
-            </div>
-            <!-- Barra de ferramentas para anotações -->
-            <div class="toolbar-notes" id="note-toolbar">
-                <button onclick="formatNote('bold')" title="Negrito (Ctrl+B)"><strong>B</strong></button>
-                <button onclick="formatNote('italic')" title="Itálico (Ctrl+I)"><em>I</em></button>
-                <button onclick="formatNote('underline')" title="Sublinhado (Ctrl+U)"><u>U</u></button>
-                <button onclick="formatNote('strikeThrough')" title="Tachado"><s>S</s></button>
-                <div class="separator"></div>
-                <label title="Cor do texto"><input type="color" id="text-color" value="#000000" onchange="formatNote('foreColor', this.value)"></label>
-                <label title="Cor de fundo"><input type="color" id="bg-color" value="#FFFF00" onchange="formatNote('hiliteColor', this.value)"></label>
-                <div class="separator"></div>
-                <button onclick="formatNote('removeFormat')" class="btn-clear" title="Limpar formatação">✕</button>
             </div>
         </header>
 
@@ -613,12 +461,60 @@
         </footer>
     </div>
 
-    <!-- ===== MODAL DE EDIÇÃO ===== -->
+    <!-- ===== MODAL DE EDIÇÃO DE ANOTAÇÃO ===== -->
+    <div class="modal-overlay" id="note-modal">
+        <div class="modal-content">
+            <h2 id="note-modal-title">✏️ Editar Anotação</h2>
+            <!-- Barra de ferramentas -->
+            <div class="modal-toolbar" id="modal-toolbar">
+                <button onclick="execNoteCmd('bold')" title="Negrito"><strong>B</strong></button>
+                <button onclick="execNoteCmd('italic')" title="Itálico"><em>I</em></button>
+                <button onclick="execNoteCmd('underline')" title="Sublinhado"><u>U</u></button>
+                <button onclick="execNoteCmd('strikeThrough')" title="Tachado"><s>S</s></button>
+                <div class="separator"></div>
+                <label title="Cor do texto"><input type="color" id="modal-text-color" value="#000000" onchange="execNoteCmd('foreColor', this.value)"></label>
+                <label title="Cor de fundo"><input type="color" id="modal-bg-color" value="#FFFF00" onchange="execNoteCmd('hiliteColor', this.value)"></label>
+                <div class="separator"></div>
+                <select id="modal-font-select" onchange="execNoteCmd('fontName', this.value)">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times</option>
+                    <option value="Courier New">Courier</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                <select id="modal-font-size" onchange="execNoteCmd('fontSize', this.value)">
+                    <option value="1">Pequeno</option>
+                    <option value="3" selected>Médio</option>
+                    <option value="5">Grande</option>
+                    <option value="7">Muito Grande</option>
+                </select>
+                <div class="separator"></div>
+                <button onclick="execNoteCmd('justifyLeft')" title="Alinhar à esquerda">◄</button>
+                <button onclick="execNoteCmd('justifyCenter')" title="Centralizar">◄►</button>
+                <button onclick="execNoteCmd('justifyRight')" title="Alinhar à direita">►</button>
+                <button onclick="execNoteCmd('justifyFull')" title="Justificar">≡</button>
+                <div class="separator"></div>
+                <button onclick="execNoteCmd('insertUnorderedList')" title="Lista com marcadores">•</button>
+                <button onclick="execNoteCmd('insertOrderedList')" title="Lista numerada">1.</button>
+                <div class="separator"></div>
+                <button onclick="execNoteCmd('removeFormat')" class="btn-clear" title="Limpar formatação">✕</button>
+            </div>
+            <!-- Editor -->
+            <div class="modal-editor" id="modal-editor" contenteditable="true"></div>
+            <!-- Ações -->
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" id="modal-cancel-btn">Cancelar</button>
+                <button class="btn-save-modal" id="modal-save-btn">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE EDIÇÃO DA ESCALA ===== -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; text-align: center;">
-                Defina os nomes do rodízio e quantas pessoas aparecem em cada dia.
+                Defina os nomes do rodízio, quantas pessoas aparecem em cada dia e o modo de rotação.
             </p>
 
             <!-- RODÍZIO -->
@@ -636,7 +532,7 @@
                 <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (quantos quiser)</div>
             </div>
 
-            <!-- QUANTIDADES POR DIA -->
+            <!-- QUANTIDADES E MODO -->
             <div class="day-section" style="border-color: #F59E0B; background: #FFFBEB;">
                 <h3 style="color: #D97706;">
                     🔢 Quantos nomes do rodízio em cada dia?
@@ -649,7 +545,14 @@
                     <label>Domingo:</label>
                     <input type="number" id="qtd-domingo" min="0" max="10" value="1">
                 </div>
-                <div class="helper">Digite quantas pessoas do rodízio você quer em cada dia. Ex: sexta 2, sábado 3, domingo 1.</div>
+                <div class="qtd-row" style="margin-top: 12px;">
+                    <label>Modo de rotação:</label>
+                    <select id="modo-rotacao">
+                        <option value="sequencial">Sequencial (ordem fixa)</option>
+                        <option value="aleatorio">Aleatório (sorteia a cada plantão)</option>
+                    </select>
+                </div>
+                <div class="helper">Digite quantas pessoas do rodízio por dia. No modo aleatório, os nomes são sorteados a cada plantão.</div>
             </div>
 
             <!-- QUINTA -->
@@ -739,7 +642,6 @@
         let notesCache = {};
         let noteMetaCache = {};
         const saveTimers = new Map();
-        let activeEditor = null; // referência ao editor atual
 
         // Configuração da escala
         let staffConfig = {
@@ -750,7 +652,8 @@
                 sexta: 1,
                 sabado: 1,
                 domingo: 1
-            }
+            },
+            modo_rotacao: "sequencial"
         };
 
         const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -792,15 +695,22 @@
                     staffConfig.quinta = data.quinta || staffConfig.quinta;
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
+                    staffConfig.modo_rotacao = data.modo_rotacao || "sequencial";
                 } else {
-                    await saveStaffConfig(staffConfig.rotation, staffConfig.quinta, staffConfig.excecoes, staffConfig.quantidades);
+                    await saveStaffConfig(
+                        staffConfig.rotation,
+                        staffConfig.quinta,
+                        staffConfig.excecoes,
+                        staffConfig.quantidades,
+                        staffConfig.modo_rotacao
+                    );
                 }
             } catch (error) {
                 console.error("Erro ao carregar configuração:", error);
             }
         }
 
-        async function saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades) {
+        async function saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades, newModoRotacao) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
@@ -808,12 +718,14 @@
                     rotation: newRotation,
                     quinta: newQuinta,
                     excecoes: newExcecoes || {},
-                    quantidades: newQuantidades || { sexta:1, sabado:1, domingo:1 }
+                    quantidades: newQuantidades || { sexta:1, sabado:1, domingo:1 },
+                    modo_rotacao: newModoRotacao || "sequencial"
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
                 staffConfig.quinta = newQuinta;
                 staffConfig.excecoes = newExcecoes || {};
                 staffConfig.quantidades = newQuantidades || { sexta:1, sabado:1, domingo:1 };
+                staffConfig.modo_rotacao = newModoRotacao || "sequencial";
                 buildCalendar();
             } catch (error) {
                 console.error("Erro ao salvar configuração:", error);
@@ -871,7 +783,17 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ===== LÓGICA INVERTIDA COM QUANTIDADES CONFIGURÁVEIS =====
+        function shuffleArray(array, seed) {
+            const arr = [...array];
+            let s = seed;
+            for (let i = arr.length - 1; i > 0; i--) {
+                s = (s * 9301 + 49297) % 233280;
+                const j = Math.floor((s / 233280) * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
         function getWorkersForDate(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
@@ -882,6 +804,7 @@
             const quintaList = staffConfig.quinta || [];
             const excecoes = staffConfig.excecoes || {};
             const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
+            const modo = staffConfig.modo_rotacao || "sequencial";
 
             const dayOfWeek = new Date(year, month, day).getDay();
             const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -910,21 +833,35 @@
                 } else {
                     if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offset = mathematicalMod(weekendIdx, rotation.length);
-                        if (posTipo === 'sexta') {
-                            offset = mathematicalMod(weekendIdx, rotation.length);
-                        } else if (posTipo === 'sabado') {
-                            offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                        } else if (posTipo === 'domingo') {
-                            offset = mathematicalMod(weekendIdx + 2, rotation.length);
+                        let listaNomes = [...rotation];
+                        if (modo === "aleatorio") {
+                            listaNomes = shuffleArray(rotation, weekendIdx);
+                        }
+                        let offset = 0;
+                        if (modo === "sequencial") {
+                            if (posTipo === 'sexta') {
+                                offset = mathematicalMod(weekendIdx, rotation.length);
+                            } else if (posTipo === 'sabado') {
+                                offset = mathematicalMod(weekendIdx + 1, rotation.length);
+                            } else if (posTipo === 'domingo') {
+                                offset = mathematicalMod(weekendIdx + 2, rotation.length);
+                            }
                         }
                         let quantidade = 0;
                         if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
                         else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
                         else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
-                        for (let i = 0; i < quantidade; i++) {
-                            const idx = mathematicalMod(offset + i, rotation.length);
-                            activeWorkers.push(rotation[idx]);
+
+                        if (modo === "sequencial") {
+                            for (let i = 0; i < quantidade; i++) {
+                                const idx = mathematicalMod(offset + i, rotation.length);
+                                activeWorkers.push(rotation[idx]);
+                            }
+                        } else {
+                            const shuffled = shuffleArray(rotation, weekendIdx);
+                            for (let i = 0; i < Math.min(quantidade, shuffled.length); i++) {
+                                activeWorkers.push(shuffled[i]);
+                            }
                         }
                     }
                 }
@@ -942,29 +879,10 @@
             return isDutyOriginal;
         }
 
-        // ===== FUNÇÕES DE ANOTAÇÃO (com HTML) =====
-        function getEditorContent(editor) {
-            if (!editor) return '';
-            // Se estiver vazio, retorna string vazia
-            const html = editor.innerHTML.trim();
-            if (html === '<br>' || html === '' || html === '<div><br></div>') return '';
-            return html;
-        }
-
-        function setEditorContent(editor, html) {
-            if (!editor) return;
-            if (!html || html.trim() === '') {
-                editor.innerHTML = '';
-            } else {
-                editor.innerHTML = html;
-            }
-        }
-
-        // Salvar anotação (agora com HTML)
+        // ===== FUNÇÕES DE ANOTAÇÃO (com modal) =====
         function saveNoteToServer(dayNum, htmlContent) {
             if (!sessionUser) return;
             const key = noteKey(activeYear, activeMonth, dayNum);
-            // Armazena o HTML
             notesCache[key] = htmlContent;
 
             if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
@@ -978,7 +896,7 @@
                         delete noteMetaCache[key];
                     } else {
                         await setDoc(ref, {
-                            nota: htmlContent, // agora salva HTML
+                            nota: htmlContent,
                             atualizadoPor: sessionUser.email || sessionUser.uid,
                             atualizadoPorUid: sessionUser.uid,
                             atualizadoEm: serverTimestamp(),
@@ -997,7 +915,6 @@
             saveTimers.set(key, timer);
         }
 
-        // Carregar anotações
         async function loadNotesFromServer() {
             try {
                 const snapshot = await getDocs(collection(db, "agenda"));
@@ -1006,7 +923,7 @@
                 snapshot.forEach(documentSnapshot => {
                     const item = documentSnapshot.data();
                     if (typeof item.nota === "string" && item.nota.trim()) {
-                        notesCache[documentSnapshot.id] = item.nota; // HTML
+                        notesCache[documentSnapshot.id] = item.nota;
                         noteMetaCache[documentSnapshot.id] = {
                             sequenceId: item.sequenceId || null
                         };
@@ -1020,65 +937,91 @@
             }
         }
 
-        // ===== FUNÇÕES DE FORMATAÇÃO (barra de ferramentas) =====
-        window.formatNote = function(command, value) {
-            // Usa o editor ativo (o que está com foco)
-            const editor = activeEditor;
-            if (!editor) {
-                // Se nenhum editor estiver ativo, tenta encontrar o primeiro visível?
-                // Melhor: alertar o usuário para clicar em uma anotação primeiro.
-                alert('Clique em uma anotação para formatá-la.');
+        // ===== FUNÇÕES DO MODAL DE ANOTAÇÃO =====
+        const noteModal = document.getElementById('note-modal');
+        const modalEditor = document.getElementById('modal-editor');
+        const modalTitle = document.getElementById('note-modal-title');
+        let currentEditingDay = null;
+        let currentEditingContent = '';
+
+        function openNoteModal(day, content) {
+            if (!sessionUser) {
+                alert('Faça login para editar anotações.');
                 return;
             }
-            // Dá foco ao editor
-            editor.focus();
-            // Aplica o comando
+            currentEditingDay = day;
+            currentEditingContent = content || '';
+            modalTitle.textContent = `✏️ Editar Anotação - Dia ${day}`;
+            modalEditor.innerHTML = currentEditingContent;
+            noteModal.classList.add('active');
+            // Foco no editor após um pequeno delay
+            setTimeout(() => modalEditor.focus(), 100);
+        }
+
+        function closeNoteModal() {
+            noteModal.classList.remove('active');
+            modalEditor.innerHTML = '';
+            currentEditingDay = null;
+            currentEditingContent = '';
+        }
+
+        function saveNoteFromModal() {
+            if (currentEditingDay === null) return;
+            const html = modalEditor.innerHTML.trim();
+            // Se estiver vazio, salvar como vazio
+            const content = (html === '<br>' || html === '' || html === '<div><br></div>') ? '' : html;
+            saveNoteToServer(currentEditingDay, content);
+            // Atualiza o cache local
+            const key = noteKey(activeYear, activeMonth, currentEditingDay);
+            notesCache[key] = content;
+            closeNoteModal();
+            buildCalendar();
+        }
+
+        // Função para executar comandos de formatação no modal
+        window.execNoteCmd = function(command, value) {
+            modalEditor.focus();
             if (command === 'removeFormat') {
                 document.execCommand('removeFormat', false, null);
             } else if (command === 'foreColor' || command === 'hiliteColor') {
                 document.execCommand(command, false, value);
+            } else if (command === 'fontName' || command === 'fontSize') {
+                document.execCommand(command, false, value);
             } else {
                 document.execCommand(command, false, null);
             }
-            // Após formatar, atualiza o cache e salva
-            const dayNum = editor.dataset.day;
-            if (dayNum) {
-                const html = getEditorContent(editor);
-                saveNoteToServer(parseInt(dayNum), html);
-                // Atualiza visualmente a classe de "anotado"
-                const td = editor.closest('td');
-                if (td) {
-                    if (html.trim()) {
-                        td.classList.add('annotated-cell');
-                    } else {
-                        td.classList.remove('annotated-cell');
-                    }
-                }
-                // Sincroniza com a versão mobile
-                const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${dayNum}"]`);
-                if (mobileEditor) {
-                    setEditorContent(mobileEditor, html);
-                }
-            }
         };
 
-        // ===== FUNÇÕES DE REPLICAÇÃO E CANCELAMENTO (adaptadas) =====
+        // Eventos do modal
+        document.getElementById('modal-save-btn').addEventListener('click', saveNoteFromModal);
+        document.getElementById('modal-cancel-btn').addEventListener('click', closeNoteModal);
+        noteModal.addEventListener('click', (e) => {
+            if (e.target === noteModal) closeNoteModal();
+        });
+        // Atalho Ctrl+Enter para salvar
+        modalEditor.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                saveNoteFromModal();
+            }
+        });
+
+        // ===== REPLICAÇÃO E CANCELAMENTO (adaptados) =====
         function dateFromNoteKey(key) {
             const [year, month, day] = key.split("_").map(Number);
             return new Date(year, month, day);
         }
 
-        async function cancelConsecutiveReminder(startDay, editor) {
+        async function cancelConsecutiveReminder(startDay) {
             if (!sessionUser) return;
             const key = noteKey(activeYear, activeMonth, startDay);
-            const targetText = getEditorContent(editor).trim();
+            const targetText = (notesCache[key] || '').trim();
 
             if (!targetText) {
                 alert('Não há anotação neste dia para cancelar.');
                 return;
             }
 
-            // (lógica similar à anterior, mas comparando HTML)
             const sequenceId = noteMetaCache[key]?.sequenceId || null;
             let sequenceKeys = [];
 
@@ -1087,7 +1030,6 @@
                     noteMetaCache[k]?.sequenceId === sequenceId
                 );
             } else {
-                // Busca sequência pelo conteúdo HTML idêntico
                 const clickedDate = new Date(activeYear, activeMonth, startDay);
                 let startDate = new Date(clickedDate);
                 while (true) {
@@ -1142,9 +1084,9 @@
             }
         }
 
-        async function replicateNoteInBulk(startDay, editor) {
+        async function replicateNoteInBulk(startDay) {
             if (!sessionUser) return;
-            const htmlContent = getEditorContent(editor).trim();
+            const htmlContent = (notesCache[noteKey(activeYear, activeMonth, startDay)] || '').trim();
             const isEmpty = !htmlContent;
             const promptMsg = isEmpty
                 ? 'O campo está vazio. Digite a quantidade de dias para APAGAR/LIMPAR (incluindo hoje):'
@@ -1232,10 +1174,16 @@
                         if (isToday) td.classList.add("today-cell");
 
                         const savedNote = notesCache[noteKey(activeYear, activeMonth, currentDayNum)] || "";
-                        if (savedNote.trim() && !isToday && !isPlantao) td.classList.add("annotated-cell");
+                        const hasNote = savedNote.trim() !== '';
+                        if (hasNote && !isToday && !isPlantao) td.classList.add("annotated-cell");
 
                         let html = `<div class="date-row">`;
                         html += isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`;
+                        html += `<div>`;
+                        if (isEditable) {
+                            html += `<button class="edit-note-btn" data-day="${currentDayNum}" title="Editar anotação">✏️</button>`;
+                        }
+                        html += `</div>`;
                         html += `</div>`;
                         if (isPlantao) html += `<span class="plantao-label">Plantão</span>`;
                         html += `<div class="badges-list">`;
@@ -1249,90 +1197,51 @@
                         }
                         html += `</div>`;
 
-                        if (isEditable) {
-                            // Editor rich-text
-                            html += `<div class="agenda-editor" contenteditable="true" data-day="${currentDayNum}" data-mobile-sync="true">${savedNote}</div>`;
-                            html += `<button type="button" class="cancel-sequence-btn" style="display:${savedNote.trim() ? 'block' : 'none'}">Cancelar lembrete</button>`;
-                        } else {
-                            if (savedNote.trim()) {
-                                html += `<div class="readonly-note" style="font-size:12px; color:#333; margin-top:4px; background:#f1f5f9; padding:4px 6px; border-radius:4px;">${savedNote}</div>`;
-                            }
+                        // Preview da anotação
+                        if (hasNote) {
+                            html += `<div class="note-preview" data-day="${currentDayNum}">${savedNote}</div>`;
+                        }
+
+                        // Botão cancelar lembrete
+                        if (isEditable && hasNote) {
+                            html += `<button type="button" class="cancel-sequence-btn" data-day="${currentDayNum}">Cancelar lembrete</button>`;
                         }
 
                         td.innerHTML = html;
 
+                        // Eventos dos botões
                         if (isEditable) {
-                            const editor = td.querySelector('.agenda-editor');
+                            const editBtn = td.querySelector('.edit-note-btn');
+                            if (editBtn) {
+                                editBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const day = parseInt(editBtn.dataset.day);
+                                    const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
+                                    openNoteModal(day, content);
+                                });
+                            }
                             const cancelBtn = td.querySelector('.cancel-sequence-btn');
-                            if (editor) {
-                                // Eventos do editor
-                                editor.addEventListener('focus', () => {
-                                    activeEditor = editor;
+                            if (cancelBtn) {
+                                cancelBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const day = parseInt(cancelBtn.dataset.day);
+                                    cancelConsecutiveReminder(day);
                                 });
-                                editor.addEventListener('blur', () => {
-                                    // Quando perde foco, salva
-                                    const day = parseInt(editor.dataset.day);
-                                    const content = getEditorContent(editor);
-                                    saveNoteToServer(day, content);
-                                    // Atualiza classes
-                                    const parentTd = editor.closest('td');
-                                    if (parentTd) {
-                                        if (content.trim()) {
-                                            parentTd.classList.add('annotated-cell');
-                                        } else {
-                                            parentTd.classList.remove('annotated-cell');
-                                        }
-                                    }
-                                    // Sincroniza com mobile
-                                    const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${day}"]`);
-                                    if (mobileEditor) {
-                                        setEditorContent(mobileEditor, content);
-                                    }
+                            }
+                            const previewDiv = td.querySelector('.note-preview');
+                            if (previewDiv) {
+                                previewDiv.addEventListener('click', (e) => {
+                                    const day = parseInt(previewDiv.dataset.day);
+                                    const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
+                                    openNoteModal(day, content);
                                 });
-                                // Atalhos de teclado (Ctrl+B, I, U)
-                                editor.addEventListener('keydown', (e) => {
-                                    if (e.ctrlKey || e.metaKey) {
-                                        let command = null;
-                                        if (e.key === 'b') { command = 'bold'; e.preventDefault(); }
-                                        else if (e.key === 'i') { command = 'italic'; e.preventDefault(); }
-                                        else if (e.key === 'u') { command = 'underline'; e.preventDefault(); }
-                                        if (command) {
-                                            document.execCommand(command, false, null);
-                                            // Salva após formatação
-                                            const day = parseInt(editor.dataset.day);
-                                            const content = getEditorContent(editor);
-                                            saveNoteToServer(day, content);
-                                            // Atualiza mobile
-                                            const mobileEditor = document.querySelector(`.agenda-editor[data-mobile-day="${day}"]`);
-                                            if (mobileEditor) {
-                                                setEditorContent(mobileEditor, content);
-                                            }
-                                        }
-                                    }
-                                    // Enter duplo para replicar
-                                    if (e.key === 'Enter' && e.shiftKey) {
-                                        // Shift+Enter para quebra de linha (padrão)
-                                    }
-                                });
-                                // Duplo clique para replicar
-                                editor.addEventListener('dblclick', (e) => {
-                                    const day = parseInt(editor.dataset.day);
-                                    replicateNoteInBulk(day, editor);
-                                });
-                                // Atualiza o cancel button
-                                if (cancelBtn) {
-                                    cancelBtn.onclick = () => {
-                                        const day = parseInt(editor.dataset.day);
-                                        cancelConsecutiveReminder(day, editor);
-                                    };
-                                }
                             }
                         }
 
                         // Versão mobile (lista)
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
-                        if (savedNote.trim() && !isToday && !isPlantao) card.classList.add("annotated-card");
+                        if (hasNote && !isToday && !isPlantao) card.classList.add("annotated-card");
 
                         let cardHtml = `
                             <div class="mobile-card-header">
@@ -1340,6 +1249,7 @@
                                     <div class="mobile-day-name">${dayNamesList[d]}</div>
                                     ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
                                     ${isPlantao ? `<span class="plantao-label">Plantão</span>` : ''}
+                                    ${isEditable ? `<button class="edit-note-btn" data-mobile-day="${currentDayNum}" title="Editar anotação">✏️</button>` : ''}
                                 </div>
                                 <div class="badges-list">
                         `;
@@ -1352,72 +1262,40 @@
                         }
                         cardHtml += `</div></div>`;
 
-                        if (isEditable) {
-                            cardHtml += `<div class="agenda-editor" contenteditable="true" data-mobile-day="${currentDayNum}">${savedNote}</div>`;
-                            cardHtml += `<button type="button" class="cancel-sequence-btn" data-mobile-cancel-day="${currentDayNum}" style="display:${savedNote.trim() ? 'block' : 'none'}">Cancelar lembrete</button>`;
-                        } else {
-                            if (savedNote.trim()) {
-                                cardHtml += `<div class="readonly-note" style="font-size:12px; color:#333; margin-top:4px; background:#f1f5f9; padding:4px 6px; border-radius:4px;">${savedNote}</div>`;
-                            }
+                        if (hasNote) {
+                            cardHtml += `<div class="note-preview" data-mobile-day="${currentDayNum}">${savedNote}</div>`;
+                        }
+                        if (isEditable && hasNote) {
+                            cardHtml += `<button type="button" class="cancel-sequence-btn" data-mobile-day="${currentDayNum}">Cancelar lembrete</button>`;
                         }
 
                         card.innerHTML = cardHtml;
 
                         if (isEditable) {
-                            const mobileEditor = card.querySelector('.agenda-editor');
-                            const mobileCancelBtn = card.querySelector('.cancel-sequence-btn');
-                            if (mobileEditor) {
-                                mobileEditor.addEventListener('focus', () => {
-                                    activeEditor = mobileEditor;
-                                });
-                                mobileEditor.addEventListener('blur', () => {
-                                    const day = parseInt(mobileEditor.dataset.mobileDay);
-                                    const content = getEditorContent(mobileEditor);
-                                    saveNoteToServer(day, content);
-                                    // Sincroniza com desktop
-                                    const desktopEditor = document.querySelector(`.agenda-editor[data-day="${day}"]`);
-                                    if (desktopEditor) {
-                                        setEditorContent(desktopEditor, content);
-                                    }
-                                    // Atualiza classe
-                                    const parentCard = mobileEditor.closest('.mobile-card');
-                                    if (parentCard) {
-                                        if (content.trim()) {
-                                            parentCard.classList.add('annotated-card');
-                                        } else {
-                                            parentCard.classList.remove('annotated-card');
-                                        }
-                                    }
-                                });
-                                mobileEditor.addEventListener('keydown', (e) => {
-                                    if (e.ctrlKey || e.metaKey) {
-                                        let command = null;
-                                        if (e.key === 'b') { command = 'bold'; e.preventDefault(); }
-                                        else if (e.key === 'i') { command = 'italic'; e.preventDefault(); }
-                                        else if (e.key === 'u') { command = 'underline'; e.preventDefault(); }
-                                        if (command) {
-                                            document.execCommand(command, false, null);
-                                            const day = parseInt(mobileEditor.dataset.mobileDay);
-                                            const content = getEditorContent(mobileEditor);
-                                            saveNoteToServer(day, content);
-                                            const desktopEditor = document.querySelector(`.agenda-editor[data-day="${day}"]`);
-                                            if (desktopEditor) {
-                                                setEditorContent(desktopEditor, content);
-                                            }
-                                        }
-                                    }
-                                });
-                                mobileEditor.addEventListener('dblclick', (e) => {
-                                    const day = parseInt(mobileEditor.dataset.mobileDay);
-                                    replicateNoteInBulk(day, mobileEditor);
+                            const mobileEditBtn = card.querySelector('.edit-note-btn');
+                            if (mobileEditBtn) {
+                                mobileEditBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const day = parseInt(mobileEditBtn.dataset.mobileDay);
+                                    const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
+                                    openNoteModal(day, content);
                                 });
                             }
-                            if (mobileCancelBtn) {
-                                mobileCancelBtn.onclick = () => {
-                                    const day = parseInt(mobileCancelBtn.dataset.mobileCancelDay);
-                                    const editor = card.querySelector('.agenda-editor');
-                                    if (editor) cancelConsecutiveReminder(day, editor);
-                                };
+                            const mobilePreview = card.querySelector('.note-preview');
+                            if (mobilePreview) {
+                                mobilePreview.addEventListener('click', (e) => {
+                                    const day = parseInt(mobilePreview.dataset.mobileDay);
+                                    const content = notesCache[noteKey(activeYear, activeMonth, day)] || '';
+                                    openNoteModal(day, content);
+                                });
+                            }
+                            const mobileCancel = card.querySelector('.cancel-sequence-btn');
+                            if (mobileCancel) {
+                                mobileCancel.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const day = parseInt(mobileCancel.dataset.mobileDay);
+                                    cancelConsecutiveReminder(day);
+                                });
                             }
                         }
 
@@ -1482,7 +1360,7 @@
         };
 
         // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
-        const modalOverlay = document.getElementById("edit-modal");
+        const editModal = document.getElementById("edit-modal");
 
         window.addNameToList = function(section) {
             const inputMap = {
@@ -1588,6 +1466,10 @@
             return { sexta, sabado, domingo };
         }
 
+        function getModoRotacaoFromUI() {
+            return document.getElementById('modo-rotacao').value;
+        }
+
         function openEditModal() {
             if (!sessionUser) {
                 alert("Você precisa estar logado para editar a escala.");
@@ -1631,11 +1513,13 @@
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
             document.getElementById('qtd-domingo').value = qtd.domingo || 1;
 
-            modalOverlay.classList.add('active');
+            document.getElementById('modo-rotacao').value = staffConfig.modo_rotacao || "sequencial";
+
+            editModal.classList.add('active');
         }
 
         function closeEditModal() {
-            modalOverlay.classList.remove('active');
+            editModal.classList.remove('active');
         }
 
         async function saveEditModal() {
@@ -1645,13 +1529,14 @@
             const newQuinta = getNamesFromList('quinta');
             const newExcecoes = getExcecoesFromList();
             const newQuantidades = getQuantidadesFromUI();
+            const newModoRotacao = getModoRotacaoFromUI();
 
             if (newRotation.length === 0) {
                 if (!confirm('O rodízio está vazio. Deseja manter os valores padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
 
-            await saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades);
+            await saveStaffConfig(newRotation, newQuinta, newExcecoes, newQuantidades, newModoRotacao);
             closeEditModal();
             alert('✅ Escala atualizada com sucesso!');
         }
@@ -1659,8 +1544,8 @@
         document.getElementById("edit-staff-btn").addEventListener("click", openEditModal);
         document.getElementById("edit-cancel-btn").addEventListener("click", closeEditModal);
         document.getElementById("edit-save-btn").addEventListener("click", saveEditModal);
-        modalOverlay.addEventListener("click", (e) => {
-            if (e.target === modalOverlay) closeEditModal();
+        editModal.addEventListener("click", (e) => {
+            if (e.target === editModal) closeEditModal();
         });
 
         // ==================== NAVEGAÇÃO ====================
