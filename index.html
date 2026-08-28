@@ -134,47 +134,115 @@
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        /* ========== CALENDÁRIO GRADE ========== */
-        .calendar-content { padding: 12px; width: 100%; overflow-x: auto; }
+        /* ========== CALENDÁRIO GRADE - CORREÇÃO DE PROPORÇÃO ========== */
+        .calendar-content { padding: 8px; width: 100%; overflow-x: auto; }
         .calendar-grid-table {
-            width: 100%; min-width: 800px;
-            border-collapse: separate; border-spacing: 0;
-            border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            table-layout: fixed;
         }
-        .calendar-grid-table th { background-color: var(--rio-blue); color: #FFF; font-size: 12px; font-weight: 700; text-transform: uppercase; padding: 10px 4px; text-align: center; }
+        .calendar-grid-table th {
+            background-color: var(--rio-blue);
+            color: #FFF;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 8px 2px;
+            text-align: center;
+            border: 1px solid var(--rio-blue);
+        }
         .calendar-grid-table td {
-            border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-            vertical-align: top; padding: 8px 4px; min-height: 140px; height: auto;
-            background-color: #FFF; position: relative;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+            padding: 6px 4px;
+            height: auto;
+            min-height: 100px;
+            background-color: #FFF;
             transition: background-color 0.2s, border-color 0.2s;
+            overflow: hidden;
+            word-wrap: break-word;
         }
-        .calendar-grid-table .empty-cell { background-color: #F8FAFC; }
-        .calendar-grid-table td.plantao-cell { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; box-shadow: inset 0 0 0 1px var(--plantao-border); }
-        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; box-shadow: inset 0 0 0 1px var(--border-annotated); }
-        .calendar-grid-table td.today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; box-shadow: none !important; }
+        .calendar-grid-table .empty-cell {
+            background-color: #F8FAFC;
+            min-height: 40px;
+        }
+        .calendar-grid-table td.plantao-cell {
+            background-color: var(--plantao-bg) !important;
+            border-color: var(--plantao-border) !important;
+        }
+        .calendar-grid-table td.annotated-cell {
+            background-color: var(--bg-annotated) !important;
+            border-color: var(--border-annotated) !important;
+        }
+        .calendar-grid-table td.today-cell {
+            background-color: #FFFBEB !important;
+            border: 2px solid #F59E0B !important;
+        }
 
-        .date-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .date-num { font-weight: 700; font-size: 14px; color: #94A3B8; }
-        .duty-day-circle { width: 26px; height: 26px; border: 2px solid var(--rio-light); background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rio-light); font-size: 12px; font-weight: 800; }
-
+        .date-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .date-num {
+            font-weight: 700;
+            font-size: 13px;
+            color: #94A3B8;
+        }
+        .duty-day-circle {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--rio-light);
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--rio-light);
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
         .plantao-label {
-            display: block; margin: 4px 0 6px 0;
-            font-size: 11px; font-weight: 900; color: var(--plantao-text); letter-spacing: 0.9px;
-            text-align: right; text-transform: uppercase;
+            display: block;
+            margin: 2px 0 4px 0;
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--plantao-text);
+            letter-spacing: 0.8px;
+            text-align: right;
+            text-transform: uppercase;
         }
-
-        .badges-list { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-        .badge { font-size: 10px; font-weight: 800; color: #FFF; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badges-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: 2px;
+        }
+        .badge {
+            font-size: 9px;
+            font-weight: 800;
+            color: #FFF;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
         .badge-default { background-color: #6B7280; }
 
         .note-preview {
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 6px 0 4px 0;
-            padding: 6px 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 4px 0 2px 0;
+            padding: 4px 6px;
             background: #F8FAFC;
-            border-radius: 6px;
-            max-height: 80px;
+            border-radius: 4px;
+            max-height: 60px;
             overflow-y: auto;
             word-wrap: break-word;
             cursor: pointer;
@@ -188,11 +256,12 @@
             background: transparent;
             border: none;
             color: var(--rio-light);
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             touch-action: manipulation;
+            line-height: 1;
         }
         .edit-note-btn:hover { background: #E2E8F0; }
 
@@ -203,7 +272,7 @@
             border: none;
             background: transparent;
             color: #B91C1C;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
             text-align: right;
             text-transform: uppercase;
@@ -211,21 +280,48 @@
         }
         .cancel-sequence-btn:hover { text-decoration: underline; }
 
-        /* Mobile list view */
-        .mobile-list-view { display: none; flex-direction: column; gap: 12px; padding: 8px; width: 100%; }
+        /* ========== MOBILE LIST VIEW ========== */
+        .mobile-list-view {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 6px;
+            width: 100%;
+        }
         .mobile-card {
-            background: #FFF; border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 14px; display: flex; flex-direction: column; gap: 6px;
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             transition: background-color 0.2s, border-color 0.2s;
         }
         .mobile-card.plantao-card { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; }
         .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
         .mobile-card.today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
-        .mobile-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; }
-        .mobile-card-date { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .mobile-day-name { font-size: 14px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .mobile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .mobile-card-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .mobile-day-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
 
-        /* ========== MODAL DE ANOTAÇÃO ========== */
+        /* ========== MODAIS ========== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -358,8 +454,8 @@
         .day-section {
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 14px;
+            margin-bottom: 14px;
             background: #FAFBFC;
         }
         .day-section h3 {
@@ -379,18 +475,18 @@
         .name-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 6px;
         }
         .name-tag {
             background: var(--rio-blue);
             color: #FFF;
-            padding: 6px 14px;
-            border-radius: 24px;
-            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .name-tag .remove-btn {
             background: none;
@@ -398,20 +494,20 @@
             color: #FF6B6B;
             cursor: pointer;
             font-weight: 900;
-            font-size: 16px;
+            font-size: 14px;
             padding: 0 2px;
         }
         .name-tag .remove-btn:hover { color: #FF0000; }
         .add-name-row {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
         .add-name-row input {
             flex: 1;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 20px;
             font-size: 14px;
             outline: none;
         }
@@ -421,9 +517,9 @@
             color: #FFF;
             border: none;
             border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            font-size: 22px;
+            width: 36px;
+            height: 36px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -436,9 +532,9 @@
             color: #B91C1C;
             border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -450,65 +546,65 @@
 
         .qtd-row {
             display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        .qtd-row label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .qtd-row input {
-            width: 70px;
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 15px;
-            text-align: center;
-        }
-        .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
-        .qtd-row select {
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 14px;
-            background: #FFF;
-        }
-        .excecao-row {
-            display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
             margin-top: 6px;
             flex-wrap: wrap;
         }
-        .excecao-row select {
-            padding: 8px 12px;
+        .qtd-row label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .qtd-row input {
+            width: 60px;
+            padding: 4px 8px;
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 6px;
             font-size: 14px;
+            text-align: center;
+        }
+        .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
+        .qtd-row select {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            background: #FFF;
+        }
+        .excecao-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .excecao-row select {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
             background: #FFF;
         }
         .excecao-row input {
             flex: 1;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 24px;
-            font-size: 14px;
+            border-radius: 20px;
+            font-size: 13px;
             outline: none;
-            min-width: 120px;
+            min-width: 100px;
         }
         .excecao-row input:focus { border-color: var(--rio-light); }
         .excecao-tag {
             background: #8B5CF6;
             color: #FFF;
-            padding: 6px 14px;
-            border-radius: 24px;
-            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             margin: 2px;
         }
         .excecao-tag .remove-btn {
@@ -517,25 +613,25 @@
             color: #FF6B6B;
             cursor: pointer;
             font-weight: 900;
-            font-size: 16px;
+            font-size: 14px;
             padding: 0 2px;
         }
         .excecao-tag .remove-btn:hover { color: #FF0000; }
         .excecoes-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
+            gap: 4px;
+            margin-top: 4px;
         }
         .helper {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .modal-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 16px;
             justify-content: flex-end;
         }
         .modal-buttons button {
@@ -554,14 +650,22 @@
 
         /* ========== FOOTER ========== */
         footer {
-            padding: 16px 20px; background-color: #F8FAFC;
+            padding: 14px 20px;
+            background-color: #F8FAFC;
             border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .legend-container {
-            display: flex; gap: 14px; font-size: 12px; font-weight: 700;
-            color: var(--text-muted); text-transform: uppercase;
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
             flex-wrap: wrap;
         }
         .legend-item { display: flex; align-items: center; gap: 4px; }
@@ -569,66 +673,59 @@
         .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
         .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; }
         .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
-
-        .credit-footer { font-size: 12px; color: var(--text-muted); }
+        .credit-footer { font-size: 11px; color: var(--text-muted); }
 
         #edit-staff-btn { display: none; }
 
         /* ========== RESPONSIVIDADE ========== */
         @media (max-width: 768px) {
             .calendar-grid-table { min-width: 600px; }
-            .calendar-grid-table td { min-height: 120px; padding: 6px 3px; }
-            .date-num { font-size: 13px; }
-            .duty-day-circle { width: 24px; height: 24px; font-size: 11px; }
-            .badge { font-size: 9px; padding: 2px 4px; }
-            .plantao-label { font-size: 10px; }
+            .calendar-grid-table td { min-height: 80px; padding: 4px 3px; }
+            .date-num { font-size: 12px; }
+            .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
+            .badge { font-size: 8px; padding: 1px 4px; }
+            .plantao-label { font-size: 9px; }
             .note-preview {
-                font-size: 14px !important;
-                line-height: 1.6 !important;
-                padding: 8px !important;
-                max-height: 70px !important;
+                font-size: 13px !important;
+                line-height: 1.5 !important;
+                padding: 4px 6px !important;
+                max-height: 50px !important;
             }
-            .edit-note-btn { font-size: 20px; padding: 4px 8px; }
-            .modal-editor { font-size: 16px; min-height: 160px; }
-            .modal-toolbar button { min-width: 40px; height: 40px; font-size: 14px; padding: 4px 10px; }
-            .modal-toolbar select { height: 40px; font-size: 13px; }
-            .modal-toolbar input[type="color"] { width: 40px; height: 40px; }
+            .edit-note-btn { font-size: 16px; padding: 2px 4px; }
+            .modal-editor { font-size: 15px; min-height: 140px; }
+            .modal-toolbar button { min-width: 38px; height: 38px; font-size: 13px; padding: 4px 8px; }
+            .modal-toolbar select { height: 38px; font-size: 13px; }
+            .modal-toolbar input[type="color"] { width: 38px; height: 38px; }
             .modal-content { padding: 16px; }
-            .day-section { padding: 12px; }
-            .name-tag { font-size: 13px; padding: 4px 12px; }
-            .qtd-row label { font-size: 13px; }
-            .qtd-row input { width: 60px; }
+            .day-section { padding: 10px; }
+            .name-tag { font-size: 12px; padding: 3px 10px; }
+            .qtd-row label { font-size: 12px; }
+            .qtd-row input { width: 50px; }
             .top-bar-header { font-size: 14px; }
-            .title-block .month-title { font-size: 26px; }
+            .title-block .month-title { font-size: 24px; }
             .auth-container { padding: 20px; margin-top: 20px; }
         }
 
         @media (max-width: 480px) {
-            .calendar-grid-table { min-width: 480px; }
-            .calendar-grid-table td { min-height: 100px; padding: 4px 2px; }
-            .date-num { font-size: 12px; }
-            .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
-            .note-preview { font-size: 13px !important; padding: 6px !important; max-height: 60px !important; }
-            .edit-note-btn { font-size: 18px; }
-            .modal-editor { font-size: 15px; min-height: 140px; }
-            .modal-toolbar button { min-width: 36px; height: 36px; font-size: 13px; padding: 2px 6px; }
-            .modal-toolbar select { height: 36px; font-size: 12px; padding: 4px 6px; }
-            .modal-toolbar input[type="color"] { width: 36px; height: 36px; }
+            .calendar-grid-table { min-width: 450px; }
+            .calendar-grid-table td { min-height: 70px; padding: 3px 2px; }
+            .date-num { font-size: 11px; }
+            .duty-day-circle { width: 18px; height: 18px; font-size: 9px; }
+            .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; }
+            .edit-note-btn { font-size: 14px; }
+            .modal-editor { font-size: 14px; min-height: 120px; }
+            .modal-toolbar button { min-width: 34px; height: 34px; font-size: 12px; padding: 2px 6px; }
+            .modal-toolbar select { height: 34px; font-size: 12px; padding: 2px 6px; }
+            .modal-toolbar input[type="color"] { width: 34px; height: 34px; }
             .modal-content { padding: 12px; }
-            .modal-actions button { padding: 10px 20px; font-size: 14px; }
-            .btn-action { font-size: 11px; padding: 6px 12px; }
-            .day-section { padding: 10px; }
-            .name-tag { font-size: 12px; padding: 3px 10px; }
-            .qtd-row { gap: 6px; }
-            .qtd-row input { width: 50px; font-size: 13px; }
-            .toolbar { padding: 10px; gap: 6px; }
+            .modal-actions button { padding: 8px 16px; font-size: 14px; }
+            .btn-action { font-size: 11px; padding: 6px 10px; }
+            .day-section { padding: 8px; }
+            .name-tag { font-size: 11px; padding: 2px 8px; }
+            .qtd-row { gap: 4px; }
+            .qtd-row input { width: 40px; font-size: 12px; }
+            .toolbar { padding: 8px; gap: 4px; }
         }
-
-        /* ========== UTILITÁRIOS ========== */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-8 { margin-top: 8px; }
-        .mb-8 { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -827,6 +924,19 @@
 
     <!-- ========== JAVASCRIPT ========== -->
     <script type="module">
+        // ========== CONFIGURAÇÃO DO FIREBASE ==========
+        // COLOQUE AQUI AS SUAS CHAVES DO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
+            authDomain: "escalaaberta-d968c.firebaseapp.com",
+            projectId: "escalaaberta-d968c",
+            storageBucket: "escalaaberta-d968c.firebasestorage.app",
+            messagingSenderId: "259093020146",
+            appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
+            measurementId: "G-ETSK8NEHDF"
+        };
+        // ================================================
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
             getAuth,
@@ -847,19 +957,6 @@
             writeBatch,
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-        // ==================== CONFIGURAÇÃO FIREBASE ====================
-        // ** SUBSTITUA PELAS SUAS CHAVES **
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
-            authDomain: "escalaaberta-d968c.firebaseapp.com",
-            projectId: "escalaaberta-d968c",
-            storageBucket: "escalaaberta-d968c.firebasestorage.app",
-            messagingSenderId: "259093020146",
-            appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
-            measurementId: "G-ETSK8NEHDF"
-        };
-        // ================================================================
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -883,7 +980,7 @@
         let activeMonth = new Date().getMonth();
         let activeYear = Math.min(Math.max(new Date().getFullYear(), 2026), 2035);
 
-        // Preencher selects de ano
+        // Preencher selects de ano e mês
         const yearSelect = document.getElementById("jump-year-select");
         for (let y = 2026; y <= 2035; y++) {
             const opt = document.createElement("option");
@@ -891,7 +988,6 @@
             opt.innerText = y;
             yearSelect.appendChild(opt);
         }
-        // Preencher meses
         const monthSelect = document.getElementById("jump-month-select");
         monthNamesList.forEach((m, i) => {
             const opt = document.createElement("option");
@@ -909,7 +1005,7 @@
         const passwordInput = document.getElementById("auth-password");
         const editStaffBtn = document.getElementById("edit-staff-btn");
 
-        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
+        // ========== FUNÇÕES DE CONFIGURAÇÃO ==========
         async function loadStaffConfig() {
             try {
                 const docRef = doc(db, "config", "staff");
@@ -958,7 +1054,7 @@
             }
         }
 
-        // ==================== FUNÇÕES AUXILIARES ====================
+        // ========== FUNÇÕES AUXILIARES ==========
         function friendlyFirebaseError(error) {
             const code = error?.code || "";
             const messages = {
@@ -1086,7 +1182,7 @@
 
         function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
 
-        // ==================== ANOTAÇÕES ====================
+        // ========== ANOTAÇÕES ==========
         function saveNoteToServer(dayNum, htmlContent) {
             if (!sessionUser) return;
             const key = noteKey(activeYear, activeMonth, dayNum);
@@ -1142,7 +1238,7 @@
             }
         }
 
-        // ==================== MODAL DE ANOTAÇÃO ====================
+        // ========== MODAL DE ANOTAÇÃO ==========
         const noteModal = document.getElementById('note-modal');
         const modalEditor = document.getElementById('modal-editor');
         const modalTitle = document.getElementById('note-modal-title');
@@ -1197,7 +1293,7 @@
             }
         });
 
-        // ==================== REPLICAR E CANCELAR ====================
+        // ========== REPLICAR E CANCELAR ==========
         function dateFromNoteKey(key) {
             const [year, month, day] = key.split("_").map(Number);
             return new Date(year, month, day);
@@ -1306,7 +1402,7 @@
             }
         }
 
-        // ==================== CONSTRUIR CALENDÁRIO ====================
+        // ========== CONSTRUIR CALENDÁRIO ==========
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
             const daysInMonth = new Date(activeYear, activeMonth + 1, 0).getDate();
@@ -1469,7 +1565,7 @@
             }
         }
 
-        // ==================== AUTENTICAÇÃO ====================
+        // ========== AUTENTICAÇÃO ==========
         async function doLogin() {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
@@ -1515,7 +1611,7 @@
             }
         };
 
-        // ==================== MODAL DE EDIÇÃO DA ESCALA ====================
+        // ========== MODAL DE EDIÇÃO DA ESCALA ==========
         const editModal = document.getElementById('edit-modal');
 
         window.addNameToList = function(section) {
@@ -1613,7 +1709,6 @@
 
         function openEditModal() {
             if (!sessionUser) { alert("Faça login para editar a escala."); return; }
-            // Preencher rodízio
             const rotationList = document.getElementById('rotation-list');
             rotationList.innerHTML = '';
             (staffConfig.rotation || []).forEach(name => {
@@ -1622,7 +1717,6 @@
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
                 rotationList.appendChild(tag);
             });
-            // Quinta
             const quintaList = document.getElementById('quinta-list');
             quintaList.innerHTML = '';
             (staffConfig.quinta || []).forEach(name => {
@@ -1631,7 +1725,6 @@
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('quinta', this)">×</button>`;
                 quintaList.appendChild(tag);
             });
-            // Exceções
             const excecoesList = document.getElementById('excecoes-list');
             excecoesList.innerHTML = '';
             const excecoes = staffConfig.excecoes || {};
@@ -1645,7 +1738,6 @@
                     excecoesList.appendChild(tag);
                 });
             }
-            // Quantidades
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
             document.getElementById('qtd-sexta').value = qtd.sexta || 1;
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
@@ -1678,7 +1770,7 @@
         document.getElementById('edit-save-btn').addEventListener('click', saveEditModal);
         editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
 
-        // ==================== NAVEGAÇÃO ====================
+        // ========== NAVEGAÇÃO ==========
         document.getElementById('view-grid-btn').onclick = () => {
             document.getElementById('main-grid-view').style.display = 'table';
             document.getElementById('main-list-view').style.display = 'none';
@@ -1713,7 +1805,7 @@
             buildCalendar();
         };
 
-        // ==================== INICIALIZAÇÃO ====================
+        // ========== INICIALIZAÇÃO ==========
         onAuthStateChanged(auth, async (user) => {
             await loadStaffConfig();
             if (user) {
