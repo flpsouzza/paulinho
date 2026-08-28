@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=10.0">
-    <title>Visualização - Plantão</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Plantão - Visualização</title>
     <style>
+        /* ========== RESET E BASE ========== */
         :root {
             --rio-blue: #002D5E;
             --rio-light: #004A8D;
@@ -16,35 +17,26 @@
             --border-color: #E2E8F0;
             --bg-annotated: #F0FDF4;
             --border-annotated: #BBF7D0;
-            --font-base: 14px;
+            --plantao-bg: #EAF4FF;
+            --plantao-border: #C9DDF5;
+            --plantao-text: #315F8C;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: var(--font-base);
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             padding: 12px;
-            touch-action: manipulation;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        @media (max-width: 768px) {
-            :root { --font-base: 15px; }
-            body { padding: 8px; }
-        }
-        @media (max-width: 480px) {
-            :root { --font-base: 16px; }
-            body { padding: 4px; }
         }
 
+        /* ========== CALENDÁRIO ========== */
         .calendar-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             background-color: var(--bg-card);
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -57,158 +49,112 @@
             background-color: var(--rio-blue);
             color: #FFF;
             text-align: center;
-            padding: 14px 12px;
-            font-size: 1.1rem;
+            padding: 14px;
+            font-size: 16px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             position: relative;
         }
-        .view-badge {
-            position: absolute;
-            right: 12px; top: 50%;
-            transform: translateY(-50%);
+        .badge-visualizacao {
             background: rgba(255,255,255,0.2);
-            color: #FFF;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 400;
+            margin-left: 10px;
         }
         header {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 16px 12px;
+            padding: 20px;
             background: #FFF;
-            gap: 10px;
+            gap: 16px;
             border-bottom: 1px solid var(--border-color);
         }
         .title-block { width: 100%; }
-        .title-block .month-title { font-size: 1.8rem; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
-        .title-block .year-title { font-size: 0.9rem; color: var(--accent-bronze); font-weight: 700; letter-spacing: 4px; margin-top: 2px; }
-        .readonly-banner {
-            background: #FEF3C7;
-            border: 1px solid #F59E0B;
-            color: #92400E;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .title-block .month-title { font-size: 32px; font-weight: 800; color: var(--rio-blue); text-transform: uppercase; }
+        .title-block .year-title { font-size: 14px; color: var(--accent-bronze); font-weight: 700; letter-spacing: 4px; margin-top: 4px; }
+
+        /* ========== TOOLBAR ========== */
         .toolbar {
             display: flex; flex-wrap: wrap; gap: 10px; width: 100%; justify-content: center; align-items: center;
-            background: #F8FAFC; padding: 12px 16px; border-bottom: 1px solid var(--border-color);
+            background: #F8FAFC; padding: 14px 20px; border-bottom: 1px solid var(--border-color);
         }
-        .toolbar select, .toolbar input { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 0.85rem; background: #FFF; }
+        .nav-controls, .view-controls, .jump-control { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .toolbar select, .toolbar input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 14px; background: #FFF; }
         .btn-action {
-            background: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
-            padding: 6px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border-radius: 20px;
-            transition: all 0.2s; text-transform: uppercase;
-            white-space: nowrap;
+            background-color: #FFF; color: var(--rio-blue); border: 1.5px solid var(--rio-blue);
+            padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 20px; transition: all 0.2s ease; text-transform: uppercase;
+            touch-action: manipulation;
         }
         .btn-action:hover, .btn-action.active { background-color: var(--rio-blue); color: #FFF; }
 
-        .calendar-content {
-            padding: 10px;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-x pan-y;
-        }
+        /* ========== CALENDÁRIO GRADE ========== */
+        .calendar-content { padding: 8px; width: 100%; overflow-x: auto; }
         .calendar-grid-table {
             width: 100%;
             min-width: 700px;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed;
+            border-collapse: collapse;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             overflow: hidden;
-            touch-action: pan-x pan-y;
+            table-layout: fixed;
         }
         .calendar-grid-table th {
             background-color: var(--rio-blue);
             color: #FFF;
-            font-size: 0.7rem;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             padding: 8px 2px;
             text-align: center;
+            border: 1px solid var(--rio-blue);
         }
         .calendar-grid-table td {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
+            border: 1px solid var(--border-color);
             vertical-align: top;
-            padding: 4px 3px;
-            height: 120px;
+            padding: 6px 4px;
+            height: auto;
+            min-height: 90px;
             background-color: #FFF;
-            position: relative;
             transition: background-color 0.2s, border-color 0.2s;
-            font-size: 0.85rem;
+            overflow: hidden;
+            word-wrap: break-word;
         }
-        .calendar-grid-table .empty-cell { background-color: #F8FAFC; }
-        .calendar-grid-table td.annotated-cell { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
-        .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
-
-        .calendar-grid-table td.bate-volta-cell {
-            border: 2px solid #F59E0B !important;
-            background-color: #FFFBEB !important;
-        }
-        .mobile-card.bate-volta-card {
-            border: 2px solid #F59E0B !important;
-            background-color: #FFFBEB !important;
-        }
-
-        :root {
-            --plantao-bg: #EAF4FF;
-            --plantao-border: #C9DDF5;
-            --plantao-text: #315F8C;
+        .calendar-grid-table .empty-cell {
+            background-color: #F8FAFC;
+            min-height: 40px;
         }
         .calendar-grid-table td.plantao-cell {
             background-color: var(--plantao-bg) !important;
             border-color: var(--plantao-border) !important;
-            box-shadow: inset 0 0 0 1px var(--plantao-border);
         }
-        .calendar-grid-table td.plantao-cell.weekday-plantao {
-            background-color: #E8F5E9 !important;
-            border-color: #A5D6A7 !important;
+        .calendar-grid-table td.annotated-cell {
+            background-color: var(--bg-annotated) !important;
+            border-color: var(--border-annotated) !important;
         }
-
-        .plantao-label {
-            display: block;
-            margin-top: 2px;
-            margin-bottom: 4px;
-            font-size: 0.6rem;
-            line-height: 1.2;
-            font-weight: 900;
-            color: var(--plantao-text);
-            letter-spacing: 0.5px;
-            text-align: right;
-            text-transform: uppercase;
-        }
-        .plantao-label.weekday-label { color: #2E7D32; }
-
-        .mobile-card.plantao-card {
-            background-color: var(--plantao-bg) !important;
-            border-color: var(--plantao-border) !important;
-        }
-        .mobile-card.plantao-card.weekday-plantao {
-            background-color: #E8F5E9 !important;
-            border-color: #A5D6A7 !important;
-        }
-        .mobile-card .plantao-label {
-            margin: 0 0 0 6px;
-            text-align: left;
-            align-self: center;
+        .calendar-grid-table td.today-cell {
+            background-color: #FFFBEB !important;
+            border: 2px solid #F59E0B !important;
         }
 
-        .date-row { display: flex; justify-content: flex-end; margin-bottom: 2px; }
-        .date-num { font-weight: 700; font-size: 0.8rem; color: #94A3B8; }
+        .date-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .date-num {
+            font-weight: 700;
+            font-size: 13px;
+            color: #94A3B8;
+        }
         .duty-day-circle {
-            width: 22px; height: 22px;
+            width: 24px;
+            height: 24px;
             border: 2px solid var(--rio-light);
             background: transparent;
             border-radius: 50%;
@@ -216,124 +162,171 @@
             align-items: center;
             justify-content: center;
             color: var(--rio-light);
-            font-size: 0.75rem;
+            font-size: 11px;
             font-weight: 800;
+            flex-shrink: 0;
+        }
+        .plantao-label {
+            display: block;
+            margin: 2px 0 4px 0;
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--plantao-text);
+            letter-spacing: 0.8px;
+            text-align: right;
+            text-transform: uppercase;
+        }
+        .badges-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+            min-height: 24px;
+        }
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            color: #FFF;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline-block;
+            border: 2px solid rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .badge-empty {
+            font-size: 10px;
+            color: #94A3B8;
+            padding: 2px 4px;
+            font-style: italic;
         }
 
-        .mobile-list-view { display: none; flex-direction: column; gap: 10px; padding: 8px; width: 100%; }
+        .note-preview {
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 4px 0 2px 0;
+            padding: 4px 6px;
+            background: #F8FAFC;
+            border-radius: 4px;
+            max-height: 60px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            border: 1px solid transparent;
+        }
+        .note-preview:empty { display: none; }
+
+        /* ========== MOBILE LIST VIEW ========== */
+        .mobile-list-view {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 6px;
+            width: 100%;
+        }
         .mobile-card {
             background: #FFF;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             transition: background-color 0.2s, border-color 0.2s;
         }
-        .mobile-card-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .mobile-card-date { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .mobile-day-name { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        
-        .badges-list { display: flex; flex-direction: column; gap: 2px; width: 100%; }
-        .badge {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: #FFF;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .badge-coringa {
-            background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important;
-            border: 1px solid #5B21B6;
-        }
-        .badge-bate-volta {
-            background: #F59E0B !important;
-            border: 1px solid #D97706;
-            color: #000 !important;
-        }
-        .readonly-note {
-            font-size: 0.75rem;
-            color: #333;
-            margin-top: 4px;
-            background: #f1f5f9;
-            padding: 4px 6px;
-            border-radius: 4px;
-            border-left: 3px solid #94A3B8;
-        }
-
-        .today-cell { background-color: #FFFBEB !important; border: 2px solid #F59E0B !important; box-shadow: none !important; }
-        .today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
-        
-        footer {
-            padding: 12px 16px;
-            background: #F8FAFC;
-            border-top: 1px solid var(--border-color);
+        .mobile-card.plantao-card { background-color: var(--plantao-bg) !important; border-color: var(--plantao-border) !important; }
+        .mobile-card.annotated-card { background-color: var(--bg-annotated) !important; border-color: var(--border-annotated) !important; }
+        .mobile-card.today-card { border: 2px solid #F59E0B !important; background-color: #FFFBEB !important; }
+        .mobile-card-header {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-        }
-        .legend-container {
-            display: flex;
+            justify-content: space-between;
+            width: 100%;
             flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.7rem;
+        }
+        .mobile-card-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .mobile-day-name {
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
         }
+
+        /* ========== FOOTER ========== */
+        footer {
+            padding: 14px 20px;
+            background-color: #F8FAFC;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .legend-container {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            flex-wrap: wrap;
+        }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .l-dot { width: 12px; height: 12px; border-radius: 50%; }
         .l-active { background: var(--rio-light); border: 2px solid var(--rio-light); }
-        .l-coringa { background: linear-gradient(135deg, #8B5CF6, #6D28D9); border: 1px solid #5B21B6; }
-        .l-bate-volta { background: #F59E0B; border: 1px solid #D97706; }
-        .l-today { background: #FFFBEB; border: 2px solid #F59E0B; }
-        .l-annotated { background: var(--bg-annotated); border: 1px solid var(--border-annotated); }
+        .l-today { background-color: #FFFBEB; border: 2px solid #F59E0B; }
+        .l-annotated { background-color: var(--bg-annotated); border: 1px solid var(--border-annotated); }
+        .credit-footer { font-size: 11px; color: var(--text-muted); }
 
-        .badge-color-0 { background-color: #3B82F6; }
-        .badge-color-1 { background-color: #10B981; }
-        .badge-color-2 { background-color: #F59E0B; }
-        .badge-color-3 { background-color: #EF4444; }
-        .badge-color-4 { background-color: #8B5CF6; }
-        .badge-color-5 { background-color: #EC4899; }
-        .badge-color-6 { background-color: #14B8A6; }
-        .badge-color-7 { background-color: #F97316; }
-        .badge-color-8 { background-color: #6366F1; }
-        .badge-color-9 { background-color: #84CC16; }
+        /* ========== RESPONSIVIDADE ========== */
+        @media (max-width: 768px) {
+            .calendar-grid-table { min-width: 600px; }
+            .calendar-grid-table td { min-height: 70px; padding: 4px 3px; }
+            .date-num { font-size: 12px; }
+            .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
+            .badge { font-size: 9px; padding: 2px 6px; }
+            .plantao-label { font-size: 9px; }
+            .note-preview {
+                font-size: 13px !important;
+                line-height: 1.5 !important;
+                padding: 4px 6px !important;
+                max-height: 50px !important;
+            }
+            .top-bar-header { font-size: 14px; }
+            .title-block .month-title { font-size: 24px; }
+        }
 
         @media (max-width: 480px) {
-            .calendar-grid-table td { height: 100px; padding: 3px 2px; font-size: 0.75rem; }
-            .calendar-grid-table th { font-size: 0.6rem; padding: 6px 1px; }
-            .duty-day-circle { width: 18px; height: 18px; font-size: 0.65rem; }
-            .date-num { font-size: 0.7rem; }
-            .badge { font-size: 0.6rem; padding: 1px 4px; }
-            .plantao-label { font-size: 0.5rem; }
-            .toolbar { gap: 6px; padding: 8px 10px; }
-            .btn-action { font-size: 0.65rem; padding: 4px 10px; }
-            .title-block .month-title { font-size: 1.4rem; }
+            .calendar-grid-table { min-width: 450px; }
+            .calendar-grid-table td { min-height: 60px; padding: 3px 2px; }
+            .date-num { font-size: 11px; }
+            .duty-day-circle { width: 18px; height: 18px; font-size: 9px; }
+            .badge { font-size: 8px; padding: 1px 4px; }
+            .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; }
+            .btn-action { font-size: 11px; padding: 6px 10px; }
+            .toolbar { padding: 8px; gap: 4px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ========== CALENDÁRIO (SEM LOGIN, SEM EDIÇÃO) ========== -->
     <div class="calendar-container" id="calendar-screen">
         <div class="top-bar-header">
-            📅 Plantão
-            <span class="view-badge">👁️ Visualização</span>
+            Plantão — Visualização
+            <span class="badge-visualizacao">🔍 Somente leitura</span>
         </div>
         <header>
             <div class="title-block">
                 <div class="month-title" id="month-label">Julho</div>
                 <div class="year-title" id="year-label">2026</div>
             </div>
-            <div class="readonly-banner">🔒 Modo de visualização — sem login, sem edição</div>
         </header>
 
         <div class="toolbar">
@@ -346,12 +339,7 @@
                 <button class="btn-action" id="view-list-btn">Lista</button>
             </div>
             <div class="jump-control">
-                <select id="jump-month-select">
-                    <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
-                    <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
-                    <option value="6" selected>Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
-                    <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
-                </select>
+                <select id="jump-month-select"></select>
                 <select id="jump-year-select"></select>
                 <button class="btn-action" id="jump-submit-btn">Ir</button>
             </div>
@@ -368,25 +356,16 @@
         <footer>
             <div class="legend-container">
                 <div class="legend-item"><div class="l-dot l-active"></div> Plantão</div>
-                <div class="legend-item"><div class="l-dot l-coringa"></div> Coringa</div>
-                <div class="legend-item"><div class="l-dot l-bate-volta"></div> Bate e Volta</div>
                 <div class="legend-item"><div class="l-dot l-today"></div> Hoje</div>
                 <div class="legend-item"><div class="l-dot l-annotated"></div> Com Anotação</div>
             </div>
-            <span class="credit-footer" style="font-size:0.7rem;">Desenvolvido por <strong>Felipe Souza</strong></span>
+            <span class="credit-footer">Desenvolvido por <strong>Felipe Souza</strong></span>
         </footer>
     </div>
 
+    <!-- ========== JAVASCRIPT (somente leitura) ========== -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-        import {
-            getFirestore,
-            collection,
-            doc,
-            getDocs,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
+        // ========== CONFIGURAÇÃO FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
             authDomain: "escalaaberta-d968c.firebaseapp.com",
@@ -396,32 +375,47 @@
             appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
             measurementId: "G-ETSK8NEHDF"
         };
+        // ===========================================
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDocs,
+            getDoc,
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         let notesCache = {};
+
+        // ========== CONFIGURAÇÃO DA ESCALA ==========
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
-            quantidades: {
-                sexta: 1,
-                sabado: 1,
-                domingo: 1
-            },
-            bateVolta: {
-                ativo: false,
-                dia: 0
-            }
+            quantidades: { sexta: 1, sabado: 1, domingo: 1 },
+            manual_overrides: {}
         };
 
-        const monthNamesList = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-        const dayNamesList = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+        // ========== FUNÇÃO PARA GERAR CORES ÚNICAS ==========
+        function getColorForName(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const hue = Math.abs(hash % 360);
+            const sat = 70 + (hash % 15);
+            const light = 50 + (hash % 15);
+            return `hsl(${hue}, ${sat}%, ${light}%)`;
+        }
 
-        const todayInitial = new Date();
-        let activeMonth = todayInitial.getMonth();
-        let activeYear = Math.min(Math.max(todayInitial.getFullYear(), 2026), 2035);
-        let currentViewMode = "grid";
+        // ========== CONSTANTES ==========
+        const monthNamesList = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const dayNamesList = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        let activeMonth = new Date().getMonth();
+        let activeYear = Math.min(Math.max(new Date().getFullYear(), 2026), 2035);
 
         const yearSelect = document.getElementById("jump-year-select");
         for (let y = 2026; y <= 2035; y++) {
@@ -430,14 +424,15 @@
             opt.innerText = y;
             yearSelect.appendChild(opt);
         }
-
         const monthSelect = document.getElementById("jump-month-select");
-        monthSelect.value = String(activeMonth);
-        yearSelect.value = String(activeYear);
+        monthNamesList.forEach((m, i) => {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.innerText = m;
+            monthSelect.appendChild(opt);
+        });
 
-        const ALTERNANCIA_REF = new Date(2026, 7, 25);
-
-        // ==================== CONFIG ====================
+        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
         async function loadStaffConfig() {
             try {
                 const docRef = doc(db, "config", "staff");
@@ -446,261 +441,129 @@
                     const data = docSnap.data();
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
                     staffConfig.excecoes = data.excecoes || {};
-                    staffConfig.quantidades = data.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    staffConfig.bateVolta = data.bateVolta || { ativo: false, dia: 0 };
+                    staffConfig.quantidades = data.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
+                    staffConfig.manual_overrides = data.manual_overrides || {};
                 }
-            } catch (error) { console.error("Erro ao carregar configuração:", error); }
+            } catch (error) {
+                console.error("Erro ao carregar configuração:", error);
+            }
         }
 
-        // ==================== AUXILIARES ====================
-        function escapeHtml(text) {
-            return String(text ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-        }
-        function mathematicalMod(n,m) { return ((n%m)+m)%m; }
+        // ==================== FUNÇÕES AUXILIARES ====================
         function noteKey(year, month, day) { return `${year}_${month}_${day}`; }
-        function cleanStringForClass(text) { return text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
 
-        const colorPalette = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
-        const colorMap = {};
-        let colorIndex = 0;
-        function getColorForName(name) {
-            if (!name) return '#6B7280';
-            const trimmed = name.trim();
-            if (!trimmed) return '#6B7280';
-            if (colorMap[trimmed]) return colorMap[trimmed];
-            const color = colorPalette[colorIndex % colorPalette.length];
-            colorMap[trimmed] = color;
-            colorIndex++;
-            return color;
+        function calculateDaysFromAnchor(y, m, d) {
+            const anchor = Date.UTC(2026, 6, 3);
+            const target = Date.UTC(y, m, d);
+            return Math.floor((target - anchor) / (1000 * 60 * 60 * 24));
         }
 
-        function daysBetween(date1, date2) {
-            const msPerDay = 1000*60*60*24;
-            const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
-            const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
-            return Math.floor((utc1 - utc2) / msPerDay);
+        function mathematicalMod(n, m) { return ((n % m) + m) % m; }
+
+        function escapeHtml(text) {
+            return String(text ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        // ===== BATE E VOLTA =====
-        function calcularNomeBateVolta(year, month, day) {
-            const rotation = staffConfig.rotation || [];
-            if (rotation.length === 0) return null;
+        // ===== LÓGICA DO RODÍZIO =====
+        function getWorkersForDate(year, month, day) {
+            const key = noteKey(year, month, day);
 
-            let bestStreak = -1;
-            const candidates = [];
-            const currentDate = new Date(year, month, day);
-            const startDate = new Date(currentDate);
-            startDate.setDate(startDate.getDate() - 60);
-
-            for (const nome of rotation) {
-                let streak = 0;
-                const checkDate = new Date(currentDate);
-                checkDate.setDate(checkDate.getDate() - 1);
-                while (checkDate >= startDate) {
-                    const { isDuty, activeWorkers } = getWorkersForDateHelper(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
-                    if (isDuty && activeWorkers.includes(nome)) {
-                        streak++;
-                        checkDate.setDate(checkDate.getDate() - 1);
-                    } else {
-                        break;
-                    }
-                }
-                if (streak > bestStreak) {
-                    bestStreak = streak;
-                    candidates.length = 0;
-                    candidates.push(nome);
-                } else if (streak === bestStreak) {
-                    candidates.push(nome);
-                }
+            if (staffConfig.manual_overrides && staffConfig.manual_overrides[key]) {
+                const overridden = staffConfig.manual_overrides[key];
+                return { isDuty: overridden.length > 0, activeWorkers: overridden };
             }
 
-            if (candidates.length === 0) return rotation[0];
-            const randomIndex = Math.floor(Math.random() * candidates.length);
-            return candidates[randomIndex];
-        }
-
-        function getWorkersForDateHelper(year, month, day) {
             let activeWorkers = [];
             let isDuty = false;
-            const currentDate = new Date(year, month, day);
-            const dayOfWeek = currentDate.getDay();
-            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+            const diff = calculateDaysFromAnchor(year, month, day);
+            const pos = mathematicalMod(diff, 14);
 
-            if (isWeekday) {
-                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) isDuty = true;
-            }
+            const rotation = staffConfig.rotation || [];
+            const excecoes = staffConfig.excecoes || {};
+            const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
 
-            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
-                const anchor = new Date(2026, 6, 3);
-                const diff = daysBetween(currentDate, anchor);
-                const pos = mathematicalMod(diff, 14);
-                let isWeekendPlantao = false;
-                if (pos === 7 && dayOfWeek === 5) isWeekendPlantao = true;
-                else if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
-                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
+            const dayOfWeek = new Date(year, month, day).getDay();
+            const excecaoNomes = excecoes[dayOfWeek] || [];
 
-                if (isWeekendPlantao) {
-                    isDuty = true;
-                    const rotation = staffConfig.rotation || [];
-                    const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
-                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
-                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
-                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
+            let isPlantaoRegra = false;
+            let posTipo = null;
 
-                    if (rotation.length > 0 && totalPorFDS > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
-                        const getSlice = (start, count) => {
-                            const slice = [];
-                            for (let i = 0; i < count; i++) {
-                                const idx = mathematicalMod(start + i, rotation.length);
-                                slice.push(rotation[idx]);
-                            }
-                            return slice;
-                        };
-                        let offsetSexta = offsetBase;
-                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
-                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
+            if (pos === 6) { isPlantaoRegra = true;
+                posTipo = 'quinta'; } else if (pos === 7) { isPlantaoRegra = true;
+                posTipo = 'sexta'; } else if (pos === 8) { isPlantaoRegra = true;
+                posTipo = 'sabado'; } else if (pos === 9) { isPlantaoRegra = true;
+                posTipo = 'domingo'; }
 
-                        if (dayOfWeek === 5) {
-                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
-                        } else if (dayOfWeek === 6) {
-                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
-                        } else if (dayOfWeek === 0) {
-                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
+            if (isPlantaoRegra) {
+                isDuty = true;
+                if (posTipo === 'quinta') {
+                    // quinta removida
+                } else {
+                    if (rotation.length > 0) {
+                        const plantaoIndex = Math.floor((diff - pos) / 14);
+                        const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
+                        const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
+                        const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
+                        const totalPorPlantao = qtdSexta + qtdSabado + qtdDomingo;
+
+                        let offset = 0;
+                        let quantidade = 0;
+                        if (posTipo === 'sexta') {
+                            offset = plantaoIndex * totalPorPlantao;
+                            quantidade = qtdSexta;
+                        } else if (posTipo === 'sabado') {
+                            offset = plantaoIndex * totalPorPlantao + qtdSexta;
+                            quantidade = qtdSabado;
+                        } else if (posTipo === 'domingo') {
+                            offset = plantaoIndex * totalPorPlantao + qtdSexta + qtdSabado;
+                            quantidade = qtdDomingo;
+                        }
+
+                        for (let i = 0; i < quantidade; i++) {
+                            const idx = mathematicalMod(offset + i, rotation.length);
+                            activeWorkers.push(rotation[idx]);
                         }
                     }
                 }
             }
 
-            if (isDuty) {
-                const excecoes = staffConfig.excecoes || {};
-                const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
+            if (isPlantaoRegra && excecaoNomes.length > 0) {
+                activeWorkers.push(...excecaoNomes);
             }
 
             activeWorkers = [...new Set(activeWorkers)];
             return { isDuty, activeWorkers };
         }
 
-        // ===== LÓGICA DE PLANTÃO (COM BATE E VOLTA) =====
-        function getWorkersForDate(year, month, day) {
-            let activeWorkers = [];
-            let isDuty = false;
-            let isBateVolta = false;
-            let nomeBateVolta = null;
-            const currentDate = new Date(year, month, day);
-            const dayOfWeek = currentDate.getDay();
-            const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-
-            // REGRA 1: ALTERNÂNCIA (segunda a sexta)
-            if (isWeekday) {
-                const diffDays = daysBetween(currentDate, ALTERNANCIA_REF);
-                if (diffDays % 2 === 0) isDuty = true;
-            }
-
-            // REGRA 2: FIM DE SEMANA (sexta, sábado e domingo)
-            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
-                const anchor = new Date(2026, 6, 3);
-                const diff = daysBetween(currentDate, anchor);
-                const pos = mathematicalMod(diff, 14);
-                let isWeekendPlantao = false;
-                if (pos === 7 && dayOfWeek === 5) isWeekendPlantao = true;
-                else if (pos === 8 && dayOfWeek === 6) isWeekendPlantao = true;
-                else if (pos === 9 && dayOfWeek === 0) isWeekendPlantao = true;
-
-                if (isWeekendPlantao) {
-                    isDuty = true;
-                    const rotation = staffConfig.rotation || [];
-                    const qtd = staffConfig.quantidades || { sexta:1, sabado:1, domingo:1 };
-                    const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
-                    const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
-                    const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
-                    const totalPorFDS = qtdSexta + qtdSabado + qtdDomingo;
-
-                    if (rotation.length > 0 && totalPorFDS > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offsetBase = mathematicalMod(weekendIdx * totalPorFDS, rotation.length);
-
-                        const getSlice = (start, count) => {
-                            const slice = [];
-                            for (let i = 0; i < count; i++) {
-                                const idx = mathematicalMod(start + i, rotation.length);
-                                slice.push(rotation[idx]);
-                            }
-                            return slice;
-                        };
-
-                        let offsetSexta = offsetBase;
-                        let offsetSabado = mathematicalMod(offsetBase + qtdSexta, rotation.length);
-                        let offsetDomingo = mathematicalMod(offsetBase + qtdSexta + qtdSabado, rotation.length);
-
-                        if (dayOfWeek === 5) {
-                            activeWorkers.push(...getSlice(offsetSexta, qtdSexta));
-                        } else if (dayOfWeek === 6) {
-                            activeWorkers.push(...getSlice(offsetSabado, qtdSabado));
-                        } else if (dayOfWeek === 0) {
-                            activeWorkers.push(...getSlice(offsetDomingo, qtdDomingo));
-                        }
-                    }
-                }
-            }
-
-            // EXCEÇÕES (coringas)
-            if (isDuty) {
-                const excecoes = staffConfig.excecoes || {};
-                const excecaoNomes = excecoes[dayOfWeek] || [];
-                if (excecaoNomes.length > 0) {
-                    activeWorkers.push(...excecaoNomes);
-                }
-            }
-
-            // REGRA 3: BATE E VOLTA
-            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-            if (bateVolta.ativo && dayOfWeek === bateVolta.dia) {
-                if (isDuty) {
-                    const nomeExtra = calcularNomeBateVolta(year, month, day);
-                    if (nomeExtra) {
-                        if (!activeWorkers.includes(nomeExtra)) {
-                            activeWorkers.push(nomeExtra);
-                            isBateVolta = true;
-                            nomeBateVolta = nomeExtra;
-                        }
-                    }
-                }
-            }
-
-            activeWorkers = [...new Set(activeWorkers)];
-            return { isDuty, activeWorkers, isBateVolta, nomeBateVolta };
-        }
-
         function isPlantaoDia(year, month, day, isDutyOriginal) { return isDutyOriginal; }
 
-        // ==================== NOTAS ====================
+        // ==================== ANOTAÇÕES ====================
         async function loadNotesFromServer() {
             try {
                 const snapshot = await getDocs(collection(db, "agenda"));
                 notesCache = {};
                 snapshot.forEach(docSnap => {
-                    const item = docSnap.data();
-                    if (typeof item.nota === "string" && item.nota.trim()) {
-                        notesCache[docSnap.id] = item.nota;
+                    const data = docSnap.data();
+                    if (typeof data.nota === "string" && data.nota.trim()) {
+                        notesCache[docSnap.id] = data.nota;
                     }
                 });
+                buildCalendar();
             } catch (error) {
                 console.error("Erro ao carregar anotações:", error);
+                buildCalendar();
             }
-            buildCalendar();
         }
 
-        // ==================== BUILD CALENDAR ====================
+        // ==================== CONSTRUIR CALENDÁRIO ====================
         function buildCalendar() {
             const firstDay = new Date(activeYear, activeMonth, 1).getDay();
-            const daysInMonth = new Date(activeYear, activeMonth+1, 0).getDate();
+            const daysInMonth = new Date(activeYear, activeMonth + 1, 0).getDate();
             const today = new Date();
 
             document.getElementById("month-label").innerText = monthNamesList[activeMonth];
@@ -714,120 +577,73 @@
             listView.innerHTML = "";
             let dayNum = 1;
 
-            for (let w=0; w<6; w++) {
+            for (let w = 0; w < 6; w++) {
                 const tr = document.createElement("tr");
                 let hasData = false;
-                for (let d=0; d<7; d++) {
+                for (let d = 0; d < 7; d++) {
                     const td = document.createElement("td");
-                    if ((w===0 && d<firstDay) || dayNum > daysInMonth) {
+                    if ((w === 0 && d < firstDay) || dayNum > daysInMonth) {
                         td.className = "empty-cell";
                     } else {
                         hasData = true;
                         const currentDayNum = dayNum;
                         const isToday = currentDayNum === today.getDate() && activeYear === today.getFullYear() && activeMonth === today.getMonth();
 
-                        const result = getWorkersForDate(activeYear, activeMonth, currentDayNum);
-                        const { isDuty, activeWorkers, isBateVolta, nomeBateVolta } = result;
+                        const { isDuty, activeWorkers } = getWorkersForDate(activeYear, activeMonth, currentDayNum);
                         const isPlantao = isPlantaoDia(activeYear, activeMonth, currentDayNum, isDuty);
-                        const dayOfWeek = new Date(activeYear, activeMonth, currentDayNum).getDay();
-                        const isWeekend = dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0;
-
-                        if (isPlantao) {
-                            td.classList.add("plantao-cell");
-                            if (!isWeekend) td.classList.add("weekday-plantao");
-                        }
-                        if (isToday) td.classList.add("today-cell");
-                        if (isBateVolta) td.classList.add("bate-volta-cell");
-
                         const savedNote = notesCache[noteKey(activeYear, activeMonth, currentDayNum)] || "";
-                        if (savedNote.trim() && !isToday && !isPlantao) td.classList.add("annotated-cell");
+                        const hasNote = savedNote.trim() !== '';
 
-                        let html = `<div class="date-row">`;
-                        html += isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`;
-                        html += `</div>`;
-                        if (isPlantao) {
-                            const labelClass = !isWeekend ? 'weekday-label' : '';
-                            html += `<span class="plantao-label ${labelClass}">Plantão</span>`;
-                        }
+                        if (isPlantao) td.classList.add("plantao-cell");
+                        if (isToday) td.classList.add("today-cell");
+                        if (hasNote && !isToday && !isPlantao) td.classList.add("annotated-cell");
+
+                        let html = `<div class="date-row">
+                            ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
+                        </div>`;
+                        if (isPlantao) html += `<span class="plantao-label">Plantão</span>`;
                         html += `<div class="badges-list">`;
+
                         if (activeWorkers.length === 0) {
-                            html += ``;
+                            html += `<span class="badge-empty">(vazio)</span>`;
                         } else {
-                            const excecoes = staffConfig.excecoes || {};
-                            const excecaoNomes = excecoes[dayOfWeek] || [];
-                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-
-                            // AGORA USAMOS o nomeBateVolta retornado pela função getWorkersForDate
-                            // NÃO recalculamos, usamos o que veio no result
-                            const nomeBateVoltaCalculado = nomeBateVolta; // já vem do result
-
                             activeWorkers.forEach(worker => {
-                                const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
-                                let coringaClass = isCoringa ? 'badge-coringa' : '';
-                                let bateClass = isBate ? 'badge-bate-volta' : '';
-                                let badgeText = escapeHtml(worker);
-                                if (isBate) {
-                                    badgeText += ' 🔄 B&V';
-                                }
-                                html += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
+                                html += `<span class="badge" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
                             });
                         }
                         html += `</div>`;
 
-                        if (savedNote.trim()) {
-                            html += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
+                        if (hasNote) {
+                            html += `<div class="note-preview" data-day="${currentDayNum}">${savedNote}</div>`;
                         }
 
                         td.innerHTML = html;
 
-                        // MOBILE CARD
+                        // Mobile card
                         const card = document.createElement("div");
                         card.className = `mobile-card ${isPlantao ? 'plantao-card' : ''} ${isToday ? 'today-card' : ''}`;
-                        if (isPlantao && !isWeekend) card.classList.add('weekday-plantao');
-                        if (savedNote.trim() && !isToday && !isPlantao) card.classList.add("annotated-card");
-                        if (isBateVolta) card.classList.add('bate-volta-card');
+                        if (hasNote && !isToday && !isPlantao) card.classList.add("annotated-card");
 
-                        let cardHtml = `
-                            <div class="mobile-card-header">
-                                <div class="mobile-card-date">
-                                    <div class="mobile-day-name">${dayNamesList[d]}</div>
-                                    ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
-                                    ${isPlantao ? `<span class="plantao-label ${!isWeekend ? 'weekday-label' : ''}">Plantão</span>` : ''}
-                                </div>
-                                <div class="badges-list">
-                        `;
-                        if (activeWorkers.length === 0) {
-                            cardHtml += ``;
-                        } else {
-                            const excecoes = staffConfig.excecoes || {};
-                            const excecaoNomes = excecoes[dayOfWeek] || [];
-                            const bateVolta = staffConfig.bateVolta || { ativo: false, dia: 0 };
-                            const isBateVoltaDia = bateVolta.ativo && dayOfWeek === bateVolta.dia && isPlantao;
-                            // USAR O nomeBateVolta do result
-                            const nomeBateVoltaCalculado = nomeBateVolta;
-
+                        let cardHtml = `<div class="mobile-card-header">
+                            <div class="mobile-card-date">
+                                <span class="mobile-day-name">${dayNamesList[d]}</span>
+                                ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<span class="date-num">${currentDayNum}</span>`}
+                                ${isPlantao ? `<span class="plantao-label">Plantão</span>` : ''}
+                            </div>
+                            <div class="badges-list">`;
+                        if (activeWorkers.length === 0) cardHtml += `<span class="badge-empty">(vazio)</span>`;
+                        else {
                             activeWorkers.forEach(worker => {
-                                const isCoringa = excecaoNomes.includes(worker);
-                                const isBate = (worker === nomeBateVoltaCalculado && isBateVoltaDia);
                                 const color = getColorForName(worker);
-                                let coringaClass = isCoringa ? 'badge-coringa' : '';
-                                let bateClass = isBate ? 'badge-bate-volta' : '';
-                                let badgeText = escapeHtml(worker);
-                                if (isBate) {
-                                    badgeText += ' 🔄 B&V';
-                                }
-                                cardHtml += `<span class="badge ${coringaClass} ${bateClass}" style="background-color:${color};">${badgeText}</span>`;
+                                cardHtml += `<span class="badge" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
                             });
                         }
                         cardHtml += `</div></div>`;
 
-                        if (savedNote.trim()) {
-                            cardHtml += `<div class="readonly-note">${escapeHtml(savedNote)}</div>`;
+                        if (hasNote) {
+                            cardHtml += `<div class="note-preview" data-mobile-day="${currentDayNum}">${savedNote}</div>`;
                         }
-
                         card.innerHTML = cardHtml;
                         listView.appendChild(card);
                         dayNum++;
@@ -841,14 +657,12 @@
 
         // ==================== NAVEGAÇÃO ====================
         document.getElementById('view-grid-btn').onclick = () => {
-            currentViewMode = 'grid';
             document.getElementById('main-grid-view').style.display = 'table';
             document.getElementById('main-list-view').style.display = 'none';
             document.getElementById('view-grid-btn').classList.add('active');
             document.getElementById('view-list-btn').classList.remove('active');
         };
         document.getElementById('view-list-btn').onclick = () => {
-            currentViewMode = 'list';
             document.getElementById('main-grid-view').style.display = 'none';
             document.getElementById('main-list-view').style.display = 'flex';
             document.getElementById('view-list-btn').classList.add('active');
@@ -856,14 +670,18 @@
         };
         document.getElementById('btn-prev-month').onclick = () => {
             activeMonth--;
-            if (activeMonth < 0) { activeMonth = 11; activeYear--; }
-            if (activeYear < 2026) { activeYear = 2026; activeMonth = 0; }
+            if (activeMonth < 0) { activeMonth = 11;
+                activeYear--; }
+            if (activeYear < 2026) { activeYear = 2026;
+                activeMonth = 0; }
             buildCalendar();
         };
         document.getElementById('btn-next-month').onclick = () => {
             activeMonth++;
-            if (activeMonth > 11) { activeMonth = 0; activeYear++; }
-            if (activeYear > 2035) { activeYear = 2035; activeMonth = 11; }
+            if (activeMonth > 11) { activeMonth = 0;
+                activeYear++; }
+            if (activeYear > 2035) { activeYear = 2035;
+                activeMonth = 11; }
             buildCalendar();
         };
         document.getElementById('jump-submit-btn').onclick = () => {
@@ -872,12 +690,9 @@
             buildCalendar();
         };
 
-        // ==================== INIT ====================
-        async function init() {
-            await loadStaffConfig();
-            await loadNotesFromServer();
-        }
-        init();
+        // ==================== INICIALIZAÇÃO ====================
+        await loadStaffConfig();
+        await loadNotesFromServer();
     </script>
 </body>
 </html>
