@@ -1268,7 +1268,7 @@
             }
         }
 
-        // ==================== DRAG & DROP ====================
+        // ==================== DRAG & DROP (CORRIGIDO) ====================
         let draggedData = null;
 
         window.dragStart = function(e, day, name) {
@@ -1317,25 +1317,28 @@
             let sourceList = [...sourceResult.activeWorkers];
             let targetList = [...targetResult.activeWorkers];
 
+            // Verifica se o nome existe na origem
             if (!sourceList.includes(draggedName)) {
                 alert('Este nome não está mais disponível.');
                 return;
             }
 
-            if (targetList.length === 0) {
-                sourceList = sourceList.filter(n => n !== draggedName);
-                targetList = [draggedName];
-            } else {
-                const targetName = targetList[0];
-                sourceList = sourceList.filter(n => n !== draggedName);
-                targetList = targetList.filter(n => n !== targetName);
-                targetList.unshift(draggedName);
-                sourceList.push(targetName);
+            // Se o destino já tem o nome, não faz nada
+            if (targetList.includes(draggedName)) {
+                alert('Este nome já está no dia de destino.');
+                return;
             }
 
+            // Remove da origem
+            sourceList = sourceList.filter(n => n !== draggedName);
+
+            // Adiciona ao destino (sem substituir)
+            targetList.push(draggedName);
+
+            // Atualiza overrides
             const newOverrides = { ...staffConfig.manual_overrides };
 
-            // Remove override se a lista calculada for igual à padrão
+            // Se a lista da origem ficou igual ao padrão, remove override; senão, mantém
             const defaultSource = getWorkersForDate(activeYear, activeMonth, sourceDay);
             const isSourceDefault = JSON.stringify(sourceList.sort()) === JSON.stringify(defaultSource.activeWorkers.sort());
             if (isSourceDefault || sourceList.length === 0) {
@@ -1344,9 +1347,10 @@
                 newOverrides[sourceKey] = sourceList;
             }
 
+            // Se a lista do destino ficou igual ao padrão, remove override; senão, mantém
             const defaultTarget = getWorkersForDate(activeYear, activeMonth, parseInt(targetDay));
             const isTargetDefault = JSON.stringify(targetList.sort()) === JSON.stringify(defaultTarget.activeWorkers.sort());
-            if (isTargetDefault || targetList.length === 0) {
+            if (isTargetDefault) {
                 delete newOverrides[targetKey];
             } else {
                 newOverrides[targetKey] = targetList;
