@@ -1002,8 +1002,7 @@
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
             quantidades: { sexta: 1, sabado: 1, domingo: 1 },
-            // NOVO: sobrescritas manuais para dias específicos (drag & drop)
-            manual_overrides: {} // chave: "2026_8_28", valor: ["Nome1", "Nome2"]
+            manual_overrides: {} // chave: "ano_mes_dia" -> array de nomes
         };
 
         // ========== FUNÇÃO PARA GERAR CORES ÚNICAS ==========
@@ -1012,7 +1011,6 @@
             for (let i = 0; i < name.length; i++) {
                 hash = name.charCodeAt(i) + ((hash << 5) - hash);
             }
-            // Garante cores vibrantes (saturação 65-85%, luminosidade 45-65%)
             const hue = Math.abs(hash % 360);
             const sat = 70 + (hash % 15);
             const light = 50 + (hash % 15);
@@ -1129,10 +1127,6 @@
 
         function mathematicalMod(n, m) { return ((n % m) + m) % m; }
 
-        function cleanStringForClass(text) {
-            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        }
-
         function escapeHtml(text) {
             return String(text ?? "")
                 .replace(/&/g, "&amp;")
@@ -1146,7 +1140,7 @@
         function getWorkersForDate(year, month, day) {
             const key = noteKey(year, month, day);
 
-            // 1. Verifica se há sobrescrita manual (drag & drop)
+            // 1. Verifica se há sobrescrita manual
             if (staffConfig.manual_overrides && staffConfig.manual_overrides[key]) {
                 const overridden = staffConfig.manual_overrides[key];
                 return { isDuty: overridden.length > 0, activeWorkers: overridden };
@@ -1177,22 +1171,28 @@
             if (isPlantaoRegra) {
                 isDuty = true;
                 if (posTipo === 'quinta') {
-                    // Quinta removida, apenas exceções
+                    // quinta removida
                 } else {
                     if (rotation.length > 0) {
-                        const weekendIdx = Math.floor((diff - pos) / 14);
-                        let offsetBase = 0;
-                        if (posTipo === 'sexta') offsetBase = 0;
-                        else if (posTipo === 'sabado') offsetBase = parseInt(qtd.sexta) || 1;
-                        else if (posTipo === 'domingo') offsetBase = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1);
+                        // Índice do plantão (0, 1, 2, ...)
+                        const plantaoIndex = Math.floor((diff - pos) / 14);
+                        const qtdSexta = Math.max(0, parseInt(qtd.sexta) || 1);
+                        const qtdSabado = Math.max(0, parseInt(qtd.sabado) || 1);
+                        const qtdDomingo = Math.max(0, parseInt(qtd.domingo) || 1);
+                        const totalPorPlantao = qtdSexta + qtdSabado + qtdDomingo;
 
-                        const totalPorPlantao = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1) + (parseInt(qtd.domingo) || 1);
-                        let offset = mathematicalMod(weekendIdx * totalPorPlantao + offsetBase, rotation.length);
-
+                        let offset = 0;
                         let quantidade = 0;
-                        if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
-                        else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
-                        else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
+                        if (posTipo === 'sexta') {
+                            offset = plantaoIndex * totalPorPlantao;
+                            quantidade = qtdSexta;
+                        } else if (posTipo === 'sabado') {
+                            offset = plantaoIndex * totalPorPlantao + qtdSexta;
+                            quantidade = qtdSabado;
+                        } else if (posTipo === 'domingo') {
+                            offset = plantaoIndex * totalPorPlantao + qtdSexta + qtdSabado;
+                            quantidade = qtdDomingo;
+                        }
 
                         for (let i = 0; i < quantidade; i++) {
                             const idx = mathematicalMod(offset + i, rotation.length);
@@ -1306,11 +1306,8 @@
             const sourceDay = source.day;
             const draggedName = source.name;
 
-            if (sourceDay === parseInt(targetDay)) {
-                return; // Mesmo dia, não faz nada
-            }
+            if (sourceDay === parseInt(targetDay)) return;
 
-            // Busca as listas atuais (considerando overrides)
             const sourceKey = noteKey(activeYear, activeMonth, sourceDay);
             const targetKey = noteKey(activeYear, activeMonth, parseInt(targetDay));
 
@@ -1320,35 +1317,25 @@
             let sourceList = [...sourceResult.activeWorkers];
             let targetList = [...targetResult.activeWorkers];
 
-            // Verifica se o nome existe na origem
             if (!sourceList.includes(draggedName)) {
-                alert('Este nome não está mais disponível para arrastar.');
+                alert('Este nome não está mais disponível.');
                 return;
             }
 
-            // Se o destino estiver vazio, apenas move
             if (targetList.length === 0) {
-                // Remove da origem
                 sourceList = sourceList.filter(n => n !== draggedName);
-                // Adiciona no destino
                 targetList = [draggedName];
             } else {
-                // Troca (swap) com o primeiro nome do destino
                 const targetName = targetList[0];
-                // Remove o nome arrastado da origem
                 sourceList = sourceList.filter(n => n !== draggedName);
-                // Remove o primeiro nome do destino
                 targetList = targetList.filter(n => n !== targetName);
-                // Adiciona o nome arrastado no destino
                 targetList.unshift(draggedName);
-                // Adiciona o nome que estava no destino na origem
                 sourceList.push(targetName);
             }
 
-            // Atualiza os overrides
             const newOverrides = { ...staffConfig.manual_overrides };
 
-            // Se a lista da origem for igual à lista calculada (padrão), remove o override
+            // Remove override se a lista calculada for igual à padrão
             const defaultSource = getWorkersForDate(activeYear, activeMonth, sourceDay);
             const isSourceDefault = JSON.stringify(sourceList.sort()) === JSON.stringify(defaultSource.activeWorkers.sort());
             if (isSourceDefault || sourceList.length === 0) {
@@ -1357,7 +1344,6 @@
                 newOverrides[sourceKey] = sourceList;
             }
 
-            // Se a lista do destino for igual à lista calculada (padrão), remove o override
             const defaultTarget = getWorkersForDate(activeYear, activeMonth, parseInt(targetDay));
             const isTargetDefault = JSON.stringify(targetList.sort()) === JSON.stringify(defaultTarget.activeWorkers.sort());
             if (isTargetDefault || targetList.length === 0) {
@@ -1366,7 +1352,6 @@
                 newOverrides[targetKey] = targetList;
             }
 
-            // Salva a configuração
             await saveStaffConfig(
                 staffConfig.rotation,
                 staffConfig.excecoes,
@@ -1530,7 +1515,6 @@
                         if (isToday) td.classList.add("today-cell");
                         if (hasNote && !isToday && !isPlantao) td.classList.add("annotated-cell");
 
-                        // Configura drag & drop na célula
                         td.setAttribute('ondragover', 'dragOver(event)');
                         td.setAttribute('ondragleave', 'dragLeave(event)');
                         td.setAttribute('ondrop', `drop(event, ${currentDayNum})`);
@@ -1547,8 +1531,8 @@
                         } else {
                             activeWorkers.forEach(worker => {
                                 const color = getColorForName(worker);
-                                const isDraggable = isEditable ? 'true' : 'false';
-                                html += `<span class="badge" draggable="${isDraggable}" ondragstart="dragStart(event, ${currentDayNum}, '${worker}')" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
+                                const draggable = isEditable ? 'true' : 'false';
+                                html += `<span class="badge" draggable="${draggable}" ondragstart="dragStart(event, ${currentDayNum}, '${worker}')" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
                             });
                         }
                         html += `</div>`;
@@ -1776,7 +1760,6 @@
 
         function openEditModal() {
             if (!sessionUser) { alert("Faça login para editar a escala."); return; }
-            // Preencher rodízio
             const rotationList = document.getElementById('rotation-list');
             rotationList.innerHTML = '';
             (staffConfig.rotation || []).forEach(name => {
@@ -1785,7 +1768,6 @@
                 tag.innerHTML = `${escapeHtml(name)} <button class="remove-btn" onclick="removeNameFromList('rotation', this)">×</button>`;
                 rotationList.appendChild(tag);
             });
-            // Exceções
             const excecoesList = document.getElementById('excecoes-list');
             excecoesList.innerHTML = '';
             const excecoes = staffConfig.excecoes || {};
@@ -1799,7 +1781,6 @@
                     excecoesList.appendChild(tag);
                 });
             }
-            // Quantidades
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
             document.getElementById('qtd-sexta').value = qtd.sexta || 1;
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
@@ -1819,7 +1800,6 @@
                 if (!confirm('O rodízio está vazio. Manter padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
-            // Mantém os overrides manuais (não os altera aqui)
             await saveStaffConfig(newRotation, newExcecoes, newQuantidades, staffConfig.manual_overrides || {});
             closeEditModal();
             alert('✅ Escala atualizada!');
