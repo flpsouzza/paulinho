@@ -166,6 +166,10 @@
             overflow: hidden;
             word-wrap: break-word;
         }
+        .calendar-grid-table td.drag-over {
+            background-color: #E2E8F0 !important;
+            border: 2px dashed var(--rio-blue) !important;
+        }
         .calendar-grid-table .empty-cell {
             background-color: #F8FAFC;
             min-height: 40px;
@@ -221,19 +225,37 @@
         .badges-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 3px;
+            gap: 4px;
             margin-top: 2px;
+            min-height: 24px;
         }
         .badge {
-            font-size: 9px;
-            font-weight: 800;
+            font-size: 10px;
+            font-weight: 700;
             color: #FFF;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
             text-transform: uppercase;
             white-space: nowrap;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: inline-block;
+            border: 2px solid rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .badge-default { background-color: #6B7280; }
+        .badge:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .badge-empty {
+            font-size: 10px;
+            color: #94A3B8;
+            padding: 2px 4px;
+            font-style: italic;
+        }
 
         .note-preview {
             font-size: 12px;
@@ -587,13 +609,6 @@
             text-align: center;
         }
         .qtd-row input:focus { outline: none; border-color: var(--rio-light); }
-        .qtd-row select {
-            padding: 4px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 13px;
-            background: #FFF;
-        }
 
         /* Exceções */
         .excecao-row {
@@ -708,7 +723,7 @@
             .calendar-grid-table td { min-height: 70px; padding: 4px 3px; }
             .date-num { font-size: 12px; }
             .duty-day-circle { width: 20px; height: 20px; font-size: 10px; }
-            .badge { font-size: 8px; padding: 1px 4px; }
+            .badge { font-size: 9px; padding: 2px 6px; }
             .plantao-label { font-size: 9px; }
             .note-preview {
                 font-size: 13px !important;
@@ -739,6 +754,7 @@
             .calendar-grid-table td { min-height: 60px; padding: 3px 2px; }
             .date-num { font-size: 11px; }
             .duty-day-circle { width: 18px; height: 18px; font-size: 9px; }
+            .badge { font-size: 8px; padding: 1px 4px; }
             .note-preview { font-size: 12px !important; padding: 3px 4px !important; max-height: 40px !important; }
             .edit-note-btn { font-size: 14px; }
             .modal-editor { font-size: 14px; min-height: 120px; }
@@ -875,14 +891,14 @@
         <div class="modal-content">
             <h2>📝 Editar Escala</h2>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px; text-align: center;">
-                Defina os nomes do rodízio, quantas pessoas aparecem em cada dia e a distribuição.
+                Defina os nomes do rodízio e quantas pessoas aparecem em cada dia.
             </p>
 
             <!-- Rodízio -->
             <div class="day-section" id="section-rotation">
                 <h3>
                     🔄 Rodízio
-                    <span class="badge-info">— nomes que se alternam</span>
+                    <span class="badge-info">— nomes se alternam (sexta → sábado → domingo)</span>
                     <button class="btn-remove-day" onclick="removeLastFromList('rotation')" title="Remover último nome">−</button>
                 </h3>
                 <div class="name-list" id="rotation-list"></div>
@@ -893,7 +909,7 @@
                 <div class="helper">Ex: Carlos, Leticia, Gustavo, Tatiane... (quantos quiser)</div>
             </div>
 
-            <!-- Quantidades e modo -->
+            <!-- Quantidades -->
             <div class="day-section" style="border-color: #F59E0B; background: #FFFBEB;">
                 <h3 style="color: #D97706;">🔢 Quantos nomes do rodízio em cada dia?</h3>
                 <div class="qtd-row">
@@ -904,21 +920,7 @@
                     <label>Domingo:</label>
                     <input type="number" id="qtd-domingo" min="0" max="10" value="1">
                 </div>
-                <div class="qtd-row" style="margin-top: 12px;">
-                    <label>Modo de rotação:</label>
-                    <select id="modo-rotacao">
-                        <option value="sequencial">Sequencial (ordem fixa)</option>
-                        <option value="aleatorio">Aleatório (sorteia a cada plantão)</option>
-                    </select>
-                </div>
-                <div class="qtd-row" style="margin-top: 12px;">
-                    <label>Distribuição:</label>
-                    <select id="distribuicao">
-                        <option value="sobreposicao">Com sobreposição (padrão)</option>
-                        <option value="sem_sobreposicao" selected>Sem sobreposição (blocos exclusivos)</option>
-                    </select>
-                </div>
-                <div class="helper">Sem sobreposição: cada dia recebe nomes únicos no plantão.</div>
+                <div class="helper">A ordem é fixa: os nomes se alternam em sequência (sexta → sábado → domingo).</div>
             </div>
 
             <!-- Exceções (coringas) -->
@@ -953,7 +955,7 @@
 
     <!-- ========== JAVASCRIPT ========== -->
     <script type="module">
-        // ========== CONFIGURAÇÃO FIREBASE (SUAS CHAVES) ==========
+        // ========== CONFIGURAÇÃO FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyAWzxdzAi8u0oz-NFQcTxxwt6kI-8y72hQ",
             authDomain: "escalaaberta-d968c.firebaseapp.com",
@@ -963,7 +965,7 @@
             appId: "1:259093020146:web:86ea2cbf2789e0937f3f6b",
             measurementId: "G-ETSK8NEHDF"
         };
-        // =========================================================
+        // ===========================================
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
@@ -995,14 +997,29 @@
         let noteMetaCache = {};
         const saveTimers = new Map();
 
+        // ========== CONFIGURAÇÃO DA ESCALA ==========
         let staffConfig = {
             rotation: ["Carlos", "Leticia", "Gustavo", "Tatiane"],
             excecoes: {},
             quantidades: { sexta: 1, sabado: 1, domingo: 1 },
-            modo_rotacao: "sequencial",
-            distribuicao: "sem_sobreposicao"  // NOVO: padrão sem sobreposição
+            // NOVO: sobrescritas manuais para dias específicos (drag & drop)
+            manual_overrides: {} // chave: "2026_8_28", valor: ["Nome1", "Nome2"]
         };
 
+        // ========== FUNÇÃO PARA GERAR CORES ÚNICAS ==========
+        function getColorForName(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            // Garante cores vibrantes (saturação 65-85%, luminosidade 45-65%)
+            const hue = Math.abs(hash % 360);
+            const sat = 70 + (hash % 15);
+            const light = 50 + (hash % 15);
+            return `hsl(${hue}, ${sat}%, ${light}%)`;
+        }
+
+        // ========== CONSTANTES ==========
         const monthNamesList = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const dayNamesList = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
         let activeMonth = new Date().getMonth();
@@ -1032,7 +1049,7 @@
         const passwordInput = document.getElementById("auth-password");
         const editStaffBtn = document.getElementById("edit-staff-btn");
 
-        // ==================== CONFIGURAÇÃO ====================
+        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
         async function loadStaffConfig() {
             try {
                 const docRef = doc(db, "config", "staff");
@@ -1042,15 +1059,13 @@
                     staffConfig.rotation = data.rotation || staffConfig.rotation;
                     staffConfig.excecoes = data.excecoes || {};
                     staffConfig.quantidades = data.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
-                    staffConfig.modo_rotacao = data.modo_rotacao || "sequencial";
-                    staffConfig.distribuicao = data.distribuicao || "sem_sobreposicao";
+                    staffConfig.manual_overrides = data.manual_overrides || {};
                 } else {
                     await saveStaffConfig(
                         staffConfig.rotation,
                         staffConfig.excecoes,
                         staffConfig.quantidades,
-                        staffConfig.modo_rotacao,
-                        staffConfig.distribuicao
+                        staffConfig.manual_overrides
                     );
                 }
             } catch (error) {
@@ -1058,7 +1073,7 @@
             }
         }
 
-        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao, newDistribuicao) {
+        async function saveStaffConfig(newRotation, newExcecoes, newQuantidades, newManualOverrides) {
             if (!sessionUser) return;
             try {
                 const docRef = doc(db, "config", "staff");
@@ -1066,14 +1081,12 @@
                     rotation: newRotation,
                     excecoes: newExcecoes || {},
                     quantidades: newQuantidades || { sexta: 1, sabado: 1, domingo: 1 },
-                    modo_rotacao: newModoRotacao || "sequencial",
-                    distribuicao: newDistribuicao || "sem_sobreposicao"
+                    manual_overrides: newManualOverrides || {}
                 }, { merge: true });
                 staffConfig.rotation = newRotation;
                 staffConfig.excecoes = newExcecoes || {};
                 staffConfig.quantidades = newQuantidades || { sexta: 1, sabado: 1, domingo: 1 };
-                staffConfig.modo_rotacao = newModoRotacao || "sequencial";
-                staffConfig.distribuicao = newDistribuicao || "sem_sobreposicao";
+                staffConfig.manual_overrides = newManualOverrides || {};
                 buildCalendar();
             } catch (error) {
                 console.error("Erro ao salvar configuração:", error);
@@ -1129,19 +1142,17 @@
                 .replace(/'/g, "&#039;");
         }
 
-        function shuffleArray(array, seed) {
-            const arr = [...array];
-            let s = seed;
-            for (let i = arr.length - 1; i > 0; i--) {
-                s = (s * 9301 + 49297) % 233280;
-                const j = Math.floor((s / 233280) * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        // ===== NOVA FUNÇÃO DE DISTRIBUIÇÃO (SEM SOBREPOSIÇÃO) =====
+        // ===== LÓGICA DO RODÍZIO (FIXA: SEQUENCIAL SEM SOBREPOSIÇÃO) =====
         function getWorkersForDate(year, month, day) {
+            const key = noteKey(year, month, day);
+
+            // 1. Verifica se há sobrescrita manual (drag & drop)
+            if (staffConfig.manual_overrides && staffConfig.manual_overrides[key]) {
+                const overridden = staffConfig.manual_overrides[key];
+                return { isDuty: overridden.length > 0, activeWorkers: overridden };
+            }
+
+            // 2. Cálculo padrão
             let activeWorkers = [];
             let isDuty = false;
             const diff = calculateDaysFromAnchor(year, month, day);
@@ -1150,8 +1161,6 @@
             const rotation = staffConfig.rotation || [];
             const excecoes = staffConfig.excecoes || {};
             const qtd = staffConfig.quantidades || { sexta: 1, sabado: 1, domingo: 1 };
-            const modo = staffConfig.modo_rotacao || "sequencial";
-            const distribuicao = staffConfig.distribuicao || "sem_sobreposicao";
 
             const dayOfWeek = new Date(year, month, day).getDay();
             const excecaoNomes = excecoes[dayOfWeek] || [];
@@ -1168,36 +1177,23 @@
             if (isPlantaoRegra) {
                 isDuty = true;
                 if (posTipo === 'quinta') {
-                    // sem quinta fixa
+                    // Quinta removida, apenas exceções
                 } else {
                     if (rotation.length > 0) {
                         const weekendIdx = Math.floor((diff - pos) / 14);
-                        let listaNomes = [...rotation];
-                        if (modo === "aleatorio") listaNomes = shuffleArray(rotation, weekendIdx);
+                        let offsetBase = 0;
+                        if (posTipo === 'sexta') offsetBase = 0;
+                        else if (posTipo === 'sabado') offsetBase = parseInt(qtd.sexta) || 1;
+                        else if (posTipo === 'domingo') offsetBase = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1);
+
+                        const totalPorPlantao = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1) + (parseInt(qtd.domingo) || 1);
+                        let offset = mathematicalMod(weekendIdx * totalPorPlantao + offsetBase, rotation.length);
 
                         let quantidade = 0;
                         if (posTipo === 'sexta') quantidade = Math.max(0, parseInt(qtd.sexta) || 1);
                         else if (posTipo === 'sabado') quantidade = Math.max(0, parseInt(qtd.sabado) || 1);
                         else if (posTipo === 'domingo') quantidade = Math.max(0, parseInt(qtd.domingo) || 1);
 
-                        let offset = 0;
-                        if (distribuicao === "sem_sobreposicao") {
-                            // Cálculo de bloco contíguo: soma das quantidades dos dias anteriores
-                            let offsetBase = 0;
-                            if (posTipo === 'sexta') offsetBase = 0;
-                            else if (posTipo === 'sabado') offsetBase = parseInt(qtd.sexta) || 1;
-                            else if (posTipo === 'domingo') offsetBase = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1);
-
-                            const totalPorPlantao = (parseInt(qtd.sexta) || 1) + (parseInt(qtd.sabado) || 1) + (parseInt(qtd.domingo) || 1);
-                            offset = mathematicalMod(weekendIdx * totalPorPlantao + offsetBase, rotation.length);
-                        } else {
-                            // Sobreposição (original)
-                            if (posTipo === 'sexta') offset = mathematicalMod(weekendIdx, rotation.length);
-                            else if (posTipo === 'sabado') offset = mathematicalMod(weekendIdx + 1, rotation.length);
-                            else if (posTipo === 'domingo') offset = mathematicalMod(weekendIdx + 2, rotation.length);
-                        }
-
-                        // Pega os nomes a partir do offset
                         for (let i = 0; i < quantidade; i++) {
                             const idx = mathematicalMod(offset + i, rotation.length);
                             activeWorkers.push(rotation[idx]);
@@ -1271,6 +1267,113 @@
                 buildCalendar();
             }
         }
+
+        // ==================== DRAG & DROP ====================
+        let draggedData = null;
+
+        window.dragStart = function(e, day, name) {
+            if (!sessionUser) {
+                e.preventDefault();
+                return alert('Faça login para arrastar nomes.');
+            }
+            draggedData = { day: parseInt(day), name: name };
+            e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+            e.dataTransfer.effectAllowed = 'move';
+        };
+
+        window.dragOver = function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const td = e.currentTarget;
+            td.classList.add('drag-over');
+        };
+
+        window.dragLeave = function(e) {
+            const td = e.currentTarget;
+            td.classList.remove('drag-over');
+        };
+
+        window.drop = async function(e, targetDay) {
+            e.preventDefault();
+            const td = e.currentTarget;
+            td.classList.remove('drag-over');
+
+            if (!sessionUser) return alert('Faça login para arrastar nomes.');
+
+            const rawData = e.dataTransfer.getData('text/plain');
+            if (!rawData) return;
+            const source = JSON.parse(rawData);
+            const sourceDay = source.day;
+            const draggedName = source.name;
+
+            if (sourceDay === parseInt(targetDay)) {
+                return; // Mesmo dia, não faz nada
+            }
+
+            // Busca as listas atuais (considerando overrides)
+            const sourceKey = noteKey(activeYear, activeMonth, sourceDay);
+            const targetKey = noteKey(activeYear, activeMonth, parseInt(targetDay));
+
+            const sourceResult = getWorkersForDate(activeYear, activeMonth, sourceDay);
+            const targetResult = getWorkersForDate(activeYear, activeMonth, parseInt(targetDay));
+
+            let sourceList = [...sourceResult.activeWorkers];
+            let targetList = [...targetResult.activeWorkers];
+
+            // Verifica se o nome existe na origem
+            if (!sourceList.includes(draggedName)) {
+                alert('Este nome não está mais disponível para arrastar.');
+                return;
+            }
+
+            // Se o destino estiver vazio, apenas move
+            if (targetList.length === 0) {
+                // Remove da origem
+                sourceList = sourceList.filter(n => n !== draggedName);
+                // Adiciona no destino
+                targetList = [draggedName];
+            } else {
+                // Troca (swap) com o primeiro nome do destino
+                const targetName = targetList[0];
+                // Remove o nome arrastado da origem
+                sourceList = sourceList.filter(n => n !== draggedName);
+                // Remove o primeiro nome do destino
+                targetList = targetList.filter(n => n !== targetName);
+                // Adiciona o nome arrastado no destino
+                targetList.unshift(draggedName);
+                // Adiciona o nome que estava no destino na origem
+                sourceList.push(targetName);
+            }
+
+            // Atualiza os overrides
+            const newOverrides = { ...staffConfig.manual_overrides };
+
+            // Se a lista da origem for igual à lista calculada (padrão), remove o override
+            const defaultSource = getWorkersForDate(activeYear, activeMonth, sourceDay);
+            const isSourceDefault = JSON.stringify(sourceList.sort()) === JSON.stringify(defaultSource.activeWorkers.sort());
+            if (isSourceDefault || sourceList.length === 0) {
+                delete newOverrides[sourceKey];
+            } else {
+                newOverrides[sourceKey] = sourceList;
+            }
+
+            // Se a lista do destino for igual à lista calculada (padrão), remove o override
+            const defaultTarget = getWorkersForDate(activeYear, activeMonth, parseInt(targetDay));
+            const isTargetDefault = JSON.stringify(targetList.sort()) === JSON.stringify(defaultTarget.activeWorkers.sort());
+            if (isTargetDefault || targetList.length === 0) {
+                delete newOverrides[targetKey];
+            } else {
+                newOverrides[targetKey] = targetList;
+            }
+
+            // Salva a configuração
+            await saveStaffConfig(
+                staffConfig.rotation,
+                staffConfig.excecoes,
+                staffConfig.quantidades,
+                newOverrides
+            );
+        };
 
         // ==================== MODAL DE ANOTAÇÃO ====================
         const noteModal = document.getElementById('note-modal');
@@ -1427,17 +1530,25 @@
                         if (isToday) td.classList.add("today-cell");
                         if (hasNote && !isToday && !isPlantao) td.classList.add("annotated-cell");
 
+                        // Configura drag & drop na célula
+                        td.setAttribute('ondragover', 'dragOver(event)');
+                        td.setAttribute('ondragleave', 'dragLeave(event)');
+                        td.setAttribute('ondrop', `drop(event, ${currentDayNum})`);
+
                         let html = `<div class="date-row">
                             ${isDuty ? `<div class="duty-day-circle">${currentDayNum}</div>` : `<div class="date-num">${currentDayNum}</div>`}
                             ${isEditable ? `<button class="edit-note-btn" data-day="${currentDayNum}" title="Editar anotação">✏️</button>` : ''}
                         </div>`;
                         if (isPlantao) html += `<span class="plantao-label">Plantão</span>`;
                         html += `<div class="badges-list">`;
+
                         if (activeWorkers.length === 0) {
-                            html += `<span style="font-size:10px; color:#94A3B8;">(vazio)</span>`;
+                            html += `<span class="badge-empty">(vazio)</span>`;
                         } else {
-                            activeWorkers.forEach(w => {
-                                html += `<span class="badge badge-default">${escapeHtml(w)}</span>`;
+                            activeWorkers.forEach(worker => {
+                                const color = getColorForName(worker);
+                                const isDraggable = isEditable ? 'true' : 'false';
+                                html += `<span class="badge" draggable="${isDraggable}" ondragstart="dragStart(event, ${currentDayNum}, '${worker}')" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
                             });
                         }
                         html += `</div>`;
@@ -1481,8 +1592,13 @@
                                 ${isEditable ? `<button class="edit-note-btn" data-mobile-day="${currentDayNum}" title="Editar">✏️</button>` : ''}
                             </div>
                             <div class="badges-list">`;
-                        if (activeWorkers.length === 0) cardHtml += `<span style="font-size:10px; color:#94A3B8;">(vazio)</span>`;
-                        else activeWorkers.forEach(w => { cardHtml += `<span class="badge badge-default">${escapeHtml(w)}</span>`; });
+                        if (activeWorkers.length === 0) cardHtml += `<span class="badge-empty">(vazio)</span>`;
+                        else {
+                            activeWorkers.forEach(worker => {
+                                const color = getColorForName(worker);
+                                cardHtml += `<span class="badge" style="background-color: ${color};">${escapeHtml(worker)}</span>`;
+                            });
+                        }
                         cardHtml += `</div></div>`;
 
                         if (hasNote) {
@@ -1658,14 +1774,6 @@
             };
         }
 
-        function getModoRotacaoFromUI() {
-            return document.getElementById('modo-rotacao').value;
-        }
-
-        function getDistribuicaoFromUI() {
-            return document.getElementById('distribuicao').value;
-        }
-
         function openEditModal() {
             if (!sessionUser) { alert("Faça login para editar a escala."); return; }
             // Preencher rodízio
@@ -1696,8 +1804,6 @@
             document.getElementById('qtd-sexta').value = qtd.sexta || 1;
             document.getElementById('qtd-sabado').value = qtd.sabado || 1;
             document.getElementById('qtd-domingo').value = qtd.domingo || 1;
-            document.getElementById('modo-rotacao').value = staffConfig.modo_rotacao || 'sequencial';
-            document.getElementById('distribuicao').value = staffConfig.distribuicao || 'sem_sobreposicao';
             editModal.classList.add('active');
         }
 
@@ -1708,14 +1814,13 @@
             const newRotation = getNamesFromList('rotation');
             const newExcecoes = getExcecoesFromList();
             const newQuantidades = getQuantidadesFromUI();
-            const newModoRotacao = getModoRotacaoFromUI();
-            const newDistribuicao = getDistribuicaoFromUI();
 
             if (newRotation.length === 0) {
                 if (!confirm('O rodízio está vazio. Manter padrão?')) return;
                 newRotation.push('Carlos', 'Leticia', 'Gustavo', 'Tatiane');
             }
-            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, newModoRotacao, newDistribuicao);
+            // Mantém os overrides manuais (não os altera aqui)
+            await saveStaffConfig(newRotation, newExcecoes, newQuantidades, staffConfig.manual_overrides || {});
             closeEditModal();
             alert('✅ Escala atualizada!');
         }
