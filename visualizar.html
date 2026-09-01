@@ -312,6 +312,261 @@
             .btn-action { font-size: 11px; padding: 6px 10px; }
             .toolbar { padding: 8px; gap: 4px; }
         }
+
+
+        /* ========== INTEGRAÇÃO COM AGENDA ========== */
+        .agenda-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .agenda-status-pill {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 18px;
+            font-size: 11px;
+            font-weight: 800;
+            background: #ECFDF5;
+            color: #047857;
+            border: 1px solid #A7F3D0;
+            white-space: nowrap;
+        }
+        .agenda-status-pill.warning {
+            display: inline-flex;
+            background: #FFF7ED;
+            color: #C2410C;
+            border-color: #FED7AA;
+        }
+        .agenda-status-pill.ok { display: inline-flex; }
+
+        .agenda-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.56);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 9999;
+        }
+        .agenda-modal-backdrop.open { display: flex; }
+        .agenda-modal {
+            width: min(560px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            background: #FFF;
+            border-radius: 18px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.28);
+            border: 1px solid var(--border-color);
+        }
+        .agenda-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .agenda-modal-title {
+            color: var(--rio-blue);
+            font-size: 19px;
+            font-weight: 900;
+        }
+        .agenda-modal-subtitle {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .agenda-modal-close {
+            border: 0;
+            background: #F1F5F9;
+            color: #475569;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .agenda-modal-body { padding: 18px 20px 20px; }
+        .agenda-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .agenda-field { display: flex; flex-direction: column; gap: 6px; }
+        .agenda-field.full { grid-column: 1 / -1; }
+        .agenda-field label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #334155;
+        }
+        .agenda-field select,
+        .agenda-field input[type="time"] {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid #CBD5E1;
+            border-radius: 11px;
+            padding: 9px 11px;
+            background: #FFF;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+        .agenda-field select:focus,
+        .agenda-field input[type="time"]:focus {
+            border-color: var(--rio-light);
+            box-shadow: 0 0 0 3px rgba(0,74,141,0.08);
+        }
+        .agenda-notification-box {
+            grid-column: 1 / -1;
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .agenda-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .agenda-toggle-label strong { display: block; font-size: 13px; color: #334155; }
+        .agenda-toggle-label span { display: block; margin-top: 2px; font-size: 11px; color: var(--text-muted); }
+        .agenda-switch {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .agenda-switch input { opacity: 0; width: 0; height: 0; }
+        .agenda-slider {
+            position: absolute;
+            inset: 0;
+            background: #CBD5E1;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .agenda-slider:before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #FFF;
+            transition: .2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,.2);
+        }
+        .agenda-switch input:checked + .agenda-slider { background: var(--rio-light); }
+        .agenda-switch input:checked + .agenda-slider:before { transform: translateX(20px); }
+        .agenda-notification-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .agenda-warning {
+            grid-column: 1 / -1;
+            background: #FFF7ED;
+            border: 1px solid #FED7AA;
+            color: #9A3412;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .agenda-warning strong { color: #7C2D12; }
+        .agenda-change-box {
+            display: none;
+            grid-column: 1 / -1;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            color: #92400E;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .agenda-change-box.show { display: block; }
+        .agenda-provider-note {
+            grid-column: 1 / -1;
+            font-size: 11px;
+            line-height: 1.45;
+            color: var(--text-muted);
+            margin-top: -4px;
+        }
+        .agenda-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .agenda-primary-btn,
+        .agenda-secondary-btn,
+        .agenda-danger-btn {
+            border-radius: 22px;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            border: 1.5px solid var(--rio-blue);
+        }
+        .agenda-primary-btn { background: var(--rio-blue); color: #FFF; }
+        .agenda-primary-btn:disabled,
+        .agenda-danger-btn:disabled { opacity: .55; cursor: wait; }
+        .agenda-secondary-btn { background: #FFF; color: var(--rio-blue); }
+        .agenda-danger-btn {
+            background: #FFF;
+            color: #B91C1C;
+            border-color: #FCA5A5;
+        }
+        .agenda-danger-btn:hover {
+            background: #FEF2F2;
+            border-color: #EF4444;
+        }
+        .agenda-danger-btn[hidden] { display: none !important; }
+        .agenda-result {
+            display: none;
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            color: #065F46;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .agenda-result.show { display: block; }
+        .agenda-result.error {
+            background: #FEF2F2;
+            border-color: #FECACA;
+            color: #991B1B;
+        }
+
+        @media (max-width: 600px) {
+            .agenda-form-grid { grid-template-columns: 1fr; }
+            .agenda-field.full,
+            .agenda-notification-box,
+            .agenda-warning,
+            .agenda-change-box,
+            .agenda-provider-note { grid-column: 1; }
+            .agenda-notification-settings { grid-template-columns: 1fr; }
+            .agenda-modal-header { padding: 15px 15px 10px; }
+            .agenda-modal-body { padding: 15px; }
+            .agenda-actions { flex-direction: column-reverse; }
+            .agenda-primary-btn, .agenda-secondary-btn, .agenda-danger-btn { width: 100%; }
+            .agenda-status-pill { white-space: normal; text-align: center; }
+        }
+
     </style>
 </head>
 <body>
@@ -343,6 +598,11 @@
                 <select id="jump-year-select"></select>
                 <button class="btn-action" id="jump-submit-btn">Ir</button>
             </div>
+
+            <div class="agenda-controls">
+                <button class="btn-action" id="open-agenda-btn">📅 Minha agenda</button>
+                <span class="agenda-status-pill" id="agenda-status-pill"></span>
+            </div>
         </div>
 
         <div class="calendar-content">
@@ -363,6 +623,100 @@
         </footer>
     </div>
 
+
+
+    <!-- ========== MODAL: MINHA AGENDA ========== -->
+    <div class="agenda-modal-backdrop" id="agenda-modal-backdrop" aria-hidden="true">
+        <div class="agenda-modal" role="dialog" aria-modal="true" aria-labelledby="agenda-modal-title">
+            <div class="agenda-modal-header">
+                <div>
+                    <div class="agenda-modal-title" id="agenda-modal-title">📅 Minha agenda</div>
+                    <div class="agenda-modal-subtitle">
+                        Adicione a escala completa à sua agenda. Seus próprios plantões serão destacados.
+                    </div>
+                </div>
+                <button class="agenda-modal-close" id="agenda-modal-close" aria-label="Fechar">×</button>
+            </div>
+
+            <div class="agenda-modal-body">
+                <div class="agenda-form-grid">
+                    <div class="agenda-field">
+                        <label for="agenda-user-select">Quem é você?</label>
+                        <select id="agenda-user-select"></select>
+                    </div>
+
+                    <div class="agenda-field">
+                        <label for="agenda-period-select">Período</label>
+                        <select id="agenda-period-select">
+                            <option value="1">1 mês</option>
+                            <option value="3">3 meses</option>
+                            <option value="6">6 meses</option>
+                            <option value="12">1 ano</option>
+                        </select>
+                    </div>
+
+                    <div class="agenda-field full">
+                        <label for="agenda-provider-select">Adicionar em</label>
+                        <select id="agenda-provider-select">
+                            <option value="google">Google Agenda — sincronizar alterações</option>
+                            <option value="ics">Outlook / Apple / outras agendas — arquivo .ics</option>
+                        </select>
+                    </div>
+
+                    <div class="agenda-provider-note" id="agenda-provider-note">
+                        No Google Agenda, os eventos já existentes são localizados e atualizados sem duplicação.
+                    </div>
+
+                    <div class="agenda-notification-box">
+                        <div class="agenda-toggle-row">
+                            <div class="agenda-toggle-label">
+                                <strong>🔔 Notificação dos seus plantões</strong>
+                                <span>Os demais plantões continuam visíveis, mas não geram lembrete.</span>
+                            </div>
+                            <label class="agenda-switch">
+                                <input type="checkbox" id="agenda-notification-enabled" checked>
+                                <span class="agenda-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="agenda-notification-settings" id="agenda-notification-settings">
+                            <div class="agenda-field">
+                                <label for="agenda-reminder-days">Avisar</label>
+                                <select id="agenda-reminder-days">
+                                    <option value="0">No mesmo dia</option>
+                                    <option value="1" selected>1 dia antes</option>
+                                    <option value="2">2 dias antes</option>
+                                    <option value="3">3 dias antes</option>
+                                    <option value="7">7 dias antes</option>
+                                </select>
+                            </div>
+                            <div class="agenda-field">
+                                <label for="agenda-reminder-time">Horário</label>
+                                <input type="time" id="agenda-reminder-time" value="18:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agenda-change-box" id="agenda-change-box"></div>
+
+                    <div class="agenda-warning">
+                        <strong>⚠ Importante:</strong> a escala poderá sofrer alterações de acordo com as necessidades do supervisor.
+                        Consulte periodicamente esta página e use <strong>Sincronizar agenda</strong> sempre que houver alteração.
+                    </div>
+                </div>
+
+                <div class="agenda-actions">
+                    <button class="agenda-danger-btn" id="agenda-remove-btn" type="button">🗑️ Remover da agenda</button>
+                    <button class="agenda-secondary-btn" id="agenda-cancel-btn">Cancelar</button>
+                    <button class="agenda-primary-btn" id="agenda-sync-btn">📅 Adicionar à agenda</button>
+                </div>
+
+                <div class="agenda-result" id="agenda-result"></div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- ========== JAVASCRIPT (somente leitura) ========== -->
     <script type="module">
         // ========== CONFIGURAÇÃO FIREBASE ==========
@@ -379,6 +733,11 @@
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
         import {
+            getAuth,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        import {
             getFirestore,
             collection,
             doc,
@@ -388,6 +747,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         let notesCache = {};
 
@@ -690,9 +1050,588 @@
             buildCalendar();
         };
 
+
+
+        // ==================== INTEGRAÇÃO COM AGENDA ====================
+        const AGENDA_SOURCE = "escalaaberta-d968c";
+        const AGENDA_TZ = "America/Sao_Paulo";
+        const AGENDA_STORAGE_KEY = "escalaAgendaConfigV1";
+
+        const agendaModalBackdrop = document.getElementById("agenda-modal-backdrop");
+        const agendaUserSelect = document.getElementById("agenda-user-select");
+        const agendaPeriodSelect = document.getElementById("agenda-period-select");
+        const agendaProviderSelect = document.getElementById("agenda-provider-select");
+        const agendaNotificationEnabled = document.getElementById("agenda-notification-enabled");
+        const agendaNotificationSettings = document.getElementById("agenda-notification-settings");
+        const agendaReminderDays = document.getElementById("agenda-reminder-days");
+        const agendaReminderTime = document.getElementById("agenda-reminder-time");
+        const agendaProviderNote = document.getElementById("agenda-provider-note");
+        const agendaChangeBox = document.getElementById("agenda-change-box");
+        const agendaResult = document.getElementById("agenda-result");
+        const agendaSyncBtn = document.getElementById("agenda-sync-btn");
+        const agendaRemoveBtn = document.getElementById("agenda-remove-btn");
+        const agendaStatusPill = document.getElementById("agenda-status-pill");
+
+        function getStoredAgendaConfig() {
+            try {
+                return JSON.parse(localStorage.getItem(AGENDA_STORAGE_KEY) || "null");
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function setStoredAgendaConfig(data) {
+            localStorage.setItem(AGENDA_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function clearStoredAgendaConfig() {
+            localStorage.removeItem(AGENDA_STORAGE_KEY);
+        }
+
+        function collectStaffNames() {
+            const names = new Set();
+            (staffConfig.rotation || []).forEach(n => n && names.add(String(n)));
+            Object.values(staffConfig.excecoes || {}).forEach(list => {
+                if (Array.isArray(list)) list.forEach(n => n && names.add(String(n)));
+            });
+            Object.values(staffConfig.manual_overrides || {}).forEach(list => {
+                if (Array.isArray(list)) list.forEach(n => n && names.add(String(n)));
+            });
+            return [...names].sort((a, b) => a.localeCompare(b, "pt-BR"));
+        }
+
+        function populateAgendaUserSelect() {
+            const stored = getStoredAgendaConfig();
+            const names = collectStaffNames();
+            agendaUserSelect.innerHTML = "";
+            names.forEach(name => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                opt.textContent = name;
+                agendaUserSelect.appendChild(opt);
+            });
+            if (stored?.selectedUser && names.includes(stored.selectedUser)) {
+                agendaUserSelect.value = stored.selectedUser;
+            }
+            if (stored?.months && [1,3,6,12].includes(Number(stored.months))) {
+                agendaPeriodSelect.value = String(stored.months);
+            }
+        }
+
+        function pad2(v) { return String(v).padStart(2, "0"); }
+        function dateKeyFromParts(y, m, d) { return `${y}-${pad2(m + 1)}-${pad2(d)}`; }
+
+        function addMonthsStart(y, m, count) {
+            const dt = new Date(y, m + count, 1);
+            return { year: dt.getFullYear(), month: dt.getMonth() };
+        }
+
+        function getDutyEventsForPeriod(months, startYear = activeYear, startMonth = activeMonth) {
+            const result = [];
+            for (let step = 0; step < months; step++) {
+                const ref = addMonthsStart(startYear, startMonth, step);
+                const days = new Date(ref.year, ref.month + 1, 0).getDate();
+                for (let day = 1; day <= days; day++) {
+                    const { isDuty, activeWorkers } = getWorkersForDate(ref.year, ref.month, day);
+                    if (!isDuty || !activeWorkers.length) continue;
+                    const next = new Date(ref.year, ref.month, day + 1);
+                    result.push({
+                        key: dateKeyFromParts(ref.year, ref.month, day),
+                        year: ref.year,
+                        month: ref.month,
+                        day,
+                        workers: [...activeWorkers],
+                        start: `${ref.year}-${pad2(ref.month + 1)}-${pad2(day)}T19:00:00`,
+                        end: `${next.getFullYear()}-${pad2(next.getMonth() + 1)}-${pad2(next.getDate())}T07:00:00`
+                    });
+                }
+            }
+            return result;
+        }
+
+        function scheduleSnapshot(events) {
+            const out = {};
+            events.forEach(ev => { out[ev.key] = [...ev.workers].sort(); });
+            return out;
+        }
+
+        function snapshotsEqual(a, b) {
+            return JSON.stringify(a || {}) === JSON.stringify(b || {});
+        }
+
+        function buildSnapshotDiff(oldSnapshot = {}, newSnapshot = {}) {
+            const keys = [...new Set([...Object.keys(oldSnapshot), ...Object.keys(newSnapshot)])].sort();
+            return keys.filter(key => JSON.stringify(oldSnapshot[key] || []) !== JSON.stringify(newSnapshot[key] || []))
+                .map(key => ({ key, before: oldSnapshot[key] || [], after: newSnapshot[key] || [] }));
+        }
+
+        function updateLocalChangeStatus() {
+            const stored = getStoredAgendaConfig();
+            agendaStatusPill.className = "agenda-status-pill";
+            agendaStatusPill.textContent = "";
+            agendaChangeBox.classList.remove("show");
+            agendaChangeBox.textContent = "";
+
+            if (!stored?.snapshot || !stored?.startYear || stored?.startMonth === undefined || !stored?.months) {
+                return;
+            }
+
+            const currentEvents = getDutyEventsForPeriod(Number(stored.months), Number(stored.startYear), Number(stored.startMonth));
+            const currentSnapshot = scheduleSnapshot(currentEvents);
+            const changed = !snapshotsEqual(stored.snapshot, currentSnapshot);
+
+            if (changed) {
+                const diffs = buildSnapshotDiff(stored.snapshot, currentSnapshot);
+                const preview = diffs.slice(0, 5).map(item => {
+                    const [y, m, d] = item.key.split("-");
+                    const before = item.before.length ? item.before.join(" + ") : "sem plantão";
+                    const after = item.after.length ? item.after.join(" + ") : "sem plantão";
+                    return `<div style="margin-top:6px"><strong>${d}/${m}/${y}</strong>: ${escapeHtml(before)} → ${escapeHtml(after)}</div>`;
+                }).join("");
+                agendaStatusPill.classList.add("warning");
+                agendaStatusPill.textContent = `⚠ ${diffs.length} alteração(ões) — atualize sua agenda`;
+                agendaChangeBox.classList.add("show");
+                agendaChangeBox.innerHTML = `<strong>⚠ Alterações detectadas desde a última sincronização.</strong>${preview}${diffs.length > 5 ? `<div style="margin-top:6px">E mais ${diffs.length - 5} alteração(ões).</div>` : ""}`;
+            } else if (stored.lastSync) {
+                agendaStatusPill.classList.add("ok");
+                const when = new Date(stored.lastSync).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+                agendaStatusPill.textContent = `✓ Agenda verificada em ${when}`;
+            }
+        }
+
+        function setAgendaResult(message, isError = false) {
+            agendaResult.className = `agenda-result show${isError ? " error" : ""}`;
+            agendaResult.innerHTML = message;
+        }
+
+        function closeAgendaModal() {
+            agendaModalBackdrop.classList.remove("open");
+            agendaModalBackdrop.setAttribute("aria-hidden", "true");
+        }
+
+        function openAgendaModal() {
+            populateAgendaUserSelect();
+            updateLocalChangeStatus();
+            agendaResult.className = "agenda-result";
+            agendaResult.textContent = "";
+            updateAgendaActionLabel();
+            agendaModalBackdrop.classList.add("open");
+            agendaModalBackdrop.setAttribute("aria-hidden", "false");
+        }
+
+        function updateAgendaActionLabel() {
+            const stored = getStoredAgendaConfig();
+            const isKnown = Boolean(stored?.snapshot);
+            if (agendaProviderSelect.value === "google") {
+                agendaSyncBtn.textContent = isKnown && stored?.provider === "google" ? "🔄 Sincronizar Google Agenda" : "📅 Adicionar ao Google Agenda";
+                agendaRemoveBtn.hidden = false;
+                agendaProviderNote.textContent = "No Google Agenda, eventos deste sistema são identificados e podem ser criados, atualizados ou removidos sem duplicação. O botão Remover apaga somente eventos criados por esta página.";
+            } else {
+                agendaSyncBtn.textContent = isKnown && stored?.provider === "ics" ? "⬇ Gerar agenda atualizada (.ics)" : "⬇ Baixar agenda (.ics)";
+                agendaRemoveBtn.hidden = true;
+                agendaProviderNote.textContent = "O arquivo .ics funciona em Outlook, Apple Calendar e outras agendas. Depois da importação, a remoção deve ser feita no próprio aplicativo de agenda.";
+            }
+        }
+
+        function getReminderMinutes() {
+            if (!agendaNotificationEnabled.checked) return null;
+            const daysBefore = Number(agendaReminderDays.value);
+            const [hh, mm] = agendaReminderTime.value.split(":").map(Number);
+            const reminderPosition = (-daysBefore * 1440) + (hh * 60 + mm);
+            const eventStartPosition = 19 * 60;
+            const minutesBefore = eventStartPosition - reminderPosition;
+            if (!Number.isFinite(minutesBefore) || minutesBefore <= 0) {
+                throw new Error("O horário da notificação precisa ser anterior ao início do plantão (19:00)." );
+            }
+            return minutesBefore;
+        }
+
+        function makeEventDescription(ev, selectedUser) {
+            const mine = ev.workers.includes(selectedUser);
+            return [
+                "ESCALA DE PLANTÃO",
+                "",
+                `Equipe: ${ev.workers.join(" + ")}`,
+                "Horário: 19:00 às 07:00 do dia seguinte",
+                mine ? "" : null,
+                mine ? "⭐ Este é um dos seus dias de plantão." : null,
+                "",
+                "⚠ IMPORTANTE: a escala poderá sofrer alterações de acordo com as necessidades do supervisor.",
+                "Consulte periodicamente a escala oficial e mantenha sua agenda atualizada."
+            ].filter(v => v !== null).join("\n");
+        }
+
+        function makeGoogleEventBody(ev, selectedUser, reminderMinutes) {
+            const mine = ev.workers.includes(selectedUser);
+            return {
+                summary: `${mine ? "⭐ SEU PLANTÃO" : "Plantão"} — ${ev.workers.join(" + ")}`,
+                description: makeEventDescription(ev, selectedUser),
+                start: { dateTime: ev.start, timeZone: AGENDA_TZ },
+                end: { dateTime: ev.end, timeZone: AGENDA_TZ },
+                reminders: mine && reminderMinutes !== null
+                    ? { useDefault: false, overrides: [{ method: "popup", minutes: reminderMinutes }] }
+                    : { useDefault: false, overrides: [] },
+                extendedProperties: {
+                    private: {
+                        source: AGENDA_SOURCE,
+                        dateKey: ev.key,
+                        selectedUser: selectedUser
+                    }
+                }
+            };
+        }
+
+        function comparableGoogleEvent(obj) {
+            return JSON.stringify({
+                summary: obj?.summary || "",
+                description: obj?.description || "",
+                start: obj?.start?.dateTime || "",
+                end: obj?.end?.dateTime || "",
+                reminders: obj?.reminders || { useDefault: false, overrides: [] }
+            });
+        }
+
+        async function googleFetch(url, token, options = {}) {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                }
+            });
+            if (!response.ok) {
+                let detail = "";
+                try { detail = (await response.json())?.error?.message || ""; } catch (_) {}
+                const err = new Error(detail || `Erro Google Agenda (${response.status})`);
+                err.status = response.status;
+                throw err;
+            }
+            if (response.status === 204) return null;
+            return response.json();
+        }
+
+        async function getGoogleCalendarToken() {
+            const provider = new GoogleAuthProvider();
+            provider.addScope("https://www.googleapis.com/auth/calendar.events");
+            provider.setCustomParameters({ prompt: "consent" });
+            const result = await signInWithPopup(auth, provider);
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            if (!credential?.accessToken) throw new Error("Não foi possível obter autorização do Google Agenda.");
+            return credential.accessToken;
+        }
+
+        function periodBounds(months, startYear = activeYear, startMonth = activeMonth) {
+            const end = addMonthsStart(startYear, startMonth, months);
+            return {
+                timeMin: `${startYear}-${pad2(startMonth + 1)}-01T00:00:00-03:00`,
+                timeMax: `${end.year}-${pad2(end.month + 1)}-01T00:00:00-03:00`
+            };
+        }
+
+        async function listManagedGoogleEvents(token, months, startYear, startMonth) {
+            const { timeMin, timeMax } = periodBounds(months, startYear, startMonth);
+            const params = new URLSearchParams({
+                timeMin,
+                timeMax,
+                singleEvents: "true",
+                maxResults: "2500",
+                privateExtendedProperty: `source=${AGENDA_SOURCE}`
+            });
+            const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params.toString()}`;
+            const data = await googleFetch(url, token);
+            return data.items || [];
+        }
+
+        async function listAllManagedGoogleEvents(token) {
+            const all = [];
+            let pageToken = "";
+            do {
+                const params = new URLSearchParams({
+                    maxResults: "2500",
+                    privateExtendedProperty: `source=${AGENDA_SOURCE}`
+                });
+                if (pageToken) params.set("pageToken", pageToken);
+                const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params.toString()}`;
+                const data = await googleFetch(url, token);
+                all.push(...(data.items || []));
+                pageToken = data.nextPageToken || "";
+            } while (pageToken);
+            return all;
+        }
+
+        async function removeGoogleAgenda() {
+            const confirmed = window.confirm(
+                "Remover a escala da sua agenda?\n\n" +
+                "Serão removidos somente os eventos de plantão criados por esta página. " +
+                "Seus outros compromissos não serão alterados."
+            );
+            if (!confirmed) return;
+
+            setAgendaResult("Conectando ao Google Agenda e localizando os eventos da escala…");
+            const token = await getGoogleCalendarToken();
+            const existing = await listAllManagedGoogleEvents(token);
+
+            if (!existing.length) {
+                clearStoredAgendaConfig();
+                updateLocalChangeStatus();
+                updateAgendaActionLabel();
+                setAgendaResult("<strong>Nenhum evento da escala foi encontrado no Google Agenda.</strong><br>Seus outros compromissos permaneceram intactos.");
+                return;
+            }
+
+            let removed = 0;
+            for (const event of existing) {
+                if (!event?.id) continue;
+                await googleFetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(event.id)}`, token, { method: "DELETE" });
+                removed++;
+            }
+
+            clearStoredAgendaConfig();
+            updateLocalChangeStatus();
+            updateAgendaActionLabel();
+            setAgendaResult(
+                `<strong>✓ Escala removida da sua agenda.</strong><br>` +
+                `${removed} evento(s) de plantão removido(s).<br>` +
+                `Nenhum outro compromisso da sua agenda foi alterado.`
+            );
+        }
+
+        async function syncGoogleAgenda() {
+            const selectedUser = agendaUserSelect.value;
+            const months = Number(agendaPeriodSelect.value);
+            if (!selectedUser) throw new Error("Selecione o seu nome.");
+            const reminderMinutes = getReminderMinutes();
+            const targetEvents = getDutyEventsForPeriod(months, activeYear, activeMonth);
+            if (!targetEvents.length) throw new Error("Não há plantões no período selecionado.");
+
+            setAgendaResult("Conectando ao Google Agenda e verificando os eventos…");
+            const token = await getGoogleCalendarToken();
+            const existing = await listManagedGoogleEvents(token, months, activeYear, activeMonth);
+            const byDate = new Map();
+            existing.forEach(item => {
+                const k = item?.extendedProperties?.private?.dateKey;
+                if (k) byDate.set(k, item);
+            });
+
+            let created = 0, updated = 0, removed = 0, unchanged = 0;
+            const targetKeys = new Set(targetEvents.map(ev => ev.key));
+
+            for (const ev of targetEvents) {
+                const body = makeGoogleEventBody(ev, selectedUser, reminderMinutes);
+                const old = byDate.get(ev.key);
+                if (old) {
+                    if (comparableGoogleEvent(old) === comparableGoogleEvent(body)) {
+                        unchanged++;
+                    } else {
+                        await googleFetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(old.id)}`, token, {
+                            method: "PATCH",
+                            body: JSON.stringify(body)
+                        });
+                        updated++;
+                    }
+                } else {
+                    await googleFetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    });
+                    created++;
+                }
+            }
+
+            for (const old of existing) {
+                const k = old?.extendedProperties?.private?.dateKey;
+                if (k && !targetKeys.has(k)) {
+                    await googleFetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(old.id)}`, token, { method: "DELETE" });
+                    removed++;
+                }
+            }
+
+            const snapshot = scheduleSnapshot(targetEvents);
+            setStoredAgendaConfig({
+                selectedUser,
+                months,
+                startYear: activeYear,
+                startMonth: activeMonth,
+                provider: "google",
+                snapshot,
+                lastSync: new Date().toISOString()
+            });
+            updateLocalChangeStatus();
+
+            const hadChanges = updated > 0 || removed > 0;
+            setAgendaResult(
+                `<strong>✓ Google Agenda sincronizado.</strong><br>` +
+                `${created} criado(s) · ${updated} atualizado(s) · ${removed} removido(s) · ${unchanged} já estava(m) correto(s).` +
+                (hadChanges ? `<br><br><strong>⚠ A escala tinha alterações e sua agenda foi atualizada.</strong>` : "")
+            );
+            updateAgendaActionLabel();
+        }
+
+        function icsEscape(value) {
+            return String(value)
+                .replace(/\\/g, "\\\\")
+                .replace(/\n/g, "\\n")
+                .replace(/,/g, "\\,")
+                .replace(/;/g, "\\;");
+        }
+
+        function icsDateTime(dateTime) {
+            return dateTime.replace(/[-:]/g, "").replace("T", "T");
+        }
+
+        function foldIcsLine(line) {
+            const limit = 72;
+            if (line.length <= limit) return line;
+            const parts = [];
+            let rest = line;
+            while (rest.length > limit) {
+                parts.push(rest.slice(0, limit));
+                rest = " " + rest.slice(limit);
+            }
+            parts.push(rest);
+            return parts.join("\r\n");
+        }
+
+        function generateIcs(events, selectedUser, reminderMinutes) {
+            const now = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+            const lines = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Escala de Plantao//Felipe Souza//PT-BR",
+                "CALSCALE:GREGORIAN",
+                "METHOD:PUBLISH",
+                "X-WR-CALNAME:Escala de Plantão",
+                `X-WR-TIMEZONE:${AGENDA_TZ}`
+            ];
+
+            events.forEach(ev => {
+                const mine = ev.workers.includes(selectedUser);
+                lines.push("BEGIN:VEVENT");
+                lines.push(`UID:escala-${ev.key.replace(/-/g, "")}@${AGENDA_SOURCE}`);
+                lines.push(`DTSTAMP:${now}`);
+                lines.push(`DTSTART;TZID=${AGENDA_TZ}:${icsDateTime(ev.start)}`);
+                lines.push(`DTEND;TZID=${AGENDA_TZ}:${icsDateTime(ev.end)}`);
+                lines.push(`SUMMARY:${icsEscape(`${mine ? "⭐ SEU PLANTÃO" : "Plantão"} — ${ev.workers.join(" + ")}`)}`);
+                lines.push(`DESCRIPTION:${icsEscape(makeEventDescription(ev, selectedUser))}`);
+                lines.push(`X-ESCALA-SOURCE:${AGENDA_SOURCE}`);
+                lines.push(`X-ESCALA-DATE:${ev.key}`);
+                if (mine && reminderMinutes !== null) {
+                    lines.push("BEGIN:VALARM");
+                    lines.push(`TRIGGER:-PT${reminderMinutes}M`);
+                    lines.push("ACTION:DISPLAY");
+                    lines.push(`DESCRIPTION:${icsEscape("Lembrete do seu plantão")}`);
+                    lines.push("END:VALARM");
+                }
+                lines.push("END:VEVENT");
+            });
+            lines.push("END:VCALENDAR");
+            return lines.map(foldIcsLine).join("\r\n");
+        }
+
+        function downloadIcsAgenda() {
+            const selectedUser = agendaUserSelect.value;
+            const months = Number(agendaPeriodSelect.value);
+            if (!selectedUser) throw new Error("Selecione o seu nome.");
+            const reminderMinutes = getReminderMinutes();
+            const events = getDutyEventsForPeriod(months, activeYear, activeMonth);
+            if (!events.length) throw new Error("Não há plantões no período selecionado.");
+
+            const content = generateIcs(events, selectedUser, reminderMinutes);
+            const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `escala-plantao-${activeYear}-${pad2(activeMonth + 1)}-${months}m.ics`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+            setStoredAgendaConfig({
+                selectedUser,
+                months,
+                startYear: activeYear,
+                startMonth: activeMonth,
+                provider: "ics",
+                snapshot: scheduleSnapshot(events),
+                lastSync: new Date().toISOString()
+            });
+            updateLocalChangeStatus();
+            updateAgendaActionLabel();
+            setAgendaResult("<strong>✓ Arquivo .ics gerado.</strong><br>Importe-o na sua agenda. Se a escala mudar, volte aqui e gere uma versão atualizada.");
+        }
+
+        document.getElementById("open-agenda-btn").addEventListener("click", openAgendaModal);
+        document.getElementById("agenda-modal-close").addEventListener("click", closeAgendaModal);
+        document.getElementById("agenda-cancel-btn").addEventListener("click", closeAgendaModal);
+        agendaModalBackdrop.addEventListener("click", (e) => {
+            if (e.target === agendaModalBackdrop) closeAgendaModal();
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && agendaModalBackdrop.classList.contains("open")) closeAgendaModal();
+        });
+
+        agendaNotificationEnabled.addEventListener("change", () => {
+            agendaNotificationSettings.style.display = agendaNotificationEnabled.checked ? "grid" : "none";
+        });
+        agendaProviderSelect.addEventListener("change", updateAgendaActionLabel);
+        agendaUserSelect.addEventListener("change", updateAgendaActionLabel);
+        agendaPeriodSelect.addEventListener("change", updateAgendaActionLabel);
+
+        agendaRemoveBtn.addEventListener("click", async () => {
+            agendaRemoveBtn.disabled = true;
+            agendaSyncBtn.disabled = true;
+            agendaResult.className = "agenda-result";
+            try {
+                if (agendaProviderSelect.value !== "google") {
+                    throw new Error("A remoção automática está disponível somente para o Google Agenda.");
+                }
+                await removeGoogleAgenda();
+            } catch (error) {
+                console.error(error);
+                let extra = "";
+                if (String(error?.message || "").includes("auth/unauthorized-domain")) {
+                    extra = "<br><br>Adicione o domínio deste site em <strong>Firebase Authentication → Settings → Authorized domains</strong>.";
+                } else if (String(error?.message || "").toLowerCase().includes("calendar api") || error?.status === 403) {
+                    extra = "<br><br>Verifique se a <strong>Google Calendar API</strong> está habilitada no projeto Google Cloud/Firebase e se o consentimento OAuth permite o escopo de eventos do Calendar.";
+                }
+                setAgendaResult(`<strong>Não foi possível remover.</strong><br>${escapeHtml(error?.message || "Erro inesperado.")}${extra}`, true);
+            } finally {
+                agendaRemoveBtn.disabled = false;
+                agendaSyncBtn.disabled = false;
+            }
+        });
+
+        agendaSyncBtn.addEventListener("click", async () => {
+            agendaSyncBtn.disabled = true;
+            agendaResult.className = "agenda-result";
+            try {
+                if (agendaProviderSelect.value === "google") {
+                    await syncGoogleAgenda();
+                } else {
+                    downloadIcsAgenda();
+                }
+            } catch (error) {
+                console.error(error);
+                let extra = "";
+                if (String(error?.message || "").includes("auth/unauthorized-domain")) {
+                    extra = "<br><br>Adicione o domínio deste site em <strong>Firebase Authentication → Settings → Authorized domains</strong>.";
+                } else if (String(error?.message || "").toLowerCase().includes("calendar api") || error?.status === 403) {
+                    extra = "<br><br>Verifique se a <strong>Google Calendar API</strong> está habilitada no projeto Google Cloud/Firebase e se o consentimento OAuth permite o escopo de eventos do Calendar.";
+                }
+                setAgendaResult(`<strong>Não foi possível concluir.</strong><br>${escapeHtml(error?.message || "Erro inesperado.")}${extra}`, true);
+            } finally {
+                agendaSyncBtn.disabled = false;
+            }
+        });
+
+
         // ==================== INICIALIZAÇÃO ====================
         await loadStaffConfig();
         await loadNotesFromServer();
+        populateAgendaUserSelect();
+        updateLocalChangeStatus();
     </script>
 </body>
 </html>
