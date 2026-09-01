@@ -600,7 +600,7 @@
             </div>
 
             <div class="agenda-controls">
-                <button class="btn-action" id="open-agenda-btn">📅 Minha agenda</button>
+                <button class="btn-action" id="open-agenda-btn" title="Adicionar esta escala ao Google Agenda, Outlook ou Apple Calendar">📅 Adicionar escala à agenda</button>
                 <span class="agenda-status-pill" id="agenda-status-pill"></span>
             </div>
         </div>
@@ -630,9 +630,9 @@
         <div class="agenda-modal" role="dialog" aria-modal="true" aria-labelledby="agenda-modal-title">
             <div class="agenda-modal-header">
                 <div>
-                    <div class="agenda-modal-title" id="agenda-modal-title">📅 Minha agenda</div>
+                    <div class="agenda-modal-title" id="agenda-modal-title">📅 Adicionar escala à sua agenda</div>
                     <div class="agenda-modal-subtitle">
-                        Adicione a escala completa à sua agenda. Seus próprios plantões serão destacados.
+                        A escala completa será adicionada à agenda que você escolher. No Google Agenda, seus plantões ficam destacados e podem ser sincronizados quando houver alterações.
                     </div>
                 </div>
                 <button class="agenda-modal-close" id="agenda-modal-close" aria-label="Fechar">×</button>
@@ -656,9 +656,9 @@
                     </div>
 
                     <div class="agenda-field full">
-                        <label for="agenda-provider-select">Adicionar em</label>
+                        <label for="agenda-provider-select">Onde deseja adicionar a escala?</label>
                         <select id="agenda-provider-select">
-                            <option value="google">Google Agenda — sincronizar alterações</option>
+                            <option value="google">Google Agenda — adicionar e sincronizar alterações</option>
                             <option value="ics">Outlook / Apple / outras agendas — arquivo .ics</option>
                         </select>
                     </div>
@@ -829,6 +829,32 @@
                 .replace(/'/g, "&#039;");
         }
 
+        // Trata nomes ignorando diferenças de maiúsculas/minúsculas.
+        // Ex.: "Nicolas" e "NICOLAS" são considerados a mesma pessoa.
+        function normalizePersonName(name) {
+            return String(name ?? "").trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
+        }
+
+        function samePersonName(a, b) {
+            return normalizePersonName(a) === normalizePersonName(b);
+        }
+
+        function uniquePersonNames(list) {
+            const map = new Map();
+            (list || []).forEach(rawName => {
+                const name = String(rawName ?? "").trim().replace(/\s+/g, " ");
+                if (!name) return;
+                const key = normalizePersonName(name);
+                const current = map.get(key);
+                // Quando há duas grafias equivalentes, prefere a versão em maiúsculas
+                // para manter o padrão já utilizado na escala.
+                if (!current || name === name.toLocaleUpperCase("pt-BR")) {
+                    map.set(key, name);
+                }
+            });
+            return [...map.values()];
+        }
+
         // ===== LÓGICA DO RODÍZIO =====
         function getWorkersForDate(year, month, day) {
             const key = noteKey(year, month, day);
@@ -896,7 +922,7 @@
                 activeWorkers.push(...excecaoNomes);
             }
 
-            activeWorkers = [...new Set(activeWorkers)];
+            activeWorkers = uniquePersonNames(activeWorkers);
             return { isDuty, activeWorkers };
         }
 
@@ -1089,15 +1115,15 @@
         }
 
         function collectStaffNames() {
-            const names = new Set();
-            (staffConfig.rotation || []).forEach(n => n && names.add(String(n)));
+            const allNames = [];
+            (staffConfig.rotation || []).forEach(n => n && allNames.push(String(n)));
             Object.values(staffConfig.excecoes || {}).forEach(list => {
-                if (Array.isArray(list)) list.forEach(n => n && names.add(String(n)));
+                if (Array.isArray(list)) list.forEach(n => n && allNames.push(String(n)));
             });
             Object.values(staffConfig.manual_overrides || {}).forEach(list => {
-                if (Array.isArray(list)) list.forEach(n => n && names.add(String(n)));
+                if (Array.isArray(list)) list.forEach(n => n && allNames.push(String(n)));
             });
-            return [...names].sort((a, b) => a.localeCompare(b, "pt-BR"));
+            return uniquePersonNames(allNames).sort((a, b) => a.localeCompare(b, "pt-BR", { sensitivity: "base" }));
         }
 
         function populateAgendaUserSelect() {
@@ -1110,8 +1136,9 @@
                 opt.textContent = name;
                 agendaUserSelect.appendChild(opt);
             });
-            if (stored?.selectedUser && names.includes(stored.selectedUser)) {
-                agendaUserSelect.value = stored.selectedUser;
+            if (stored?.selectedUser) {
+                const storedMatch = names.find(name => samePersonName(name, stored.selectedUser));
+                if (storedMatch) agendaUserSelect.value = storedMatch;
             }
             if (stored?.months && [1,3,6,12].includes(Number(stored.months))) {
                 agendaPeriodSelect.value = String(stored.months);
@@ -1223,9 +1250,9 @@
             const stored = getStoredAgendaConfig();
             const isKnown = Boolean(stored?.snapshot);
             if (agendaProviderSelect.value === "google") {
-                agendaSyncBtn.textContent = isKnown && stored?.provider === "google" ? "🔄 Sincronizar Google Agenda" : "📅 Adicionar ao Google Agenda";
+                agendaSyncBtn.textContent = isKnown && stored?.provider === "google" ? "🔄 Atualizar escala no Google Agenda" : "📅 Adicionar escala ao Google Agenda";
                 agendaRemoveBtn.hidden = false;
-                agendaProviderNote.textContent = "No Google Agenda, eventos deste sistema são identificados e podem ser criados, atualizados ou removidos sem duplicação. O botão Remover apaga somente eventos criados por esta página.";
+                agendaProviderNote.textContent = "Ao continuar, esta escala será adicionada ao seu Google Agenda. Se você já tiver adicionado antes, o sistema atualiza as alterações sem duplicar eventos. O botão Remover apaga somente os eventos criados por esta página.";
             } else {
                 agendaSyncBtn.textContent = isKnown && stored?.provider === "ics" ? "⬇ Gerar agenda atualizada (.ics)" : "⬇ Baixar agenda (.ics)";
                 agendaRemoveBtn.hidden = true;
@@ -1247,7 +1274,7 @@
         }
 
         function makeEventDescription(ev, selectedUser) {
-            const mine = ev.workers.includes(selectedUser);
+            const mine = ev.workers.some(worker => samePersonName(worker, selectedUser));
             return [
                 "ESCALA DE PLANTÃO",
                 "",
@@ -1262,7 +1289,7 @@
         }
 
         function makeGoogleEventBody(ev, selectedUser, reminderMinutes) {
-            const mine = ev.workers.includes(selectedUser);
+            const mine = ev.workers.some(worker => samePersonName(worker, selectedUser));
             return {
                 summary: `${mine ? "⭐ SEU PLANTÃO" : "Plantão"} — ${ev.workers.join(" + ")}`,
                 description: makeEventDescription(ev, selectedUser),
@@ -1506,7 +1533,7 @@
             ];
 
             events.forEach(ev => {
-                const mine = ev.workers.includes(selectedUser);
+                const mine = ev.workers.some(worker => samePersonName(worker, selectedUser));
                 lines.push("BEGIN:VEVENT");
                 lines.push(`UID:escala-${ev.key.replace(/-/g, "")}@${AGENDA_SOURCE}`);
                 lines.push(`DTSTAMP:${now}`);
