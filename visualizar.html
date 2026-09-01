@@ -503,6 +503,17 @@
             color: var(--text-muted);
             margin-top: -4px;
         }
+        .agenda-google-login-info {
+            grid-column: 1 / -1;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: #1E3A8A;
+            border-radius: 12px;
+            padding: 11px 12px;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .agenda-google-login-info strong { color: #172554; }
         .agenda-actions {
             display: flex;
             justify-content: flex-end;
@@ -665,6 +676,10 @@
 
                     <div class="agenda-provider-note" id="agenda-provider-note">
                         No Google Agenda, os eventos já existentes são localizados e atualizados sem duplicação.
+                    </div>
+
+                    <div class="agenda-google-login-info" id="agenda-google-login-info">
+                        <strong>🔐 Como funciona:</strong> você não precisa digitar seu e-mail nesta página. Ao clicar no botão abaixo, o Google abrirá a tela oficial para você <strong>escolher a sua conta Google</strong> e autorizar o acesso à agenda.
                     </div>
 
                     <div class="agenda-notification-box">
@@ -1094,6 +1109,7 @@
         const agendaProviderNote = document.getElementById("agenda-provider-note");
         const agendaChangeBox = document.getElementById("agenda-change-box");
         const agendaResult = document.getElementById("agenda-result");
+        const agendaGoogleLoginInfo = document.getElementById("agenda-google-login-info");
         const agendaSyncBtn = document.getElementById("agenda-sync-btn");
         const agendaRemoveBtn = document.getElementById("agenda-remove-btn");
         const agendaStatusPill = document.getElementById("agenda-status-pill");
@@ -1250,12 +1266,14 @@
             const stored = getStoredAgendaConfig();
             const isKnown = Boolean(stored?.snapshot);
             if (agendaProviderSelect.value === "google") {
-                agendaSyncBtn.textContent = isKnown && stored?.provider === "google" ? "🔄 Atualizar escala no Google Agenda" : "📅 Adicionar escala ao Google Agenda";
+                agendaSyncBtn.textContent = isKnown && stored?.provider === "google" ? "🔐 Conectar ao Google e atualizar escala" : "🔐 Conectar ao Google e adicionar escala";
                 agendaRemoveBtn.hidden = false;
-                agendaProviderNote.textContent = "Ao continuar, esta escala será adicionada ao seu Google Agenda. Se você já tiver adicionado antes, o sistema atualiza as alterações sem duplicar eventos. O botão Remover apaga somente os eventos criados por esta página.";
+                agendaGoogleLoginInfo.style.display = "block";
+                agendaProviderNote.textContent = "A escala será gravada na conta Google que você escolher na janela oficial do Google. Se já existir, o sistema atualiza sem duplicar eventos.";
             } else {
                 agendaSyncBtn.textContent = isKnown && stored?.provider === "ics" ? "⬇ Gerar agenda atualizada (.ics)" : "⬇ Baixar agenda (.ics)";
                 agendaRemoveBtn.hidden = true;
+                agendaGoogleLoginInfo.style.display = "none";
                 agendaProviderNote.textContent = "O arquivo .ics funciona em Outlook, Apple Calendar e outras agendas. Depois da importação, a remoção deve ser feita no próprio aplicativo de agenda.";
             }
         }
@@ -1341,11 +1359,19 @@
         async function getGoogleCalendarToken() {
             const provider = new GoogleAuthProvider();
             provider.addScope("https://www.googleapis.com/auth/calendar.events");
-            provider.setCustomParameters({ prompt: "consent" });
+            // Sempre deixa explícito qual conta Google receberá a escala.
+            provider.setCustomParameters({ prompt: "select_account consent" });
+
+            setAgendaResult("<strong>🔐 Abrindo o Google…</strong><br>Escolha a conta Google em que deseja adicionar a escala e autorize o acesso à agenda.");
+
             const result = await signInWithPopup(auth, provider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             if (!credential?.accessToken) throw new Error("Não foi possível obter autorização do Google Agenda.");
-            return credential.accessToken;
+
+            const email = result?.user?.email || "conta Google selecionada";
+            setAgendaResult(`<strong>✓ Conta Google conectada:</strong> ${escapeHtml(email)}<br>Agora estou sincronizando os eventos da escala…`);
+
+            return { token: credential.accessToken, email };
         }
 
         function periodBounds(months, startYear = activeYear, startMonth = activeMonth) {
@@ -1396,7 +1422,8 @@
             if (!confirmed) return;
 
             setAgendaResult("Conectando ao Google Agenda e localizando os eventos da escala…");
-            const token = await getGoogleCalendarToken();
+            const googleAuth = await getGoogleCalendarToken();
+            const token = googleAuth.token;
             const existing = await listAllManagedGoogleEvents(token);
 
             if (!existing.length) {
@@ -1419,6 +1446,7 @@
             updateAgendaActionLabel();
             setAgendaResult(
                 `<strong>✓ Escala removida da sua agenda.</strong><br>` +
+                `Conta: <strong>${escapeHtml(googleAuth.email)}</strong><br>` +
                 `${removed} evento(s) de plantão removido(s).<br>` +
                 `Nenhum outro compromisso da sua agenda foi alterado.`
             );
@@ -1433,7 +1461,8 @@
             if (!targetEvents.length) throw new Error("Não há plantões no período selecionado.");
 
             setAgendaResult("Conectando ao Google Agenda e verificando os eventos…");
-            const token = await getGoogleCalendarToken();
+            const googleAuth = await getGoogleCalendarToken();
+            const token = googleAuth.token;
             const existing = await listManagedGoogleEvents(token, months, activeYear, activeMonth);
             const byDate = new Map();
             existing.forEach(item => {
@@ -1489,6 +1518,7 @@
             const hadChanges = updated > 0 || removed > 0;
             setAgendaResult(
                 `<strong>✓ Google Agenda sincronizado.</strong><br>` +
+                `Conta: <strong>${escapeHtml(googleAuth.email)}</strong><br>` +
                 `${created} criado(s) · ${updated} atualizado(s) · ${removed} removido(s) · ${unchanged} já estava(m) correto(s).` +
                 (hadChanges ? `<br><br><strong>⚠ A escala tinha alterações e sua agenda foi atualizada.</strong>` : "")
             );
@@ -1618,10 +1648,18 @@
             } catch (error) {
                 console.error(error);
                 let extra = "";
-                if (String(error?.message || "").includes("auth/unauthorized-domain")) {
-                    extra = "<br><br>Adicione o domínio deste site em <strong>Firebase Authentication → Settings → Authorized domains</strong>.";
-                } else if (String(error?.message || "").toLowerCase().includes("calendar api") || error?.status === 403) {
-                    extra = "<br><br>Verifique se a <strong>Google Calendar API</strong> está habilitada no projeto Google Cloud/Firebase e se o consentimento OAuth permite o escopo de eventos do Calendar.";
+                const code = String(error?.code || "");
+                const msg = String(error?.message || "");
+                if (code.includes("auth/unauthorized-domain") || msg.includes("auth/unauthorized-domain")) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> adicione <code>flpsouzza.github.io</code> em Firebase Authentication → Settings → Authorized domains.";
+                } else if (code.includes("auth/operation-not-allowed") || msg.includes("auth/operation-not-allowed")) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> habilite o provedor <strong>Google</strong> em Firebase Authentication → Sign-in method.";
+                } else if (code.includes("auth/popup-blocked") || msg.includes("auth/popup-blocked")) {
+                    extra = "<br><br>O navegador bloqueou a janela do Google. Libere pop-ups para este site e tente novamente.";
+                } else if (code.includes("auth/popup-closed-by-user") || msg.includes("auth/popup-closed-by-user")) {
+                    extra = "<br><br>A janela do Google foi fechada antes da autorização. Clique novamente para escolher sua conta.";
+                } else if (msg.toLowerCase().includes("calendar api") || error?.status === 403) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> verifique se a <strong>Google Calendar API</strong> está habilitada no Google Cloud e se a tela de consentimento OAuth permite o escopo de eventos do Calendar.";
                 }
                 setAgendaResult(`<strong>Não foi possível remover.</strong><br>${escapeHtml(error?.message || "Erro inesperado.")}${extra}`, true);
             } finally {
@@ -1642,10 +1680,18 @@
             } catch (error) {
                 console.error(error);
                 let extra = "";
-                if (String(error?.message || "").includes("auth/unauthorized-domain")) {
-                    extra = "<br><br>Adicione o domínio deste site em <strong>Firebase Authentication → Settings → Authorized domains</strong>.";
-                } else if (String(error?.message || "").toLowerCase().includes("calendar api") || error?.status === 403) {
-                    extra = "<br><br>Verifique se a <strong>Google Calendar API</strong> está habilitada no projeto Google Cloud/Firebase e se o consentimento OAuth permite o escopo de eventos do Calendar.";
+                const code = String(error?.code || "");
+                const msg = String(error?.message || "");
+                if (code.includes("auth/unauthorized-domain") || msg.includes("auth/unauthorized-domain")) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> adicione <code>flpsouzza.github.io</code> em Firebase Authentication → Settings → Authorized domains.";
+                } else if (code.includes("auth/operation-not-allowed") || msg.includes("auth/operation-not-allowed")) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> habilite o provedor <strong>Google</strong> em Firebase Authentication → Sign-in method.";
+                } else if (code.includes("auth/popup-blocked") || msg.includes("auth/popup-blocked")) {
+                    extra = "<br><br>O navegador bloqueou a janela do Google. Libere pop-ups para este site e tente novamente.";
+                } else if (code.includes("auth/popup-closed-by-user") || msg.includes("auth/popup-closed-by-user")) {
+                    extra = "<br><br>A janela do Google foi fechada antes da autorização. Clique novamente para escolher sua conta.";
+                } else if (msg.toLowerCase().includes("calendar api") || error?.status === 403) {
+                    extra = "<br><br><strong>Configuração necessária:</strong> verifique se a <strong>Google Calendar API</strong> está habilitada no Google Cloud e se a tela de consentimento OAuth permite o escopo de eventos do Calendar.";
                 }
                 setAgendaResult(`<strong>Não foi possível concluir.</strong><br>${escapeHtml(error?.message || "Erro inesperado.")}${extra}`, true);
             } finally {
