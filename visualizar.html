@@ -750,7 +750,9 @@
         import {
             getAuth,
             GoogleAuthProvider,
-            signInWithPopup
+            signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult
         } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
         import {
             getFirestore,
@@ -1097,6 +1099,7 @@
         const AGENDA_SOURCE = "escalaaberta-d968c";
         const AGENDA_TZ = "America/Sao_Paulo";
         const AGENDA_STORAGE_KEY = "escalaAgendaConfigV1";
+        const AGENDA_PENDING_GOOGLE_KEY = "escalaAgendaPendingGoogleV2";
 
         const agendaModalBackdrop = document.getElementById("agenda-modal-backdrop");
         const agendaUserSelect = document.getElementById("agenda-user-select");
@@ -1128,6 +1131,60 @@
 
         function clearStoredAgendaConfig() {
             localStorage.removeItem(AGENDA_STORAGE_KEY);
+        }
+
+        function isMobileDevice() {
+            const ua = navigator.userAgent || "";
+            return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || window.matchMedia?.("(max-width: 768px)").matches;
+        }
+
+        function isLikelyInAppBrowser() {
+            const ua = navigator.userAgent || "";
+            return /FBAN|FBAV|Instagram|Line\/|WhatsApp|wv\)|; wv|WebView/i.test(ua);
+        }
+
+        function savePendingGoogleAction(action) {
+            const pending = {
+                action,
+                selectedUser: agendaUserSelect.value,
+                months: Number(agendaPeriodSelect.value),
+                startYear: activeYear,
+                startMonth: activeMonth,
+                notificationEnabled: Boolean(agendaNotificationEnabled.checked),
+                reminderDays: Number(agendaReminderDays.value),
+                reminderTime: agendaReminderTime.value || "18:00",
+                savedAt: Date.now()
+            };
+            localStorage.setItem(AGENDA_PENDING_GOOGLE_KEY, JSON.stringify(pending));
+            return pending;
+        }
+
+        function getPendingGoogleAction() {
+            try {
+                const data = JSON.parse(localStorage.getItem(AGENDA_PENDING_GOOGLE_KEY) || "null");
+                if (!data) return null;
+                // Descarta tentativas antigas depois de 30 minutos.
+                if (!data.savedAt || Date.now() - data.savedAt > 30 * 60 * 1000) {
+                    localStorage.removeItem(AGENDA_PENDING_GOOGLE_KEY);
+                    return null;
+                }
+                return data;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function clearPendingGoogleAction() {
+            localStorage.removeItem(AGENDA_PENDING_GOOGLE_KEY);
+        }
+
+        function reminderMinutesFromPending(pending) {
+            if (!pending?.notificationEnabled) return null;
+            const daysBefore = Math.max(0, Number(pending.reminderDays) || 0);
+            const [hh, mm] = String(pending.reminderTime || "18:00").split(":").map(Number);
+            // O plantão começa às 19h. Calcula quantos minutos antes fica o horário escolhido.
+            const reminderDateMinutes = daysBefore * 24 * 60 + (19 * 60 - ((hh || 0) * 60 + (mm || 0)));
+            return Math.max(0, reminderDateMinutes);
         }
 
         function collectStaffNames() {
@@ -1356,22 +1413,42 @@
             return response.json();
         }
 
-        async function getGoogleCalendarToken() {
+        function buildGoogleProvider() {
             const provider = new GoogleAuthProvider();
             provider.addScope("https://www.googleapis.com/auth/calendar.events");
             // Sempre deixa explícito qual conta Google receberá a escala.
             provider.setCustomParameters({ prompt: "select_account consent" });
+            return provider;
+        }
 
-            setAgendaResult("<strong>🔐 Abrindo o Google…</strong><br>Escolha a conta Google em que deseja adicionar a escala e autorize o acesso à agenda.");
-
-            const result = await signInWithPopup(auth, provider);
+        function googleAuthFromResult(result) {
+            if (!result) return null;
             const credential = GoogleAuthProvider.credentialFromResult(result);
             if (!credential?.accessToken) throw new Error("Não foi possível obter autorização do Google Agenda.");
-
             const email = result?.user?.email || "conta Google selecionada";
-            setAgendaResult(`<strong>✓ Conta Google conectada:</strong> ${escapeHtml(email)}<br>Agora estou sincronizando os eventos da escala…`);
-
             return { token: credential.accessToken, email };
+        }
+
+        async function getGoogleCalendarToken(action = "sync") {
+            const provider = buildGoogleProvider();
+
+            if (isLikelyInAppBrowser()) {
+                throw new Error("O login do Google pode ser bloqueado dentro do navegador do WhatsApp/Instagram/Facebook. Abra esta página diretamente no Chrome ou Safari e tente novamente.");
+            }
+
+            // No celular, o próprio Firebase recomenda redirecionamento em vez de popup.
+            if (isMobileDevice()) {
+                savePendingGoogleAction(action);
+                setAgendaResult("<strong>🔐 Indo para o Google…</strong><br>Você será levado à tela oficial do Google para escolher sua conta. Depois da autorização, voltará automaticamente para esta página e a escala será adicionada.");
+                await signInWithRedirect(auth, provider);
+                return null; // A página será redirecionada; a operação continua no retorno.
+            }
+
+            setAgendaResult("<strong>🔐 Abrindo o Google…</strong><br>Escolha a conta Google em que deseja adicionar a escala e autorize o acesso à agenda.");
+            const result = await signInWithPopup(auth, provider);
+            const authData = googleAuthFromResult(result);
+            setAgendaResult(`<strong>✓ Conta Google conectada:</strong> ${escapeHtml(authData.email)}<br>Agora estou sincronizando os eventos da escala…`);
+            return authData;
         }
 
         function periodBounds(months, startYear = activeYear, startMonth = activeMonth) {
@@ -1413,21 +1490,25 @@
             return all;
         }
 
-        async function removeGoogleAgenda() {
-            const confirmed = window.confirm(
-                "Remover a escala da sua agenda?\n\n" +
-                "Serão removidos somente os eventos de plantão criados por esta página. " +
-                "Seus outros compromissos não serão alterados."
-            );
-            if (!confirmed) return;
+        async function removeGoogleAgenda(googleAuthOverride = null, skipConfirm = false) {
+            if (!skipConfirm) {
+                const confirmed = window.confirm(
+                    "Remover a escala da sua agenda?\n\n" +
+                    "Serão removidos somente os eventos de plantão criados por esta página. " +
+                    "Seus outros compromissos não serão alterados."
+                );
+                if (!confirmed) return;
+            }
 
             setAgendaResult("Conectando ao Google Agenda e localizando os eventos da escala…");
-            const googleAuth = await getGoogleCalendarToken();
+            const googleAuth = googleAuthOverride || await getGoogleCalendarToken("remove");
+            if (!googleAuth) return; // fluxo mobile continua após o redirecionamento
             const token = googleAuth.token;
             const existing = await listAllManagedGoogleEvents(token);
 
             if (!existing.length) {
                 clearStoredAgendaConfig();
+                clearPendingGoogleAction();
                 updateLocalChangeStatus();
                 updateAgendaActionLabel();
                 setAgendaResult("<strong>Nenhum evento da escala foi encontrado no Google Agenda.</strong><br>Seus outros compromissos permaneceram intactos.");
@@ -1442,6 +1523,7 @@
             }
 
             clearStoredAgendaConfig();
+            clearPendingGoogleAction();
             updateLocalChangeStatus();
             updateAgendaActionLabel();
             setAgendaResult(
@@ -1452,18 +1534,21 @@
             );
         }
 
-        async function syncGoogleAgenda() {
-            const selectedUser = agendaUserSelect.value;
-            const months = Number(agendaPeriodSelect.value);
+        async function syncGoogleAgenda(googleAuthOverride = null, pendingOverride = null) {
+            const selectedUser = pendingOverride?.selectedUser || agendaUserSelect.value;
+            const months = Number(pendingOverride?.months || agendaPeriodSelect.value);
+            const startYear = Number(pendingOverride?.startYear ?? activeYear);
+            const startMonth = Number(pendingOverride?.startMonth ?? activeMonth);
             if (!selectedUser) throw new Error("Selecione o seu nome.");
-            const reminderMinutes = getReminderMinutes();
-            const targetEvents = getDutyEventsForPeriod(months, activeYear, activeMonth);
+            const reminderMinutes = pendingOverride ? reminderMinutesFromPending(pendingOverride) : getReminderMinutes();
+            const targetEvents = getDutyEventsForPeriod(months, startYear, startMonth);
             if (!targetEvents.length) throw new Error("Não há plantões no período selecionado.");
 
             setAgendaResult("Conectando ao Google Agenda e verificando os eventos…");
-            const googleAuth = await getGoogleCalendarToken();
+            const googleAuth = googleAuthOverride || await getGoogleCalendarToken("sync");
+            if (!googleAuth) return; // fluxo mobile continua após o redirecionamento
             const token = googleAuth.token;
-            const existing = await listManagedGoogleEvents(token, months, activeYear, activeMonth);
+            const existing = await listManagedGoogleEvents(token, months, startYear, startMonth);
             const byDate = new Map();
             existing.forEach(item => {
                 const k = item?.extendedProperties?.private?.dateKey;
@@ -1507,12 +1592,13 @@
             setStoredAgendaConfig({
                 selectedUser,
                 months,
-                startYear: activeYear,
-                startMonth: activeMonth,
+                startYear,
+                startMonth,
                 provider: "google",
                 snapshot,
                 lastSync: new Date().toISOString()
             });
+            clearPendingGoogleAction();
             updateLocalChangeStatus();
 
             const hadChanges = updated > 0 || removed > 0;
@@ -1700,9 +1786,67 @@
         });
 
 
+        async function resumeGoogleActionAfterRedirect() {
+            const pending = getPendingGoogleAction();
+            try {
+                const result = await getRedirectResult(auth);
+                if (!result) {
+                    if (pending && isMobileDevice()) {
+                        // Se houve uma tentativa recente mas o Firebase não conseguiu recuperar
+                        // o retorno, deixa uma mensagem clara em vez de falhar silenciosamente.
+                        openAgendaModal();
+                        setAgendaResult(
+                            "<strong>⚠ O Google retornou para a página, mas a autorização não pôde ser recuperada.</strong><br>" +
+                            "Isso costuma acontecer quando o site é aberto dentro do navegador do WhatsApp/Instagram ou quando o domínio de autenticação do Firebase não está configurado para este site.<br><br>" +
+                            "Abra <strong>flpsouzza.github.io</strong> diretamente no Chrome/Safari. Se já estiver no Chrome, será necessário ajustar a configuração OAuth/Firebase do domínio.",
+                            true
+                        );
+                    }
+                    return;
+                }
+
+                const googleAuth = googleAuthFromResult(result);
+                await loadStaffConfig();
+                await loadNotesFromServer();
+                openAgendaModal();
+
+                if (pending?.selectedUser) {
+                    const names = [...agendaUserSelect.options].map(o => o.value);
+                    const match = names.find(n => samePersonName(n, pending.selectedUser));
+                    if (match) agendaUserSelect.value = match;
+                }
+                if (pending?.months) agendaPeriodSelect.value = String(pending.months);
+                if (pending?.notificationEnabled !== undefined) agendaNotificationEnabled.checked = Boolean(pending.notificationEnabled);
+                if (pending?.reminderDays !== undefined) agendaReminderDays.value = String(pending.reminderDays);
+                if (pending?.reminderTime) agendaReminderTime.value = pending.reminderTime;
+                agendaNotificationSettings.style.display = agendaNotificationEnabled.checked ? "grid" : "none";
+
+                setAgendaResult(`<strong>✓ Conta Google conectada:</strong> ${escapeHtml(googleAuth.email)}<br>Concluindo a operação na sua agenda…`);
+
+                if (pending?.action === "remove") {
+                    await removeGoogleAgenda(googleAuth, true);
+                } else {
+                    await syncGoogleAgenda(googleAuth, pending);
+                }
+            } catch (error) {
+                console.error("Erro no retorno do Google:", error);
+                openAgendaModal();
+                const code = String(error?.code || "");
+                const msg = String(error?.message || "Erro inesperado.");
+                let extra = "";
+                if (code.includes("auth/unauthorized-domain")) {
+                    extra = "<br><br>Adicione <code>flpsouzza.github.io</code> em Firebase Authentication → Settings → Authorized domains.";
+                } else if (code.includes("auth/web-storage-unsupported")) {
+                    extra = "<br><br>Abra a página diretamente no Chrome/Safari e permita cookies/armazenamento do site.";
+                }
+                setAgendaResult(`<strong>Não foi possível concluir o login do Google.</strong><br>${escapeHtml(msg)}${extra}`, true);
+            }
+        }
+
         // ==================== INICIALIZAÇÃO ====================
         await loadStaffConfig();
         await loadNotesFromServer();
+        await resumeGoogleActionAfterRedirect();
         populateAgendaUserSelect();
         updateLocalChangeStatus();
     </script>
